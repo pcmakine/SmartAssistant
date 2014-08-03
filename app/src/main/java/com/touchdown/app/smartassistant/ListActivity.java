@@ -1,5 +1,6 @@
 package com.touchdown.app.smartassistant;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 
@@ -30,11 +32,11 @@ public class ListActivity extends ActionBarActivity {
                 "Android Example List View"
         };
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, values);
+/*        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_1, android.R.id.text1, values);*/
 
         // Assign adapter to ListView
-        listView.setAdapter(adapter);
+        //listView.setAdapter(adapter);
 
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -57,6 +59,11 @@ public class ListActivity extends ActionBarActivity {
             }
 
         });
+    }
+
+    public void viewMap(View view){
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
     }
 
 

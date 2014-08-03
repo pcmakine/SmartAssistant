@@ -66,7 +66,6 @@ public class TestDb extends AndroidTestCase {
             fail("No values for reminder returned");
         }
 
-
         vals.clear();
         vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, testLat);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, testLong);
