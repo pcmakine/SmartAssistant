@@ -6,20 +6,23 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 
-import com.touchdown.app.smartassistant.data.Dao;
 import com.touchdown.app.smartassistant.data.DbContract;
 
 /**
  * Created by Pete on 3.8.2014.
  */
-public class ReminderDao implements Dao {
+public class ReminderDao {
 
     private String content;
     private long id;
     private LocationDao location;
 
-    //this constructor should only be used to use getall, getone and remove methods
-    public ReminderDao(){
+    public String getContent() {
+        return content;
+    }
+
+    public LocationDao getLocation() {
+        return location;
     }
 
     public ReminderDao(long id, String content, LocationDao location){
@@ -45,7 +48,7 @@ public class ReminderDao implements Dao {
         return -1;
     }
 
-    public Cursor getAll(SQLiteOpenHelper dbHelper){
+    public static Cursor getAll(SQLiteOpenHelper dbHelper){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String sortOrder = DbContract.ReminderEntry._ID + " DESC";
 
@@ -61,7 +64,7 @@ public class ReminderDao implements Dao {
         return c;
     }
 
-    public ReminderDao getOne(SQLiteOpenHelper dbHelper, long id){
+    public static ReminderDao getOne(SQLiteOpenHelper dbHelper, long id){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(DbContract.ReminderEntry.TABLE_NAME, null,
                 DbContract.ReminderEntry._ID + " = ?",
@@ -80,7 +83,7 @@ public class ReminderDao implements Dao {
         return reminder;
     }
 
-    public int remove(SQLiteOpenHelper dbHelper, long id){
+    public static int remove(SQLiteOpenHelper dbHelper, long id){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int rowsAffected = db.delete(DbContract.ReminderEntry.TABLE_NAME, DbContract.ReminderEntry._ID + " =?",
                 new String[] {id+""});

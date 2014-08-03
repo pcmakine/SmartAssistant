@@ -6,21 +6,32 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.touchdown.app.smartassistant.data.Dao;
 import com.touchdown.app.smartassistant.data.DbContract;
 
 /**
  * Created by Pete on 3.8.2014.
  */
-public class LocationDao implements Dao {
-    private LatLng location;
+public class LocationDao {
+    private LatLng latLng;
     private long id;
     private long reminderId;
 
-    public LocationDao(){}
-
     public LocationDao(long id, long reminderId, LatLng location){
-        this.location = location;
+        this.latLng = location;
+        this.id = id;
+        this.reminderId = reminderId;
+    }
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public long getReminderId() {
+        return reminderId;
     }
 
     public void setReminderId(long reminderId){
@@ -32,8 +43,8 @@ public class LocationDao implements Dao {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             ContentValues vals = new ContentValues();
             vals.put(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID, reminderId);
-            vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, location.latitude);
-            vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, location.longitude);
+            vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, latLng.latitude);
+            vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, latLng.longitude);
 
             id = db.insert(DbContract.LocationEntry.TABLE_NAME, null, vals);
             return id;
@@ -41,44 +52,15 @@ public class LocationDao implements Dao {
         return -1;
     }
 
-    @Override
-    public Dao getOne(SQLiteOpenHelper dbHelper, long reminderId) {
-
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(DbContract.LocationEntry.TABLE_NAME, null,
-                DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID + " = ?",
-                new String[] {String.valueOf(id)}, null, null, null, null);
-
-        if(cursor != null && cursor.moveToFirst()){
-        }else{
-            return null;
-        }
-
-        int idIndex = cursor.getColumnIndex(DbContract.LocationEntry._ID);
-
-        int latIndex = cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LAT);
-        double lat = cursor.getDouble(latIndex);
-
-        int longIndex = cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LONG);
-        double longitude = cursor.getDouble(longIndex);
-
-        this.location = new LatLng(lat, longitude);
-        this.reminderId = reminderId;
-        this.id = cursor.getLong(idIndex);
-
-        return this;
-    }
-
-    @Override
-    public int remove(SQLiteOpenHelper dbHelper, long id) {
+/*    public int remove(SQLiteOpenHelper dbHelper, long id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int rowsAffected = db.delete(DbContract.LocationEntry.TABLE_NAME, DbContract.LocationEntry._ID + " =?",
                 new String[] {id+""});
         db.close();
         return rowsAffected;
-    }
+    }*/
 
-    public Cursor getAll(SQLiteOpenHelper dbHelper){
+    public static Cursor getAll(SQLiteOpenHelper dbHelper){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String sortOrder = DbContract.LocationEntry._ID + " DESC";
 

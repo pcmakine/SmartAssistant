@@ -6,8 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
+import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.ReminderDao;
 
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +20,9 @@ import java.util.Set;
  */
 public class TestDb extends AndroidTestCase {
     public static final String LOG_TAG = TestDb.class.getSimpleName();
+
+    public static final double TESTLAT = 64.772;
+    public static final double TESTLONG = -147.335;
 
     public void testCreateDb() throws Throwable {
         mContext.deleteDatabase(DbHelper.DATABASE_NAME);
@@ -39,8 +45,6 @@ public class TestDb extends AndroidTestCase {
     public void testInsertReadDb(){
         mContext.deleteDatabase(DbHelper.DATABASE_NAME);
         String reminderContent = "test reminder";
-        double testLat = 64.772;
-        double testLong = -147.335;
 
         DbHelper dbHelper = new DbHelper(mContext);
         SQLiteDatabase db  = dbHelper.getWritableDatabase();
@@ -67,8 +71,8 @@ public class TestDb extends AndroidTestCase {
         }
 
         vals.clear();
-        vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, testLat);
-        vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, testLong);
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, TESTLAT);
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, TESTLONG);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID, reminderId);
 
         long rowId = db.insert(DbContract.LocationEntry.TABLE_NAME, null, vals);
