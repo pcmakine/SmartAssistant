@@ -1,20 +1,32 @@
 package com.touchdown.app.smartassistant;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
+
 import android.os.Bundle;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import com.touchdown.app.smartassistant.data.DbContract;
+import com.touchdown.app.smartassistant.data.DbHelper;
+import com.touchdown.app.smartassistant.models.ReminderDao;
+
 
 public class ListActivity extends ActionBarActivity {
+    public static final String LOG_TAG = ListActivity.class.getSimpleName();
+    private SimpleCursorAdapter adapter;
     private ListView listView;
+    private DbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,21 +34,20 @@ public class ListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_list);
         listView = (ListView) findViewById(R.id.list);
 
-        String[] values = new String[] { "Android List View",
-                "Adapter implementation",
-                "Simple List View In Android",
-                "Create List View Android",
-                "Android Example",
-                "List View Source Code",
-                "List View Array Adapter",
-                "Android Example List View"
-        };
+        dbHelper = new DbHelper(this);
 
-/*        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, values);*/
+        Util.clearAndInsertTestData(dbHelper, this);
+
+        Cursor cursor =  ReminderDao.getAll(dbHelper);
+
+        Log.d(LOG_TAG, String.valueOf(cursor.getCount()));
+
+        adapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,
+                new String[] {DbContract.ReminderEntry.COLUMN_CONTENT}, new int[] {R.id.itemText},
+                SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
         // Assign adapter to ListView
-        //listView.setAdapter(adapter);
+        listView.setAdapter(adapter);
 
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -44,24 +55,40 @@ public class ListActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-
                 // ListView Clicked item index
                 int itemPosition     = position;
 
                 // ListView Clicked item value
-                String  itemValue    = (String) listView.getItemAtPosition(position);
+                Cursor  c    = (Cursor) listView.getItemAtPosition(position);
+                c.moveToPosition(position);
+                String content = c.getString(c.getColumnIndex(DbContract.ReminderEntry.COLUMN_CONTENT));
+
+                toggleCheckBox(position);
+
+                // adapter.notifyDataSetChanged();
 
                 // Show Alert
                 Toast.makeText(getApplicationContext(),
-                        "Position :"+itemPosition+"  ListItem : " +itemValue , Toast.LENGTH_LONG)
+                        "Position :"+itemPosition+"  ListItem : " + content , Toast.LENGTH_LONG)
                         .show();
-
             }
 
         });
     }
 
-    public void viewMap(View view){
+    private void toggleCheckBox(int position){
+        SparseBooleanArray checked = listView.getCheckedItemPositions();
+        int firstPos = listView.getFirstVisiblePosition();
+        RelativeLayout layout = (RelativeLayout) listView.getChildAt(position - firstPos);
+        CheckBox checkBox = (CheckBox) layout.findViewById(R.id.checkBox);
+        if(checked.get(position)){
+            checkBox.setChecked(true);
+        }else{
+            checkBox.setChecked(false);
+        }
+    }
+
+    public void viewMap(){
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
     }
@@ -70,8 +97,8 @@ public class ListActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.list, menu);
-        return true;
+        getMenuInflater().inflate(R.menu.list_activity_actions, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -80,9 +107,32 @@ public class ListActivity extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id){
+            case R.id.action_map:
+                viewMap();
+                return true;
+            case R.id.action_delete:
+                SparseBooleanArray checked = listView.getCheckedItemPositions();
+                Cursor cursor;
+                for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+                    if (checked.get(i)) {
+                        cursor = (Cursor) adapter.getItem(i);
+                        int idIndex = cursor.getColumnIndex(DbContract.ReminderEntry._ID);
+                        long reminderId = cursor.getLong(idIndex);
+
+                        ReminderDao.remove(dbHelper, reminderId);
+
+                        Cursor newCursor = ReminderDao.getAll(dbHelper);
+
+                        adapter.swapCursor(newCursor);
+                        listView.setItemChecked(i, false);
+                        toggleCheckBox(i);
+                    }
+                }
+                return true;
         }
-        return super.onOptionsItemSelected(item);
+
+        return false;
+        //return super.onOptionsItemSelected(item);
     }
 }

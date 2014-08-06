@@ -17,18 +17,18 @@ public class ReminderDao {
     private long id;
     private LocationDao location;
 
+    public ReminderDao(long id, String content, LocationDao location){
+        this.content = content;
+        this.id = id;       //remember that id may be -1 and location may be null
+        this.location = location;
+    }
+
     public String getContent() {
         return content;
     }
 
     public LocationDao getLocation() {
         return location;
-    }
-
-    public ReminderDao(long id, String content, LocationDao location){
-        this.content = content;
-        this.id = id;       //remember that id may be -1 and location may be null
-        this.location = location;
     }
 
     public long insert(SQLiteOpenHelper dbHelper){
@@ -50,7 +50,7 @@ public class ReminderDao {
 
     public static Cursor getAll(SQLiteOpenHelper dbHelper){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String sortOrder = DbContract.ReminderEntry._ID + " DESC";
+        String sortOrder = DbContract.ReminderEntry._ID + " ASC";
 
         Cursor c = db.query(
                 DbContract.ReminderEntry.TABLE_NAME,

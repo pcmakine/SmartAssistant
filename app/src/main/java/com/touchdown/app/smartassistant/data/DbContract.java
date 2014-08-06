@@ -1,5 +1,6 @@
 package com.touchdown.app.smartassistant.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**

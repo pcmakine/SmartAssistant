@@ -1,9 +1,11 @@
 package com.touchdown.app.smartassistant.test;
 
+import android.database.Cursor;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.ReminderDao;
@@ -16,11 +18,16 @@ public class TestReminderDao extends AndroidTestCase {
 
     public static final double TESTLAT = 64.772;
     public static final double TESTLONG = -147.335;
+    DbHelper dbHelper;
 
+
+    @Override
+    public void setUp(){
+        dbHelper = new DbHelper(mContext);
+        Util.clearDb(dbHelper, mContext);
+    }
 
     public void testEmptyReminderNotInserted(){
-
-        DbHelper dbHelper = new DbHelper(mContext);
 
         ReminderDao reminder = new ReminderDao(-1, "", null);
 
@@ -56,11 +63,39 @@ public class TestReminderDao extends AndroidTestCase {
     }
 
     private long insertTestReminder(String text, LatLng loc){
-        DbHelper dbHelper = new DbHelper(mContext);
 
         ReminderDao reminder = new ReminderDao(-1, text, new LocationDao(-1, -1, loc));
 
         long rowId = reminder.insert(dbHelper);
         return rowId;
     }
+
+    public void testGetAllReturnsCorrectNumberofReminders(){
+        Util.insertTestData(dbHelper);
+        Cursor c = ReminderDao.getAll(dbHelper);
+        assertEquals(Util.TEST_REMINDER_COUNT, c.getCount());
+    }
+
+    public void testGetOne(){
+        Util.insertTestData(dbHelper);
+        ReminderDao reminder = ReminderDao.getOne(dbHelper, 3);
+
+        assertEquals(reminder.getId(), 3);
+    }
+
+    public void testRemoveReminder(){
+        Util.insertTestData(dbHelper);
+        ReminderDao reminder = ReminderDao.getOne(dbHelper, 10);
+
+        assertFalse(reminder == null);
+
+        int rowsAffected = ReminderDao.remove(dbHelper, 10);
+
+        assertEquals(rowsAffected, 1);
+
+        reminder = ReminderDao.getOne(dbHelper, 10);
+        assertTrue(reminder == null);
+    }
+
+
 }
