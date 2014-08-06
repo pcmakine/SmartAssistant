@@ -8,6 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbContract;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Created by Pete on 3.8.2014.
  */
@@ -36,6 +40,28 @@ public class LocationDao {
 
     public void setReminderId(long reminderId){
         this.reminderId = reminderId;
+    }
+
+    public void setLocation(LatLng location) {
+        this.latLng = location;
+    }
+
+    public ContentValues values(){
+        ContentValues vals = new ContentValues();
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, this.latLng.latitude);
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, this.latLng.longitude);
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID, this.reminderId);
+        return vals;
+    }
+
+    public boolean update(SQLiteOpenHelper dbHelper) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues vals = values();
+        int numOfRowsAffected = db.update(DbContract.LocationEntry.TABLE_NAME,
+                vals,
+                DbContract.LocationEntry._ID + " = ?",
+                new String[] {String.valueOf(this.id)});
+        return numOfRowsAffected > 0;
     }
 
     public long insert(SQLiteOpenHelper dbHelper){
@@ -100,6 +126,29 @@ public class LocationDao {
         int longIndex = cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LONG);
         double longitude = cursor.getDouble(longIndex);
 
+        return new LocationDao(id, reminderId, new LatLng(lat, longitude));
+    }
+
+    public static HashMap<Long, LocationDao> cursorDataAsMap(Cursor cursor){
+        HashMap<Long, LocationDao> reminderIdLocationMap = new HashMap<Long, LocationDao>();
+
+        if(cursor != null){
+            cursor.moveToFirst();
+            while(!cursor.isAfterLast()) {
+                LocationDao loc = constructLocationDaoFromData(cursor);
+                reminderIdLocationMap.put(loc.getReminderId(), loc);
+                //todo is it needed to overwrite the hash and equals function in this case?
+                cursor.moveToNext();
+            }
+        }
+        return reminderIdLocationMap;
+    }
+
+    private static LocationDao constructLocationDaoFromData(Cursor cursor){
+        long id = cursor.getLong(cursor.getColumnIndex(DbContract.LocationEntry._ID));
+        long reminderId = cursor.getLong(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID));
+        double lat = cursor.getDouble(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LAT));
+        double longitude = cursor.getDouble(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LONG));
         return new LocationDao(id, reminderId, new LatLng(lat, longitude));
     }
 }

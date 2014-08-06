@@ -13,7 +13,7 @@ import com.touchdown.app.smartassistant.models.ReminderDao;
  * Created by Pete on 4.8.2014.
  */
 public class Util {
-    public static final int TEST_REMINDER_COUNT = 20;
+    public static final int TEST_REMINDER_COUNT = 2;
 
     public static void clearAndInsertTestData(SQLiteOpenHelper dbHelper, Context context){
         clearDb(dbHelper, context);
@@ -27,8 +27,8 @@ public class Util {
 
     public static void insertTestData(SQLiteOpenHelper dbHelper){
         for (int i = 0; i < TEST_REMINDER_COUNT; i++){
-            int lat = 100 + i;
-            ReminderDao reminder = new ReminderDao(-1, i + ". reminder", new LocationDao(-1, -1, new LatLng(lat, -90)));
+            double lat = 60 + i*0.1;
+            ReminderDao reminder = new ReminderDao(-1, i + ". reminder", new LocationDao(-1, -1, new LatLng(lat, 25)));
 
             reminder.insert(dbHelper);
         }

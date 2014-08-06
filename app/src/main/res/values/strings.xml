@@ -9,4 +9,11 @@
     <string name="action_view_map">View on map</string>
     <string name="action_delete">Delete</string>
 
+
+    <!--MAP ACTIVITY-->
+    <string name="find_location_btn">Search</string>
+    <string name="find_location_hint">Find an address</string>
+    <string name="loading_map_error">Sorry! Unable to fetch maps</string>
+
+
 </resources>
