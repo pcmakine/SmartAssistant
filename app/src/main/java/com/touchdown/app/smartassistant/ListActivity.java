@@ -122,13 +122,14 @@ public class ListActivity extends ActionBarActivity {
 
                         ReminderDao.remove(dbHelper, reminderId);
 
-                        Cursor newCursor = ReminderDao.getAll(dbHelper);
 
-                        adapter.swapCursor(newCursor);
                         listView.setItemChecked(i, false);
                         toggleCheckBox(i);
                     }
                 }
+                Cursor newCursor = ReminderDao.getAll(dbHelper);
+
+                adapter.swapCursor(newCursor);
                 return true;
         }
 
