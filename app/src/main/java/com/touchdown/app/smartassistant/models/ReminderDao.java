@@ -4,9 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.location.Location;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbContract;
 
 import java.util.ArrayList;
@@ -30,7 +28,11 @@ public class ReminderDao {
     }
 
     public boolean isOn(){
-        return true;    //todo save info in db whether the reminder is on or not and add the field to this class
+        return isOn;
+    }
+
+    public void setOn(boolean on){
+        this.isOn = on;
     }
 
     public void turnOn(){
@@ -56,8 +58,7 @@ public class ReminderDao {
     public long insert(SQLiteOpenHelper dbHelper){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if(content != null && !content.equals("")){
-            ContentValues vals = new ContentValues();
-            vals.put(DbContract.ReminderEntry.COLUMN_CONTENT, content);
+            ContentValues vals = values();
 
             id = db.insert(DbContract.ReminderEntry.TABLE_NAME, null, vals);
             if(location != null){
@@ -102,12 +103,12 @@ public class ReminderDao {
 
     public ContentValues values(){
         ContentValues vals = new ContentValues();
-        vals.put(DbContract.ReminderEntry.COLUMN_CONTENT, this.content);
+        vals.put(DbContract.ReminderEntry.COLUMN_NAME_CONTENT, this.content);
+        int onInteger = (isOn)? 1: 0;
+        vals.put(DbContract.ReminderEntry.COLUMN_NAME_ON, onInteger);
 
         return vals;
     }
-
-
 
     public static ReminderDao getOne(SQLiteOpenHelper dbHelper, long id){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -119,13 +120,8 @@ public class ReminderDao {
             return null;
         }
 
-        int contentIndex = cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_CONTENT);
-        String content = cursor.getString(contentIndex);
-
         LocationDao location = LocationDao.getReminderLocation(db, id);
-
-        ReminderDao reminder = new ReminderDao(id, content, location);
-        return reminder;
+        return constructReminderDaoFromData(cursor, location);
     }
 
     public static int remove(SQLiteOpenHelper dbHelper, long id){
@@ -152,10 +148,20 @@ public class ReminderDao {
 
     private static ReminderDao constructReminderDaoFromData(Cursor cursor, HashMap<Long, LocationDao> reminderIdLocationMap){
         Long id = cursor.getLong(cursor.getColumnIndex(DbContract.ReminderEntry._ID));
-        String content = cursor.getString(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_CONTENT));
-        LocationDao loc = reminderIdLocationMap.get(id);
 
-        return new ReminderDao(id, content, loc);
+        return constructReminderDaoFromData(cursor, reminderIdLocationMap.get(id));
+    }
+
+    private static ReminderDao constructReminderDaoFromData(Cursor cursor, LocationDao location){
+        Long id = cursor.getLong(cursor.getColumnIndex(DbContract.ReminderEntry._ID));
+        String content = cursor.getString(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_CONTENT));
+        boolean reminderOn = (cursor.getInt(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_ON)) == 1);
+
+        ReminderDao reminder = new ReminderDao(id, content, location);
+
+        reminder.setOn(reminderOn);
+
+        return reminder;
     }
 
     public long getId(){

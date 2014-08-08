@@ -49,8 +49,10 @@ public class TestDb extends AndroidTestCase {
         DbHelper dbHelper = new DbHelper(mContext);
         SQLiteDatabase db  = dbHelper.getWritableDatabase();
 
-        ContentValues vals = new ContentValues();
-        vals.put(DbContract.ReminderEntry.COLUMN_CONTENT, reminderContent);
+        ReminderDao reminder = new ReminderDao(-1, reminderContent, null);
+        reminder.turnOn();
+
+        ContentValues vals = reminder.values();
 
         long reminderId;
         reminderId = db.insert(DbContract.ReminderEntry.TABLE_NAME, null, vals);

@@ -10,8 +10,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.data.DbHelper;
+import com.touchdown.app.smartassistant.data.MarkerData;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 
@@ -31,13 +31,16 @@ public class MarkerManager {
     private static final float EMPTY_MARKER_COLOR = BitmapDescriptorFactory.HUE_RED;
 
     private GoogleMap map;
-    private HashMap<Marker, ReminderDao> markerReminderMap;
-    private Circle activeRadius;
+  //  private Map<Marker, ReminderDao> markerReminderMap;
+   // private HashMap<LatLng, Circle> centerRadiusMap;
     private Marker selectedMarker;
+
+    private HashMap<Marker, MarkerData> markerDataMap;
 
     public MarkerManager(GoogleMap map, Context context){
         this.map = map;
-        this.markerReminderMap = new HashMap();
+      //  this.markerReminderMap = new HashMap();
+        this.markerDataMap = new HashMap<Marker, MarkerData>();
         populateMapWithMarkers(context);
         this.selectedMarker = null;
     }
@@ -54,110 +57,117 @@ public class MarkerManager {
     }
 
     public Marker generateMarker(String text, LatLng loc, float color){
-        return (map.addMarker(new MarkerOptions()
+        Marker marker = (map.addMarker(new MarkerOptions()
                 .position(loc)
                 .title(StringUtils.abbreviate(text, 20))
                 .icon(BitmapDescriptorFactory.defaultMarker(color))
                 .draggable(true)));
+        return marker;
     }
 
     public void saveMarker(Marker marker, ReminderDao reminder){    //reminder may be null
+        Circle radius = null;
         if(reminder != null){
-            showRadius(reminder.getLocation());
+            radius = addRadius(reminder.getLocation());
         }
-        markerReminderMap.put(marker, reminder);
+        markerDataMap.put(marker, new MarkerData(reminder, radius));
+
+       // markerReminderMap.put(marker, reminder);
     }
 
-    private void showRadius(LocationDao loc){
-        int radius;
-        if(loc != null) {
-            radius = loc.getRadius();
-
-            CircleOptions circleOptions = new CircleOptions()
-                    .center(loc.getLatLng())   //set center
-                            // .radius(loc.getRadius())   //set radius in meters
-                    .radius(100)    //todo add radius to locationdao
-                    .fillColor(Color.argb(50, 20, 134, 255))  //default
-                    .strokeColor(Color.BLUE)
-                    .strokeWidth(5);
-            activeRadius = map.addCircle(circleOptions);
+    public void updateRadius(Marker marker){
+        MarkerData data = markerDataMap.get(marker);
+        if(data.getReminder() != null &&
+                data.getReminder().getLocation() != null){
+            Circle radius = addRadius(data.getReminder().getLocation());
+            data.setRadius(radius);
         }
+    }
+
+    private Circle addRadius(LocationDao loc){
+        int radius;
+        radius = loc.getRadius();
+
+        CircleOptions circleOptions = new CircleOptions()
+                .center(loc.getLatLng())   //set center
+                .radius(radius)
+                .fillColor(Color.argb(50, 20, 134, 255))  //default
+                .strokeColor(Color.BLUE)
+                .strokeWidth(5);
+        Circle circle = map.addCircle(circleOptions);
+        return circle;
     }
 
     public void updateMarkerColors(){
-        Set<Marker> markersOnMap = markerReminderMap.keySet();
+        Set<Marker> markersOnMap = markerDataMap.keySet();
         for(Marker marker: markersOnMap){
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(getMarkerColor(marker)));
         }
-        // removeRadiusFromMap();
+        //   removeRadiusFromMap();
     }
 
     private float getMarkerColor(Marker marker){
         if(marker.equals(selectedMarker)){
             return SELECTED_COLOR;
         }
-        else if(markerReminderMap.get(marker) == null){
+        else if(markerDataMap.get(marker).noReminder()){
             return EMPTY_MARKER_COLOR;
-        }else if(markerReminderMap.get(marker).isOn()){
+        }else if(markerDataMap.get(marker).hasActiveReminder()){
             return NON_EMPTY_MARKER_ON;
         }else {
             return NON_EMPTY_MARKER_OFF;
         }
     }
 
-    public void removeRadiusFromMap(){
-        if(activeRadius != null){
-            activeRadius.remove();
-        }
-    }
-
     public void selectMarker(Marker marker){
         selectedMarker = marker;
         int markerHash = marker.hashCode();
-        Marker mapMarker = markerReminderMap.keySet().iterator().next();
+        Marker mapMarker = markerDataMap.keySet().iterator().next();
         int mapMarkerHash = mapMarker.hashCode();
         int selectedHash = selectedMarker.hashCode();
         updateMarkerColors();
-        removeRadiusFromMap();
-        if(markerReminderMap.get(marker) != null && markerReminderMap.get(marker).getLocation() != null){
-            showMarkerInfoWindow(marker);
-            showRadius(markerReminderMap.get(marker).getLocation());
-        }
+        //removeRadiusFromMap();
+        showMarkerInfoWindow(marker);
     }
 
     public void unSelectMarker(){
         selectedMarker = null;
         updateMarkerColors();
-        removeRadiusFromMap();
+        //removeRadiusFromMap();
     }
 
     private void showMarkerInfoWindow(Marker marker){
-        ReminderDao reminder = markerReminderMap.get(marker);
+        ReminderDao reminder = markerDataMap.get(marker).getReminder();
         if(reminder != null && reminder.getLocation() != null){
             marker.setTitle(StringUtils.abbreviate(reminder.getContent(), 20));
             marker.showInfoWindow();
         }
     }
 
+    public void removeRadius(Marker marker){
+        markerDataMap.get(marker).removeRadius();
+    }
+
     public boolean removeSelectedIfEmpty(){
-        if(markerReminderMap.get(selectedMarker) == null){
+        if(markerDataMap.get(selectedMarker).getReminder() == null){
             selectedMarker.remove();
-            markerReminderMap.remove(selectedMarker);
+            markerDataMap.remove(selectedMarker);
             return true;
         }
         return false;
     }
 
     public void removeSelectedMarker(){
-        markerReminderMap.remove(selectedMarker); //todo what happens if the program stops here, before the next command
-        selectedMarker.remove();
+        MarkerData data = markerDataMap.get(selectedMarker);
+        markerDataMap.remove(selectedMarker); //todo what happens if the program stops here, before the next command
+        data.remove(selectedMarker);
         selectedMarker = null;
-        removeRadiusFromMap();
+
     }
 
     public ReminderDao getReminder(Marker marker){
         if(marker != null){
-            return markerReminderMap.get(marker);
+            return markerDataMap.get(marker).getReminder();
         }
         return null;
     }
@@ -171,7 +181,7 @@ public class MarkerManager {
     }
 
     public boolean userHasSelectedEmptyMarker(){
-        return userHasSelectedMarker() && markerReminderMap.get(selectedMarker) == null;
+        return userHasSelectedMarker() && markerDataMap.get(selectedMarker).getReminder() == null;
     }
 
     public static float getSelectedColor(){

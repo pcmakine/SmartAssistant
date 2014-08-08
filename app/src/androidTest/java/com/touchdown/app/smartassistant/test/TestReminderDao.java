@@ -97,5 +97,21 @@ public class TestReminderDao extends AndroidTestCase {
         assertTrue(reminder == null);
     }
 
+    public void testOnStatusSavedAndRetrievedCorrectly(){
+        long testId = 3;
+
+        Util.insertTestData(dbHelper, 5);
+        ReminderDao reminder = ReminderDao.getOne(dbHelper, testId);
+        reminder.setOn(true);
+
+        reminder.update(dbHelper);
+
+        reminder = ReminderDao.getOne(dbHelper, testId);
+
+        assertTrue(reminder != null);
+        assertEquals(true, reminder.isOn());
+
+    }
+
 
 }

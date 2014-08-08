@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,13 +37,19 @@ public class ListActivity extends ActionBarActivity {
         listView = (ListView) findViewById(R.id.list);
 
         dbHelper = new DbHelper(this);
+  /*      int version = dbHelper.getReadableDatabase().getVersion();
 
-        Util.clearAndInsertTestData(dbHelper, this);
+        Toast.makeText(this, "Current db version: " + version, Toast.LENGTH_LONG).show();*/
+
+
+
+       // Util.clearDb(dbHelper, this);
+    //    Util.clearAndInsertTestData(dbHelper, this);
 
         Cursor cursor =  ReminderDao.getAll(dbHelper);
 
         adapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,
-                new String[] {DbContract.ReminderEntry.COLUMN_CONTENT}, new int[] {R.id.itemText},
+                new String[] {DbContract.ReminderEntry.COLUMN_NAME_CONTENT}, new int[] {R.id.itemText},
                 SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
         // Assign adapter to ListView
@@ -62,7 +67,7 @@ public class ListActivity extends ActionBarActivity {
                 // ListView Clicked item value
                 Cursor  c    = (Cursor) listView.getItemAtPosition(position);
                 c.moveToPosition(position);
-                String content = c.getString(c.getColumnIndex(DbContract.ReminderEntry.COLUMN_CONTENT));
+                String content = c.getString(c.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_CONTENT));
 
                 toggleCheckBox(position);
 

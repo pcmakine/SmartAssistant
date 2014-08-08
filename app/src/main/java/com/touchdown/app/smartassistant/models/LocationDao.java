@@ -51,6 +51,10 @@ public class LocationDao {
         return radius;
     }
 
+    public void setRadius(int radius){
+        this.radius = radius;
+    }
+
     public void setReminderId(long reminderId){
         this.reminderId = reminderId;
     }

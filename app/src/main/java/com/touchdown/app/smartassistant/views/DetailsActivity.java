@@ -94,6 +94,7 @@ public class DetailsActivity extends ActionBarActivity {
         }else{
             this.reminder = new ReminderDao(-1, null, null);
         }
+        reminder.setOn(true);
         onSwitch.setChecked(true);
         editMode = false;
     }
@@ -122,6 +123,9 @@ public class DetailsActivity extends ActionBarActivity {
                     radius = SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD + (progress - progressMultiplierTreshold) * SEEKBAR_MULTIPLIER_OVER_KILOMETER;
                 }
                 radiusTW.setText(getRadiusText());
+                if(reminder.getLocation() != null){
+                    reminder.getLocation().setRadius(radius);
+                }
             }
 
             private String getRadiusText(){
@@ -152,34 +156,42 @@ public class DetailsActivity extends ActionBarActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    reminder.turnOn();
+                    reminder.setOn(true);
                     //addProximityAlert();
                 }else{
-                    reminder.turnOff();
+                    reminder.setOn(false);
                     //removeProximityAlert();
                 }
             }
         });
     }
 
-    public void add(View view){
-
+    public void addOrUpdate(View view){
         reminderText  = contentToSaveTW.getText().toString();
         reminder.setContent(reminderText);
-
-        if(editMode){
-            updateReminder();
-        }else{
-            addReminder();
+        if(!displayErrorToastOnEmptyReminder(reminderText)){
+            if(editMode){
+                updateReminder();
+            }else{
+                addReminder();
+            }
         }
+    }
+
+    private boolean displayErrorToastOnEmptyReminder(String reminderText){
+        if(reminderText.equals("")){
+            Toast.makeText(this, R.string.erro_no_reminder_text_entered, Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
     }
 
     private void updateReminder(){
         if(reminder.update(dbHelper)){
             if(onSwitch.isChecked()){
-               // addProximityAlert();
+                // addProximityAlert();
             }else{
-               // removeProximityAlert();
+                // removeProximityAlert();
             }
             Toast toast = Toast.makeText(this, R.string.successfully_edited, Toast.LENGTH_LONG);
             toast.show();
@@ -191,6 +203,7 @@ public class DetailsActivity extends ActionBarActivity {
     }
 
     private void addReminder(){
+
         if(reminder.insert(dbHelper) != -1){
             //addProximityAlert();
             Toast toast = Toast.makeText(this, R.string.successfully_added, Toast.LENGTH_LONG);
@@ -219,8 +232,8 @@ public class DetailsActivity extends ActionBarActivity {
 
     private void removeProximityAlert(){
         Intent proximityIntent = new Intent(PROX_ALERT_INTENT);
-      //  PendingIntent pendingIntent = PendingIntent.getActivity(getBaseContext(), 0, proximityIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
-       // manager.removeProximityAlert(pendingIntent);
+        //  PendingIntent pendingIntent = PendingIntent.getActivity(getBaseContext(), 0, proximityIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
+        // manager.removeProximityAlert(pendingIntent);
     }
 
     @Override

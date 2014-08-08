@@ -10,7 +10,8 @@ public class DbContract {
 
     public static final class ReminderEntry implements BaseColumns {
         public static final String TABLE_NAME = "reminder";
-        public static final String COLUMN_CONTENT = "content";
+        public static final String COLUMN_NAME_CONTENT = "content";
+        public static final String COLUMN_NAME_ON = "alarm_on";
     }
 
     public static final class LocationEntry implements BaseColumns {

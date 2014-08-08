@@ -19,7 +19,8 @@ public class DbHelper extends SQLiteOpenHelper{
         final String SQL_CREATE_REMINDER_TABLE = "CREATE TABLE " + DbContract.ReminderEntry.TABLE_NAME
                 + " (" + DbContract.ReminderEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 
-                DbContract.ReminderEntry.COLUMN_CONTENT + " TEXT NOT NULL)";
+                DbContract.ReminderEntry.COLUMN_NAME_CONTENT + " TEXT NOT NULL, " +
+                DbContract.ReminderEntry.COLUMN_NAME_ON + " INTEGER NOT NULL)";
 
         final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + DbContract.LocationEntry.TABLE_NAME +
                 " (" + DbContract.LocationEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +

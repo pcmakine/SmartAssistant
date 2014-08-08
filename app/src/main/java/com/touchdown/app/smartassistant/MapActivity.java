@@ -135,13 +135,6 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.map, menu);
-        return true;
-    }
-
     //todo show the search field. If the search button is not pressed do not show it at all
     public void showSearch(){
 
@@ -163,7 +156,37 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
         startActivity(intent);
     }
 
-    private void confirmRemove(){
+    private void removeProximityAlert(){
+        Intent proximityIntent = new Intent("com.artofcodeapps.locationalarm.app.Views.MenuActivity");
+      //  PendingIntent pendingIntent = PendingIntent.getActivity(getBaseContext(), 0, proximityIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
+    //    locationManager.removeProximityAlert(pendingIntent);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.map_activity_actions, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                deleteEmptyOrConfirmRemove();
+                return true;
+            case R.id.action_view_as_list:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void deleteEmptyOrConfirmRemove(){
         if(markerManager.userHasSelectedMarker()){
             if(markerManager.removeSelectedIfEmpty()){
                 supportInvalidateOptionsMenu();
@@ -175,14 +198,14 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     private void showConfirmationPopUp(){
         new AlertDialog.Builder(this)
-                .setMessage("Are you sure you want to delete this reminder?")
+                .setMessage(R.string.remove_confirmation)
                 .setCancelable(true)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         ReminderDao.remove(new DbHelper(MapActivity.appCtx), markerManager.getReminder(markerManager.getSelectedMarker()).getId());
-                     //   removeProximityAlert();
+                        //   removeProximityAlert();
 
                         markerManager.removeSelectedMarker();
                         supportInvalidateOptionsMenu();
@@ -192,23 +215,6 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                 .show();
     }
 
-    private void removeProximityAlert(){
-        Intent proximityIntent = new Intent("com.artofcodeapps.locationalarm.app.Views.MenuActivity");
-      //  PendingIntent pendingIntent = PendingIntent.getActivity(getBaseContext(), 0, proximityIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
-    //    locationManager.removeProximityAlert(pendingIntent);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onMapLongClick(LatLng point) {
@@ -248,7 +254,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     @Override
     public void onMarkerDragStart(Marker marker) {
-        markerManager.removeRadiusFromMap();
+        markerManager.removeRadius(marker);
     }
 
     @Override
@@ -264,6 +270,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             loc.setLocation(marker.getPosition());
             loc.update(new DbHelper(this));
             markerManager.selectMarker(marker);
+            markerManager.updateRadius(marker);
         }
     }
 

@@ -78,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text = "@string/save_reminder_btn"
-        android:onClick="add"
+        android:onClick="addOrUpdate"
         />
 
 </RelativeLayout>
