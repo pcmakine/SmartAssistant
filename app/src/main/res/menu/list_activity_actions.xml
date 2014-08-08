@@ -9,4 +9,14 @@
         android:icon="@drawable/ic_action_discard"
         android:title="@string/action_delete"
         app:showAsAction="always"/>
+
+    <item android:id="@+id/action_select_all"
+        android:icon="@drawable/ic_action_select_all"
+        android:title="@string/action_select_all"
+        app:showAsAction= "always"/>
+
+    <item android:id="@+id/action_edit"
+        android:icon="@drawable/ic_action_edit"
+        android:title="@string/action_edit"
+        app:showAsAction="always"/>
 </menu>

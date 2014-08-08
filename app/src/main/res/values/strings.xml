@@ -4,17 +4,22 @@
     <string name="app_name">SmartAssistant</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_map">MapActivity</string>
+
+    <!-- LIST ACTIVITY -->
     <string name="action_view_map">View on map</string>
     <string name="action_delete">Delete</string>
+    <string name="action_select_all">Select all</string>
+    <string name="list_title">List</string>
 
     <!-- MAP ACTIVITY -->
     <string name="find_location_btn">Search</string>
     <string name="find_location_hint">Find an address</string>
     <string name="loading_map_error">Sorry! Unable to fetch maps</string>
-    <string name="title_activity_details">DetailsActivity</string>
+    <string name="title_activity_map">MapActivity</string>
+    <string name="action_view_as_list">View as a list</string>
 
     <!-- DETAILS ACTIVITY -->
+    <string name="title_activity_details">DetailsActivity</string>
     <string name="location">Location</string>
     <string name="save_reminder_btn">Save reminder</string>
     <string name="enter_text_hint">Enter the reminder here</string>
@@ -26,6 +31,7 @@
     <string name="meters">meters</string>
     <string name="toggle_alarm">Toggle alarm on or off</string>
     <string name="kilometers">kilometers</string>
+    <string name="action_edit">Edit</string>
 
 
 </resources>

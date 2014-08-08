@@ -43,8 +43,6 @@ public class ListActivity extends ActionBarActivity {
 
         Cursor cursor =  ReminderDao.getAll(dbHelper);
 
-        Log.d(LOG_TAG, String.valueOf(cursor.getCount()));
-
         adapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,
                 new String[] {DbContract.ReminderEntry.COLUMN_CONTENT}, new int[] {R.id.itemText},
                 SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -96,6 +94,18 @@ public class ListActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
+    public void updateList(){
+        Cursor newCursor = ReminderDao.getAll(dbHelper);
+
+        adapter.swapCursor(newCursor);
+    }
+
+    @Override
+    public void onResume(){
+        updateList();
+        super.onResume();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -125,17 +135,31 @@ public class ListActivity extends ActionBarActivity {
 
                         ReminderDao.remove(dbHelper, reminderId);
 
-
                         listView.setItemChecked(i, false);
                         toggleCheckBox(i);
                     }
                 }
-                Cursor newCursor = ReminderDao.getAll(dbHelper);
+                updateList();
+                return true;
 
-                adapter.swapCursor(newCursor);
+            case R.id.action_select_all:
+                checked = listView.getCheckedItemPositions();
+                boolean allSelected = true;
+                for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+                    if(!checked.get(i)){
+                        allSelected = false;
+                        listView.setItemChecked(i, true);
+                        toggleCheckBox(i);
+                    }
+                }
+                if(allSelected){
+                    for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+                        listView.setItemChecked(i, false);
+                        toggleCheckBox(i);
+                    }
+                }
                 return true;
         }
-
         return false;
         //return super.onOptionsItemSelected(item);
     }
