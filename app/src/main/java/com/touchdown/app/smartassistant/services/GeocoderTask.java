@@ -61,11 +61,9 @@ public class GeocoderTask extends AsyncTask<String, Void, List<Address>> {
         if(addresses==null || addresses.size()==0){
             Toast.makeText(ctx.getApplicationContext(), "No Location found", Toast.LENGTH_SHORT).show();
         }else{
-            // Clears all the existing markers on the map
-            map.clear();
 
             // Adding Markers on Google Map for each matching address
-            for(int i=0;i<addresses.size();i++){
+            for(int i=0;i<1;i++){   //todo add all found ones or the closest ones etc
 
                 Address address = (Address) addresses.get(i);
 
@@ -80,7 +78,7 @@ public class GeocoderTask extends AsyncTask<String, Void, List<Address>> {
                 markerOptions.position(latLng);
                 markerOptions.title(addressText);
 
-                map.addMarker(markerOptions);
+                marker = map.addMarker(markerOptions);
 
                 // Locate the first location
                 if(i==0)

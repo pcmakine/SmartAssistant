@@ -1,7 +1,6 @@
 package com.touchdown.app.smartassistant;
 
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,24 +18,22 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
 import com.touchdown.app.smartassistant.services.MarkerManager;
+import com.touchdown.app.smartassistant.views.DetailsActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLongClickListener,
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMarkerDragListener{
+
     private LocationManager locationManager;
     private MarkerManager markerManager;
     public static Context appCtx;
@@ -150,21 +147,21 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     }
 
-/*    public void startAddActivity(){
+    public void startAddActivity(){
         if(!markerManager.userHasSelectedMarker()){
             Toast.makeText(this, "No location chosen!", Toast.LENGTH_SHORT);
         }else{
-            Intent intent = new Intent(this, EditAddActivity.class);
+            Intent intent = new Intent(this, DetailsActivity.class);
             intent.putExtra("location", markerManager.getSelectedMarker().getPosition());
             this.startActivity(intent);
         }
-    }*/
+    }
 
-/*    public void startEdit(ReminderDao r){
-        Intent intent = new Intent(this, EditAddActivity.class);
+    public void startEdit(ReminderDao r){
+        Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra("reminderID", r.getId());
         startActivity(intent);
-    }*/
+    }
 
     private void confirmRemove(){
         if(markerManager.userHasSelectedMarker()){
@@ -218,7 +215,8 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
         Marker marker = markerManager.generateMarker("No reminder", point, MarkerManager.getSelectedColor());
         markerManager.saveMarker(marker, null);
         markerManager.selectMarker(marker);
-        supportInvalidateOptionsMenu();
+        startAddActivity();
+        //supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -244,7 +242,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     public void onInfoWindowClick(Marker marker) {
         ReminderDao reminder = markerManager.getReminder(marker);
         if(reminder != null){
-            //startEdit(reminder);
+            startEdit(reminder);
         }
     }
 

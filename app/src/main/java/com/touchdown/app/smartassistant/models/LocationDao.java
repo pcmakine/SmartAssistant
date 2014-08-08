@@ -16,14 +16,23 @@ import java.util.List;
  * Created by Pete on 3.8.2014.
  */
 public class LocationDao {
+    public static final int DEFAULT_RADIUS = 100;
+
     private LatLng latLng;
     private long id;
     private long reminderId;
+    private int radius;     //meters
 
-    public LocationDao(long id, long reminderId, LatLng location){
+
+    public LocationDao(long id, long reminderId, LatLng location, int radius){
         this.latLng = location;
         this.id = id;
         this.reminderId = reminderId;
+        if(radius == 0){
+            this.radius = DEFAULT_RADIUS;
+        }else{
+            this.radius = radius;
+        }
     }
 
     public LatLng getLatLng() {
@@ -36,6 +45,10 @@ public class LocationDao {
 
     public long getReminderId() {
         return reminderId;
+    }
+
+    public int getRadius(){
+        return radius;
     }
 
     public void setReminderId(long reminderId){
@@ -51,6 +64,8 @@ public class LocationDao {
         vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, this.latLng.latitude);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, this.latLng.longitude);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID, this.reminderId);
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_RADIUS, this.radius);
+
         return vals;
     }
 
@@ -67,10 +82,7 @@ public class LocationDao {
     public long insert(SQLiteOpenHelper dbHelper){
         if(coordinatesLegal() && reminderId != -1){
             SQLiteDatabase db = dbHelper.getWritableDatabase();
-            ContentValues vals = new ContentValues();
-            vals.put(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID, reminderId);
-            vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, latLng.latitude);
-            vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, latLng.longitude);
+            ContentValues vals = values();
 
             id = db.insert(DbContract.LocationEntry.TABLE_NAME, null, vals);
             return id;
@@ -117,16 +129,7 @@ public class LocationDao {
             return null;
         }
 
-        int idIndex = cursor.getColumnIndex(DbContract.LocationEntry._ID);
-        long id = cursor.getLong(idIndex);
-
-        int latIndex = cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LAT);
-        double lat = cursor.getDouble(latIndex);
-
-        int longIndex = cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LONG);
-        double longitude = cursor.getDouble(longIndex);
-
-        return new LocationDao(id, reminderId, new LatLng(lat, longitude));
+        return constructLocationDaoFromData(cursor);
     }
 
     public static HashMap<Long, LocationDao> cursorDataAsMap(Cursor cursor){
@@ -149,6 +152,9 @@ public class LocationDao {
         long reminderId = cursor.getLong(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID));
         double lat = cursor.getDouble(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LAT));
         double longitude = cursor.getDouble(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LONG));
-        return new LocationDao(id, reminderId, new LatLng(lat, longitude));
+
+        int radiusIndex = cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_RADIUS);
+        int radius = cursor.getInt(radiusIndex);
+        return new LocationDao(id, reminderId, new LatLng(lat, longitude), radius);
     }
 }

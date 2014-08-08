@@ -64,36 +64,36 @@ public class TestReminderDao extends AndroidTestCase {
 
     private long insertTestReminder(String text, LatLng loc){
 
-        ReminderDao reminder = new ReminderDao(-1, text, new LocationDao(-1, -1, loc));
+        ReminderDao reminder = new ReminderDao(-1, text, new LocationDao(-1, -1, loc, 50));
 
         long rowId = reminder.insert(dbHelper);
         return rowId;
     }
 
     public void testGetAllReturnsCorrectNumberofReminders(){
-        Util.insertTestData(dbHelper);
+        Util.insertTestData(dbHelper, Util.TEST_REMINDER_DEFAULT_COUNT);
         Cursor c = ReminderDao.getAll(dbHelper);
-        assertEquals(Util.TEST_REMINDER_COUNT, c.getCount());
+        assertEquals(Util.TEST_REMINDER_DEFAULT_COUNT, c.getCount());
     }
 
     public void testGetOne(){
-        Util.insertTestData(dbHelper);
+        Util.insertTestData(dbHelper, 4);
         ReminderDao reminder = ReminderDao.getOne(dbHelper, 3);
 
         assertEquals(reminder.getId(), 3);
     }
 
     public void testRemoveReminder(){
-        Util.insertTestData(dbHelper);
-        ReminderDao reminder = ReminderDao.getOne(dbHelper, 10);
+        Util.insertTestData(dbHelper, 5);
+        ReminderDao reminder = ReminderDao.getOne(dbHelper, 4);
 
         assertFalse(reminder == null);
 
-        int rowsAffected = ReminderDao.remove(dbHelper, 10);
+        int rowsAffected = ReminderDao.remove(dbHelper, 4);
 
         assertEquals(rowsAffected, 1);
 
-        reminder = ReminderDao.getOne(dbHelper, 10);
+        reminder = ReminderDao.getOne(dbHelper, 4);
         assertTrue(reminder == null);
     }
 

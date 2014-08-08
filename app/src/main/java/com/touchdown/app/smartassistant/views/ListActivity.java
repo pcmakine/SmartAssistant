@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant;
+package com.touchdown.app.smartassistant.views;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,6 +17,9 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import com.touchdown.app.smartassistant.MapActivity;
+import com.touchdown.app.smartassistant.R;
+import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.ReminderDao;

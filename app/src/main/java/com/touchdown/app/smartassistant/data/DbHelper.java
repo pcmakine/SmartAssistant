@@ -27,6 +27,7 @@ public class DbHelper extends SQLiteOpenHelper{
                 DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID + " INTEGER, " +
                 DbContract.LocationEntry.COLUMN_NAME_LAT + " REAL NOT NULL, " +
                 DbContract.LocationEntry.COLUMN_NAME_LONG + " REAL NOT NULL, " +
+                DbContract.LocationEntry.COLUMN_NAME_RADIUS + " INTEGER NOT NULL, " +
                 " FOREIGN KEY (" + DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID + ") REFERENCES "
                 + DbContract.ReminderEntry.TABLE_NAME + "(" + DbContract.ReminderEntry._ID +
                 ") ON DELETE CASCADE)";

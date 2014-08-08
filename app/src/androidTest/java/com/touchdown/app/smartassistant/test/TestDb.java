@@ -70,12 +70,9 @@ public class TestDb extends AndroidTestCase {
             fail("No values for reminder returned");
         }
 
-        vals.clear();
-        vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, TESTLAT);
-        vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, TESTLONG);
-        vals.put(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID, reminderId);
-
-        long rowId = db.insert(DbContract.LocationEntry.TABLE_NAME, null, vals);
+        LocationDao location = new LocationDao(-1, reminderId, new LatLng(TESTLAT, TESTLONG), 100);
+        long rowId = location.insert(dbHelper);
+        vals = location.values();
 
         assertTrue(rowId != -1);
 

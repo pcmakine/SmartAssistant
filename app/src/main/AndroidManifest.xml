@@ -25,7 +25,7 @@
             android:value="AIzaSyBqXQWZn5aVFbDDRL6KBlKXicGv92H_exU" />
 
         <activity
-            android:name=".ListActivity"
+            android:name=".views.ListActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,6 +37,18 @@
             android:name=".MapActivity"
             android:label="@string/title_activity_map" >
         </activity>
+        <activity
+            android:name=".views.DetailsActivity"
+            android:label="@string/title_activity_details"
+            android:parentActivityName=".MapActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.touchdown.app.smartassistant.MapActivity" />
+        </activity>
+
+        <receiver android:name = ".services.ProximityIntentReceiver">
+
+        </receiver>
     </application>
 
 </manifest>

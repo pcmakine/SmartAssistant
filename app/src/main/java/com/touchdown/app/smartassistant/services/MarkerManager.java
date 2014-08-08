@@ -29,6 +29,7 @@ public class MarkerManager {
     private static final float NON_EMPTY_MARKER_ON = BitmapDescriptorFactory.HUE_ORANGE;
     private static final float NON_EMPTY_MARKER_OFF = BitmapDescriptorFactory.HUE_VIOLET;
     private static final float EMPTY_MARKER_COLOR = BitmapDescriptorFactory.HUE_RED;
+
     private GoogleMap map;
     private HashMap<Marker, ReminderDao> markerReminderMap;
     private Circle activeRadius;
@@ -60,20 +61,27 @@ public class MarkerManager {
                 .draggable(true)));
     }
 
-    public void saveMarker(Marker marker, ReminderDao reminder){
-        //  showRadius(loc);
+    public void saveMarker(Marker marker, ReminderDao reminder){    //reminder may be null
+        if(reminder != null){
+            showRadius(reminder.getLocation());
+        }
         markerReminderMap.put(marker, reminder);
     }
 
     private void showRadius(LocationDao loc){
-        CircleOptions circleOptions = new CircleOptions()
-                .center(loc.getLatLng())   //set center
-               // .radius(loc.getRadius())   //set radius in meters
-                .radius(100)    //todo add radius to locationdao
-                .fillColor(Color.argb(50, 20, 134, 255))  //default
-                .strokeColor(Color.BLUE)
-                .strokeWidth(5);
-        activeRadius = map.addCircle(circleOptions);
+        int radius;
+        if(loc != null) {
+            radius = loc.getRadius();
+
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(loc.getLatLng())   //set center
+                            // .radius(loc.getRadius())   //set radius in meters
+                    .radius(100)    //todo add radius to locationdao
+                    .fillColor(Color.argb(50, 20, 134, 255))  //default
+                    .strokeColor(Color.BLUE)
+                    .strokeWidth(5);
+            activeRadius = map.addCircle(circleOptions);
+        }
     }
 
     public void updateMarkerColors(){

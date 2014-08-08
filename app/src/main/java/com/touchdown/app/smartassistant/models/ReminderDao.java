@@ -21,6 +21,7 @@ public class ReminderDao {
     private String content;
     private long id;
     private LocationDao location;
+    private boolean isOn;
 
     public ReminderDao(long id, String content, LocationDao location){
         this.content = content;
@@ -32,8 +33,20 @@ public class ReminderDao {
         return true;    //todo save info in db whether the reminder is on or not and add the field to this class
     }
 
+    public void turnOn(){
+        this.isOn = true;
+    }
+
+    public void turnOff(){
+        this.isOn = false;
+    }
+
     public String getContent() {
         return content;
+    }
+
+    public void setContent(String content){
+        this.content = content;
     }
 
     public LocationDao getLocation() {
@@ -72,6 +85,29 @@ public class ReminderDao {
         //todo can the db be closed at this point?
         return c;
     }
+
+    public boolean update(SQLiteOpenHelper dbHelper) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues vals = values();
+        int numOfRowsAffected = db.update(DbContract.ReminderEntry.TABLE_NAME,
+                vals,
+                DbContract.ReminderEntry._ID + " = ?",
+                new String[] {String.valueOf(this.id)});
+
+        if(this.location != null){
+            this.location.update(dbHelper);
+        }
+        return numOfRowsAffected > 0;
+    }
+
+    public ContentValues values(){
+        ContentValues vals = new ContentValues();
+        vals.put(DbContract.ReminderEntry.COLUMN_CONTENT, this.content);
+
+        return vals;
+    }
+
+
 
     public static ReminderDao getOne(SQLiteOpenHelper dbHelper, long id){
         SQLiteDatabase db = dbHelper.getReadableDatabase();

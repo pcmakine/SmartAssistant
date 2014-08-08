@@ -18,6 +18,7 @@ public class DbContract {
         public static final String COLUMN_NAME_REMINDER_ID = "reminderID";
         public static final String COLUMN_NAME_LAT = "lat";
         public static final String COLUMN_NAME_LONG = "long";
+        public static final String COLUMN_NAME_RADIUS = "radius";
     }
 
     public static final class TimeEntry implements BaseColumns {
