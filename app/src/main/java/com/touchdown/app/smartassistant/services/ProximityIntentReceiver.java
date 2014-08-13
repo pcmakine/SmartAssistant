@@ -7,16 +7,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.touchdown.app.smartassistant.MapActivity;
+import com.touchdown.app.smartassistant.R;
 
 /**
  * Created by Pete on 7.8.2014.
  */
-public class ProximityIntentReceiver extends BroadcastReceiver {
-
-    private static final int NOTIFICATION_ID = 1000;
+public class ProximityIntentReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent){
@@ -24,24 +26,15 @@ public class ProximityIntentReceiver extends BroadcastReceiver {
         boolean entering = intent.getBooleanExtra(key, false);
         if(entering){
             Log.d(getClass().getSimpleName(), "entering");
+            Toast.makeText(context, "Entered!!!", Toast.LENGTH_LONG).show();
         }else{
             Log.d(getClass().getSimpleName(), "exiting");
+            Toast.makeText(context, "Exited!!!", Toast.LENGTH_LONG).show();
         }
 
-        NotificationManager notificationManager =
-                (NotificationManager) MapActivity.appCtx.getSystemService(Context.NOTIFICATION_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
-        Notification notification = createNotification(context, pendingIntent);
-        notificationManager.notify(NOTIFICATION_ID, notification);
-    }
 
-    private Notification createNotification(Context context, PendingIntent pendingIntent){
-        return new Notification.Builder(context)
-                .setContentTitle("Proximity alert!!!")
-                .setContentText("You are close to your reminder")
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .setLights(Notification.DEFAULT_LIGHTS, 1500, 1500)
-                .build();
+        Intent alarmServiceIntent = new Intent(context, HandleAlarmService.class);
+        alarmServiceIntent.putExtra("reminderID", intent.getLongExtra("reminderID", -1));
+        startWakefulService(context, alarmServiceIntent);
     }
 }

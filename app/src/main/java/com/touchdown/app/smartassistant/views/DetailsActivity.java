@@ -1,11 +1,10 @@
 package com.touchdown.app.smartassistant.views;
 
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.location.LocationManager;
+import android.location.Geocoder;
+import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,20 +22,17 @@ import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.ReminderDao;
-import com.touchdown.app.smartassistant.services.ProximityIntentReceiver;
+import com.touchdown.app.smartassistant.services.GetAddressTask;
+import com.touchdown.app.smartassistant.services.ProximityAlarmManager;
+
+import java.util.Calendar;
 
 
-//todo https://github.com/BoD/android-switch-backport if this is in use include apache v2.0 license somehow
 public class DetailsActivity extends ActionBarActivity {
     public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
 
-    private static final long MINIMUM_DISTANCECHANGE_FOR_UPDATE = 1; // in Meters
-    private static final long MINIMUM_TIME_BETWEEN_UPDATE = 10000; // in Milliseconds
-    private static final long PROX_ALERT_EXPIRATION = 1000*60*60*24*2; //in milliseconds two days
-    private static final String PROX_ALERT_INTENT = "com.touchdown.smartassistant.app.Views.MapActivity";
-
-    private static final int MIN_RADIUS_METERS = 20;
-    private static final int MAX_RADIUS_METERS = 5000;
+    private static final int MIN_RADIUS_METERS = 50;
+    private static final int MAX_RADIUS_METERS = 10000;
     private static final int SEEKBAR_MULTIPLIER_BELOW_KILOMETER = 10;
     private static final int SEEKBAR_MULTIPLIER_OVER_KILOMETER = 100;
     private static final int SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD = 1000;
@@ -46,23 +43,28 @@ public class DetailsActivity extends ActionBarActivity {
     private SeekBar radiusBar;
     private int radius;
 
+    private AsyncTask<LatLng, Void, String> addressTask;
+    private ProgressBar activityIndicator;
+    private CountDownTimer timer;
+    private boolean onCreateHasRun;
+
     private TextView contentToSaveTW;
     private TextView radiusTW;
     private CompoundButton onSwitch;
     private TextView locationText;
     private ReminderDao reminder;
     private boolean editMode;
-    private LocationManager manager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(LOG_TAG, "oncreate called");
         setContentView(R.layout.activity_details);
         dbHelper = new DbHelper(this);
-        manager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
         locationText = (TextView) findViewById(R.id.location);
+        locationText.setText("");
+        this.activityIndicator = (ProgressBar) findViewById(R.id.address_progress);
         contentToSaveTW = (TextView) findViewById(R.id.contentToSave);
         radiusTW = (TextView) findViewById(R.id.radius);
 
@@ -76,10 +78,7 @@ public class DetailsActivity extends ActionBarActivity {
             ReminderDao reminder = ReminderDao.getOne(dbHelper, id);
             useExistingReminder(reminder);
         }
-
-        if(location != null){
-            locationText.setText(location.toString());
-        }
+        fetchAddress();
         setUpSeekBar();
     }
 
@@ -107,15 +106,51 @@ public class DetailsActivity extends ActionBarActivity {
         editMode = true;
     }
 
+    private void fetchAddress(){
+        if(Geocoder.isPresent() && location != null){
+            this.addressTask = new GetAddressTask(DetailsActivity.this);
+            this.addressTask.execute(location);
+            this.activityIndicator.setVisibility(View.VISIBLE);
+            startAddressTaskExpirationTimer();
+        }
+    }
+
+    private void startAddressTaskExpirationTimer(){
+        timer = new CountDownTimer(GetAddressTask.TASK_EXPIRATION_SECS * 1000, GetAddressTask.TASK_EXPIRATION_SECS * 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                finishFetchingAddress();
+                locationText.setText(getResources().getString(R.string.error_address_could_not_be_found));
+                Log.d(LOG_TAG, Calendar.getInstance().getTime() + "");
+            }
+        }.start();
+    }
+
+    private int metersToProgress(int meters){
+        if(meters <= SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD){
+            return meters/SEEKBAR_MULTIPLIER_BELOW_KILOMETER - MIN_RADIUS_METERS/SEEKBAR_MULTIPLIER_BELOW_KILOMETER;
+        }
+        return metersToProgress(SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD) +
+                (meters - SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD) / SEEKBAR_MULTIPLIER_OVER_KILOMETER;
+
+    }
+
 
     private void setUpSeekBar(){
         radiusBar = (SeekBar)findViewById(R.id.seekBar);
-        radiusBar.setProgress(MIN_RADIUS_METERS * 10);
+        if(reminder.getLocation() != null){
+            int rad = reminder.getLocation().getRadius();
+            radiusBar.setProgress(metersToProgress(rad));
+        }
 
         radiusBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int progressMultiplierTreshold = SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD/SEEKBAR_MULTIPLIER_BELOW_KILOMETER - MIN_RADIUS_METERS;
+                int progressMultiplierTreshold = metersToProgress(SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD); //SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD/SEEKBAR_MULTIPLIER_BELOW_KILOMETER - MIN_RADIUS_METERS;
 
                 if(progress < progressMultiplierTreshold){
                     radius = progress * SEEKBAR_MULTIPLIER_BELOW_KILOMETER + MIN_RADIUS_METERS;
@@ -146,7 +181,10 @@ public class DetailsActivity extends ActionBarActivity {
 
             }
         });
-        radiusBar.setMax((MAX_RADIUS_METERS - MIN_RADIUS_METERS)/10);
+        int progressUntilTreshold = SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD / SEEKBAR_MULTIPLIER_BELOW_KILOMETER;
+        int progressFromTresholdToMaxRadius = (MAX_RADIUS_METERS - SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD) / SEEKBAR_MULTIPLIER_OVER_KILOMETER;
+        int maxValue = progressUntilTreshold + progressFromTresholdToMaxRadius - MIN_RADIUS_METERS / SEEKBAR_MULTIPLIER_BELOW_KILOMETER;
+        radiusBar.setMax(maxValue);
     }
 
     private void setUpCompoundButton(){
@@ -157,10 +195,8 @@ public class DetailsActivity extends ActionBarActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     reminder.setOn(true);
-                    //addProximityAlert();
                 }else{
                     reminder.setOn(false);
-                    //removeProximityAlert();
                 }
             }
         });
@@ -189,9 +225,9 @@ public class DetailsActivity extends ActionBarActivity {
     private void updateReminder(){
         if(reminder.update(dbHelper)){
             if(onSwitch.isChecked()){
-                // addProximityAlert();
+                ProximityAlarmManager.updateAlert(reminder);
             }else{
-                // removeProximityAlert();
+                 ProximityAlarmManager.removeAlert(reminder);
             }
             Toast toast = Toast.makeText(this, R.string.successfully_edited, Toast.LENGTH_LONG);
             toast.show();
@@ -205,7 +241,7 @@ public class DetailsActivity extends ActionBarActivity {
     private void addReminder(){
 
         if(reminder.insert(dbHelper) != -1){
-            //addProximityAlert();
+            ProximityAlarmManager.saveAlert(reminder);
             Toast toast = Toast.makeText(this, R.string.successfully_added, Toast.LENGTH_LONG);
             toast.show();
             onBackPressed();
@@ -215,25 +251,10 @@ public class DetailsActivity extends ActionBarActivity {
         }
     }
 
-    private void addProximityAlert(){
-        if(reminder.getLocation() != null){
-            Intent intent = new Intent(PROX_ALERT_INTENT);
-            intent.putExtra("reminderID", reminder.getId());
-            PendingIntent proximityIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-            manager.addProximityAlert(reminder.getLocation().getLatLng().latitude,
-                    reminder.getLocation().getLatLng().longitude,
-                    reminder.getLocation().getRadius(),
-                    PROX_ALERT_EXPIRATION,
-                    proximityIntent);
-            IntentFilter filter = new IntentFilter(PROX_ALERT_INTENT);
-            registerReceiver(new ProximityIntentReceiver(), filter);
-        }
-    }
-
-    private void removeProximityAlert(){
-        Intent proximityIntent = new Intent(PROX_ALERT_INTENT);
-        //  PendingIntent pendingIntent = PendingIntent.getActivity(getBaseContext(), 0, proximityIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
-        // manager.removeProximityAlert(pendingIntent);
+    public void deliverAddress(String address){
+        this.locationText.setText(address);
+        this.activityIndicator.setVisibility(View.GONE);
+        this.timer.cancel();
     }
 
     @Override
@@ -245,6 +266,29 @@ public class DetailsActivity extends ActionBarActivity {
         Intent intent = new Intent();
         intent.putExtras(bundle);
         super.onBackPressed();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if((locationText.getText().equals("") ||
+                locationText.getText().equals(getResources().getString(R.string.error_address_could_not_be_found)))
+                && addressTask.getStatus() != AsyncTask.Status.RUNNING){
+            fetchAddress();
+        }
+    }
+
+    private void finishFetchingAddress(){
+        this.addressTask.cancel(true);
+        this.activityIndicator.setVisibility(View.GONE);
+    }
+
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        finishFetchingAddress();
+        timer.cancel();
     }
 
 

@@ -36,5 +36,9 @@
     <string name="error_no_marker_selected">No reminder selected</string>
     <string name="remove_confirmation">Are you sure you want to delete this reminder?</string>
     <string name="erro_no_reminder_text_entered">You must provide a reminder text</string>
+    <string name="estimated_address">Estimated address</string>
+    <string name="error_address_could_not_be_found">couldn\'t find address</string>
+    <string name="error_choose_one_reminder">Please choose one reminder to edit</string>
+    <string name="error_choose_only_one_reminder">Please choose only one reminder to edit</string>
 
 </resources>

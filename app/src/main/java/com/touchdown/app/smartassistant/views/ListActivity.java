@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.Util;
+import com.touchdown.app.smartassistant.data.Dao;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.ReminderDao;
@@ -33,10 +34,13 @@ public class ListActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_list);
         listView = (ListView) findViewById(R.id.list);
 
         dbHelper = new DbHelper(this);
+        Dao dao = new Dao(dbHelper);
+        dao.insert();
   /*      int version = dbHelper.getReadableDatabase().getVersion();
 
         Toast.makeText(this, "Current db version: " + version, Toast.LENGTH_LONG).show();*/
@@ -105,6 +109,13 @@ public class ListActivity extends ActionBarActivity {
         adapter.swapCursor(newCursor);
     }
 
+    public void startEdit(long reminderId){
+        Intent intent = new Intent(this, DetailsActivity.class);
+        intent.putExtra("reminderID", reminderId);
+        startActivity(intent);
+    }
+
+
     @Override
     public void onResume(){
         updateList();
@@ -164,6 +175,24 @@ public class ListActivity extends ActionBarActivity {
                     }
                 }
                 return true;
+            case R.id.action_edit:
+                checked = listView.getCheckedItemPositions();
+                if(listView.getCheckedItemCount() == 1){
+                    for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+                        if (checked.get(i)) {
+                            cursor = (Cursor) adapter.getItem(i);
+                            int idIndex = cursor.getColumnIndex(DbContract.ReminderEntry._ID);
+                            long reminderId = cursor.getLong(idIndex);
+                            startEdit(reminderId);
+
+                        }
+                    }
+
+                }else if(listView.getCheckedItemCount() < 1){
+                    Toast.makeText(this, R.string.error_choose_one_reminder, Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(this, R.string.error_choose_only_one_reminder, Toast.LENGTH_SHORT).show();
+                }
         }
         return false;
         //return super.onOptionsItemSelected(item);

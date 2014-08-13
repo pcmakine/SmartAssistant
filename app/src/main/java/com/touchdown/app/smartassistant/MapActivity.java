@@ -26,6 +26,7 @@ import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
 import com.touchdown.app.smartassistant.services.MarkerManager;
+import com.touchdown.app.smartassistant.services.ProximityAlarmManager;
 import com.touchdown.app.smartassistant.views.DetailsActivity;
 
 import java.util.List;
@@ -205,7 +206,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         ReminderDao.remove(new DbHelper(MapActivity.appCtx), markerManager.getReminder(markerManager.getSelectedMarker()).getId());
-                        //   removeProximityAlert();
+                        ProximityAlarmManager.removeAlert(markerManager.getReminder(markerManager.getSelectedMarker()));
 
                         markerManager.removeSelectedMarker();
                         supportInvalidateOptionsMenu();
@@ -271,6 +272,8 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             loc.update(new DbHelper(this));
             markerManager.selectMarker(marker);
             markerManager.updateRadius(marker);
+
+            ProximityAlarmManager.updateAlert(reminder);
         }
     }
 

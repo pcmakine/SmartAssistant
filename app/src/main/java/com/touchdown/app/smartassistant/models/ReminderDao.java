@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class ReminderDao {
 
-    private String content;
     private long id;
+    private String content;
     private LocationDao location;
     private boolean isOn;
 
