@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
 
-import com.touchdown.app.smartassistant.MapActivity;
-import com.touchdown.app.smartassistant.models.ReminderDao;
+import com.touchdown.app.smartassistant.ApplicationContextProvider;
+import com.touchdown.app.smartassistant.models.Reminder;
+
+import java.util.List;
 
 /**
  * Created by Pete on 11.8.2014.
@@ -16,14 +18,14 @@ public class ProximityAlarmManager {
     private static final String PROX_ALERT_INTENT = "com.touchdown.app.smartassistant.services.ProximityIntentReceiver";
 
 
-    public static void updateAlert(ReminderDao reminder){
+    public static void updateAlert(Reminder reminder){
         saveAlert(reminder);
     }
 
-    public static void saveAlert(ReminderDao reminder){
+    public static void saveAlert(Reminder reminder){
         if(reminder.getLocation() != null){
-            LocationManager locationManager = (LocationManager) MapActivity.appCtx.getSystemService(Context.LOCATION_SERVICE);
-            PendingIntent proximityIntent = constructPendingIntent(reminder);
+            LocationManager locationManager = (LocationManager) ApplicationContextProvider.getAppContext().getSystemService(Context.LOCATION_SERVICE);
+            PendingIntent proximityIntent = constructPendingIntent(reminder.getId());
             locationManager.addProximityAlert(reminder.getLocation().getLatLng().latitude,
                     reminder.getLocation().getLatLng().longitude,
                     reminder.getLocation().getRadius(),
@@ -32,17 +34,18 @@ public class ProximityAlarmManager {
         }
     }
 
-    public static void removeAlert(ReminderDao reminder){
-        LocationManager locationManager = (LocationManager) MapActivity.appCtx.getSystemService(Context.LOCATION_SERVICE);
-        PendingIntent pIndent = constructPendingIntent(reminder);
+    public static void removeAlert(long reminderId){
+        LocationManager locationManager = (LocationManager) ApplicationContextProvider.getAppContext().getSystemService(Context.LOCATION_SERVICE);
+        PendingIntent pIndent = constructPendingIntent(reminderId);
         locationManager.removeProximityAlert(pIndent);
     }
 
-    private static PendingIntent constructPendingIntent(ReminderDao reminder){
-        Intent intent = new Intent(MapActivity.appCtx, ProximityIntentReceiver.class);
-        intent.putExtra("reminderID", reminder.getId());
+    //todo find out how to make sure that the app context is always available (put it to the launcher activity maybe?)
+    private static PendingIntent constructPendingIntent(long reminderId){
+        Intent intent = new Intent(ApplicationContextProvider.getAppContext(), ProximityIntentReceiver.class);
+        intent.putExtra("reminderID", reminderId);
         //todo handle the case where the reminder id has grown too much to fit into int
-        PendingIntent proximityIntent = PendingIntent.getBroadcast(MapActivity.appCtx, (int) reminder.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent proximityIntent = PendingIntent.getBroadcast(ApplicationContextProvider.getAppContext(), (int) reminderId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return proximityIntent;
     }
 

@@ -1,5 +1,6 @@
 package com.touchdown.app.smartassistant.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
@@ -29,18 +30,14 @@ public class ListActivity extends ActionBarActivity {
     public static final String LOG_TAG = ListActivity.class.getSimpleName();
     private SimpleCursorAdapter adapter;
     private ListView listView;
-    private DbHelper dbHelper;
+    private ReminderDao reminderManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_list);
         listView = (ListView) findViewById(R.id.list);
 
-        dbHelper = new DbHelper(this);
-        Dao dao = new Dao(dbHelper);
-        dao.insert();
   /*      int version = dbHelper.getReadableDatabase().getVersion();
 
         Toast.makeText(this, "Current db version: " + version, Toast.LENGTH_LONG).show();*/
@@ -50,7 +47,9 @@ public class ListActivity extends ActionBarActivity {
        // Util.clearDb(dbHelper, this);
     //    Util.clearAndInsertTestData(dbHelper, this);
 
-        Cursor cursor =  ReminderDao.getAll(dbHelper);
+        reminderManager = new ReminderDao(new DbHelper(getApplicationContext()));
+
+        Cursor cursor =  reminderManager.getAll();
 
         adapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,
                 new String[] {DbContract.ReminderEntry.COLUMN_NAME_CONTENT}, new int[] {R.id.itemText},
@@ -104,7 +103,7 @@ public class ListActivity extends ActionBarActivity {
     }
 
     public void updateList(){
-        Cursor newCursor = ReminderDao.getAll(dbHelper);
+        Cursor newCursor = reminderManager.getAll();
 
         adapter.swapCursor(newCursor);
     }
@@ -149,7 +148,7 @@ public class ListActivity extends ActionBarActivity {
                         int idIndex = cursor.getColumnIndex(DbContract.ReminderEntry._ID);
                         long reminderId = cursor.getLong(idIndex);
 
-                        ReminderDao.remove(dbHelper, reminderId);
+                        reminderManager.remove(reminderId);
 
                         listView.setItemChecked(i, false);
                         toggleCheckBox(i);

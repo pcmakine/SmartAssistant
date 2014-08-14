@@ -15,7 +15,7 @@ public class ReminderManager {
     }
 
     public void insert(ReminderDao reminder){
-        reminder.insert(dbHelper);
+       //reminder.insert(dbHelper);
     }
 
 

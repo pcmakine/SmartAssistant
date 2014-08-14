@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.Context;
 
 import com.touchdown.app.smartassistant.data.DbHelper;
+import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 
 /**
@@ -35,11 +36,10 @@ public class HandleAlarmService extends IntentService {
             long id = intent.getLongExtra("reminderID", -1);
 
             if(id != -1){
-                DbHelper dbHelper = new DbHelper(this);
-                ReminderDao reminder = ReminderDao.getOne(dbHelper, id);
-                reminder.setOn(false);
-                reminder.update(dbHelper);
-                ProximityAlarmManager.removeAlert(reminder);
+                ReminderDao reminderManager = new ReminderDao(new DbHelper(getApplicationContext()));
+                Reminder reminder = reminderManager.getOne(id);
+                reminder.turnOff();
+                reminderManager.update(reminder);
                 AlarmNotification.buildAlarmNotification(this, reminder);
             }
             ProximityIntentReceiver.completeWakefulIntent(intent);

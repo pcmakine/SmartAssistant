@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
 import com.touchdown.app.smartassistant.services.MarkerManager;
@@ -37,7 +38,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     private LocationManager locationManager;
     private MarkerManager markerManager;
-    public static Context appCtx;
+    private ReminderDao reminderManager;
 
     // Google Map
     private GoogleMap googleMap;
@@ -46,7 +47,8 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        appCtx = getApplicationContext();
+
+        this.reminderManager = new ReminderDao(new DbHelper(this));
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         Button findLocationBtn = (Button) findViewById(R.id.findLocationBtn);
@@ -151,18 +153,11 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
         }
     }
 
-    public void startEdit(ReminderDao r){
+    public void startEdit(Reminder r){
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra("reminderID", r.getId());
         startActivity(intent);
     }
-
-    private void removeProximityAlert(){
-        Intent proximityIntent = new Intent("com.artofcodeapps.locationalarm.app.Views.MenuActivity");
-      //  PendingIntent pendingIntent = PendingIntent.getActivity(getBaseContext(), 0, proximityIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
-    //    locationManager.removeProximityAlert(pendingIntent);
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -205,8 +200,8 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        ReminderDao.remove(new DbHelper(MapActivity.appCtx), markerManager.getReminder(markerManager.getSelectedMarker()).getId());
-                        ProximityAlarmManager.removeAlert(markerManager.getReminder(markerManager.getSelectedMarker()));
+                        reminderManager.remove(markerManager.getReminder(markerManager.getSelectedMarker()).getId());
+                        //   ProximityAlarmManager.removeAlert(markerManager.getReminder(markerManager.getSelectedMarker()));
 
                         markerManager.removeSelectedMarker();
                         supportInvalidateOptionsMenu();
@@ -215,7 +210,6 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                 .setNegativeButton("No", null)
                 .show();
     }
-
 
     @Override
     public void onMapLongClick(LatLng point) {
@@ -229,7 +223,9 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     @Override
     protected void onResume() {
         initializeMap();
-        markerManager = new MarkerManager(googleMap, this);
+
+        markerManager = new MarkerManager(googleMap, reminderManager);
+
         super.onResume();
     }
 
@@ -247,7 +243,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        ReminderDao reminder = markerManager.getReminder(marker);
+        Reminder reminder = markerManager.getReminder(marker);
         if(reminder != null){
             startEdit(reminder);
         }
@@ -265,15 +261,16 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     @Override
     public void onMarkerDragEnd(Marker marker) {
-        ReminderDao reminder = markerManager.getReminder(marker);
+        Reminder reminder = markerManager.getReminder(marker);
         if(reminder != null){
             LocationDao loc = reminder.getLocation();
             loc.setLocation(marker.getPosition());
-            loc.update(new DbHelper(this));
+            //loc.update(new DbHelper(this));
+            reminderManager.update(reminder);
             markerManager.selectMarker(marker);
             markerManager.updateRadius(marker);
-
-            ProximityAlarmManager.updateAlert(reminder);
+            //markerManager.updateData();
+            //ProximityAlarmManager.updateAlert(reminder);
         }
     }
 

@@ -5,16 +5,17 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.CircleOptionsCreator;
 import com.google.android.gms.maps.model.Marker;
 import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 
 /**
  * Created by Pete on 8.8.2014.
  */
 public class MarkerData {
-    private ReminderDao reminder;
+    private Reminder reminder;
     private Circle radius;
 
-    public MarkerData(ReminderDao reminder, Circle radius) {
+    public MarkerData(Reminder reminder, Circle radius) {
         this.radius = radius;
         this.reminder = reminder;
     }
@@ -31,7 +32,7 @@ public class MarkerData {
         return reminder == null;
     }
 
-    public ReminderDao getReminder() {
+    public Reminder getReminder() {
         return reminder;
     }
 

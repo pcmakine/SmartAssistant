@@ -6,9 +6,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.touchdown.app.smartassistant.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.views.DetailsActivity;
+import com.touchdown.app.smartassistant.views.ListActivity;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -113,10 +115,10 @@ public class GetAddressTask extends AsyncTask <LatLng, Void, String> {
                 // Return the text
                 return addressText;
             } else {
-                return MapActivity.appCtx.getResources().getString(R.string.error_address_could_not_be_found);
+                return ApplicationContextProvider.getAppContext().getResources().getString(R.string.error_address_could_not_be_found);
             }
         }
-        return MapActivity.appCtx.getResources().getString(R.string.error_address_could_not_be_found);
+        return ApplicationContextProvider.getAppContext().getResources().getString(R.string.error_address_could_not_be_found);
     }
     /**
      * A method that's called once doInBackground() completes. Turn

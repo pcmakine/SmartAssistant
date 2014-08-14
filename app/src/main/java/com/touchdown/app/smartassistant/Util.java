@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 
 /**
@@ -17,20 +18,21 @@ public class Util {
 
     public static void clearAndInsertTestData(SQLiteOpenHelper dbHelper, Context context){
         clearDb(dbHelper, context);
-        insertTestData(dbHelper, TEST_REMINDER_DEFAULT_COUNT);
+        insertTestData(context, TEST_REMINDER_DEFAULT_COUNT);
     }
 
     public static void clearDb(SQLiteOpenHelper dbHelper, Context context){
         context.deleteDatabase(DbHelper.DATABASE_NAME);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+       // SQLiteDatabase db = dbHelper.getWritableDatabase();
     }
 
-    public static void insertTestData(SQLiteOpenHelper dbHelper, int numberOfRecords){
+    public static void insertTestData(Context context, int numberOfRecords){
+        ReminderDao reminderManager = new ReminderDao(new DbHelper(context));
         for (int i = 0; i < numberOfRecords; i++){
             double lat = 60 + i*0.1;
-            ReminderDao reminder = new ReminderDao(-1, i + ". reminder", new LocationDao(-1, -1, new LatLng(lat, 25), 100));
+            Reminder reminder = new Reminder(-1, i + ". reminder", new LocationDao(-1, -1, new LatLng(lat, 25), 100));
 
-            reminder.insert(dbHelper);
+            reminderManager.insert(reminder);
         }
 
     }

@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.data.MarkerData;
 import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,18 +38,24 @@ public class MarkerManager {
 
     private HashMap<Marker, MarkerData> markerDataMap;
 
-    public MarkerManager(GoogleMap map, Context context){
+    private ReminderDao reminderManager;
+
+    public MarkerManager(GoogleMap map, ReminderDao reminderManager){
         this.map = map;
-      //  this.markerReminderMap = new HashMap();
+        this.reminderManager = reminderManager;
         this.markerDataMap = new HashMap<Marker, MarkerData>();
-        populateMapWithMarkers(context);
+        populateMapWithMarkers();
         this.selectedMarker = null;
     }
 
-    public void populateMapWithMarkers(Context context){
-        DbHelper dbHelper = new DbHelper(context);
-        List<ReminderDao> reminderList = ReminderDao.cursorDataAsList(dbHelper, ReminderDao.getAll(dbHelper));
-        for (ReminderDao reminder: reminderList){
+ /*   public void updateData(){
+        List<Reminder> reminderList = reminderManager.cursorDataAsList(reminderManager.getAll());
+        this.selectedMarker = null;
+    }
+*/
+    public void populateMapWithMarkers(){
+        List<Reminder> reminderList = reminderManager.cursorDataAsList(reminderManager.getAll());
+        for (Reminder reminder: reminderList){
             if(reminder.getLocation() != null){
                 saveMarker(generateMarker(reminder.getContent(), reminder.getLocation().getLatLng(), NON_EMPTY_MARKER_ON), reminder);
             }
@@ -65,7 +72,7 @@ public class MarkerManager {
         return marker;
     }
 
-    public void saveMarker(Marker marker, ReminderDao reminder){    //reminder may be null
+    public void saveMarker(Marker marker, Reminder reminder){    //reminder may be null
         Circle radius = null;
         if(reminder != null){
             radius = addRadius(reminder.getLocation());
@@ -137,7 +144,7 @@ public class MarkerManager {
     }
 
     private void showMarkerInfoWindow(Marker marker){
-        ReminderDao reminder = markerDataMap.get(marker).getReminder();
+        Reminder reminder = markerDataMap.get(marker).getReminder();
         if(reminder != null && reminder.getLocation() != null){
             marker.setTitle(StringUtils.abbreviate(reminder.getContent(), 20));
             marker.showInfoWindow();
@@ -165,7 +172,7 @@ public class MarkerManager {
 
     }
 
-    public ReminderDao getReminder(Marker marker){
+    public Reminder getReminder(Marker marker){
         if(marker != null){
             return markerDataMap.get(marker).getReminder();
         }

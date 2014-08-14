@@ -11,6 +11,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
+import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 
 /**
@@ -20,7 +21,7 @@ public class AlarmNotification {
 
     private static final int NOTIFICATION_ID = 1000;
 
-    public static void buildAlarmNotification(Context context, ReminderDao reminder){
+    public static void buildAlarmNotification(Context context, Reminder reminder){
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, MapActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -28,7 +29,7 @@ public class AlarmNotification {
         notificationManager.notify((int) reminder.getId(), notification);
     }
 
-    private static Notification createNotification(Context context, PendingIntent pendingIntent, ReminderDao reminder){
+    private static Notification createNotification(Context context, PendingIntent pendingIntent, Reminder reminder){
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         return new NotificationCompat.Builder(context)
                 .setContentTitle("Proximity alert")
@@ -44,7 +45,7 @@ public class AlarmNotification {
                 .build();
     }
 
-    public static void cancelNotification(Context context, ReminderDao reminder){
+    public static void cancelNotification(Context context, Reminder reminder){
         if (Context.NOTIFICATION_SERVICE!=null) {
             NotificationManager nMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             nMgr.cancel((int) reminder.getId());

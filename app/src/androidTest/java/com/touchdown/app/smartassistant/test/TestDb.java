@@ -7,9 +7,11 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 
 import java.util.Map;
@@ -23,6 +25,13 @@ public class TestDb extends AndroidTestCase {
 
     public static final double TESTLAT = 64.772;
     public static final double TESTLONG = -147.335;
+
+    ReminderDao reminderManager;
+
+    @Override
+    public void setUp(){
+        reminderManager = new ReminderDao(new DbHelper(mContext));
+    }
 
     public void testCreateDb() throws Throwable {
         mContext.deleteDatabase(DbHelper.DATABASE_NAME);
@@ -49,10 +58,10 @@ public class TestDb extends AndroidTestCase {
         DbHelper dbHelper = new DbHelper(mContext);
         SQLiteDatabase db  = dbHelper.getWritableDatabase();
 
-        ReminderDao reminder = new ReminderDao(-1, reminderContent, null);
+        Reminder reminder = new Reminder(-1, reminderContent, null);
         reminder.turnOn();
 
-        ContentValues vals = reminder.values();
+        ContentValues vals = reminderManager.values(reminder);
 
         long reminderId;
         reminderId = db.insert(DbContract.ReminderEntry.TABLE_NAME, null, vals);

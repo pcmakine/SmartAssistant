@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.models.ReminderDao;
 import com.touchdown.app.smartassistant.services.GetAddressTask;
 import com.touchdown.app.smartassistant.services.ProximityAlarmManager;
@@ -46,14 +47,15 @@ public class DetailsActivity extends ActionBarActivity {
     private AsyncTask<LatLng, Void, String> addressTask;
     private ProgressBar activityIndicator;
     private CountDownTimer timer;
-    private boolean onCreateHasRun;
 
     private TextView contentToSaveTW;
     private TextView radiusTW;
     private CompoundButton onSwitch;
     private TextView locationText;
-    private ReminderDao reminder;
+    private Reminder reminder;
     private boolean editMode;
+
+    private ReminderDao reminderManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,7 @@ public class DetailsActivity extends ActionBarActivity {
         Log.e(LOG_TAG, "oncreate called");
         setContentView(R.layout.activity_details);
         dbHelper = new DbHelper(this);
+        reminderManager = new ReminderDao(dbHelper);
 
         locationText = (TextView) findViewById(R.id.location);
         locationText.setText("");
@@ -75,7 +78,7 @@ public class DetailsActivity extends ActionBarActivity {
             makeNewReminder();
         }else{
             long id = intent.getLongExtra("reminderID", -1);
-            ReminderDao reminder = ReminderDao.getOne(dbHelper, id);
+            Reminder reminder = reminderManager.getOne(id);
             useExistingReminder(reminder);
         }
         fetchAddress();
@@ -89,16 +92,16 @@ public class DetailsActivity extends ActionBarActivity {
     private void makeNewReminder(){
         this.location = getIntent().getParcelableExtra("location");
         if(location != null){
-            this.reminder = new ReminderDao(-1, null, new LocationDao(-1, -1, location, radius));
+            this.reminder = new Reminder(-1, null, new LocationDao(-1, -1, location, radius));
         }else{
-            this.reminder = new ReminderDao(-1, null, null);
+            this.reminder = new Reminder(-1, null, null);
         }
         reminder.setOn(true);
         onSwitch.setChecked(true);
         editMode = false;
     }
 
-    private void useExistingReminder(ReminderDao reminder){
+    private void useExistingReminder(Reminder reminder){
         this.reminder = reminder;
         this.location = reminder.getLocation().getLatLng();
         contentToSaveTW.setText(reminder.getContent());
@@ -223,12 +226,12 @@ public class DetailsActivity extends ActionBarActivity {
     }
 
     private void updateReminder(){
-        if(reminder.update(dbHelper)){
-            if(onSwitch.isChecked()){
+        if(reminderManager.update(reminder)){
+/*            if(onSwitch.isChecked()){
                 ProximityAlarmManager.updateAlert(reminder);
             }else{
-                 ProximityAlarmManager.removeAlert(reminder);
-            }
+                 ProximityAlarmManager.removeAlert(reminder.getId());
+            }*/
             Toast toast = Toast.makeText(this, R.string.successfully_edited, Toast.LENGTH_LONG);
             toast.show();
             onBackPressed();
@@ -239,9 +242,8 @@ public class DetailsActivity extends ActionBarActivity {
     }
 
     private void addReminder(){
-
-        if(reminder.insert(dbHelper) != -1){
-            ProximityAlarmManager.saveAlert(reminder);
+        if(reminderManager.insert(reminder) != -1){
+            //ProximityAlarmManager.saveAlert(reminder);
             Toast toast = Toast.makeText(this, R.string.successfully_added, Toast.LENGTH_LONG);
             toast.show();
             onBackPressed();
