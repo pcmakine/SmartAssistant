@@ -1,14 +1,13 @@
 package com.touchdown.app.smartassistant;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.models.ReminderDao;
+import com.touchdown.app.smartassistant.services.ReminderManager;
 
 /**
  * Created by Pete on 4.8.2014.
@@ -27,7 +26,7 @@ public class Util {
     }
 
     public static void insertTestData(Context context, int numberOfRecords){
-        ReminderDao reminderManager = new ReminderDao(new DbHelper(context));
+        ReminderManager reminderManager = ReminderManager.getInstance(context);
         for (int i = 0; i < numberOfRecords; i++){
             double lat = 60 + i*0.1;
             Reminder reminder = new Reminder(-1, i + ". reminder", new LocationDao(-1, -1, new LatLng(lat, 25), 100));

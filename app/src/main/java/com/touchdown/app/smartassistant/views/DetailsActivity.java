@@ -22,9 +22,8 @@ import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.models.ReminderDao;
+import com.touchdown.app.smartassistant.services.ReminderManager;
 import com.touchdown.app.smartassistant.services.GetAddressTask;
-import com.touchdown.app.smartassistant.services.ProximityAlarmManager;
 
 import java.util.Calendar;
 
@@ -55,7 +54,7 @@ public class DetailsActivity extends ActionBarActivity {
     private Reminder reminder;
     private boolean editMode;
 
-    private ReminderDao reminderManager;
+    private ReminderManager reminderManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +62,7 @@ public class DetailsActivity extends ActionBarActivity {
         Log.e(LOG_TAG, "oncreate called");
         setContentView(R.layout.activity_details);
         dbHelper = new DbHelper(this);
-        reminderManager = new ReminderDao(dbHelper);
+        reminderManager = ReminderManager.getInstance(this);
 
         locationText = (TextView) findViewById(R.id.location);
         locationText.setText("");

@@ -1,17 +1,14 @@
 package com.touchdown.app.smartassistant.data;
 
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.CircleOptionsCreator;
 import com.google.android.gms.maps.model.Marker;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.models.ReminderDao;
 
 /**
  * Created by Pete on 8.8.2014.
  */
-public class MarkerData {
+public class MarkerData implements Comparable{
     private Reminder reminder;
     private Circle radius;
 
@@ -57,5 +54,19 @@ public class MarkerData {
     public void remove(Marker marker){
         radius.remove();
         marker.remove();
+    }
+
+    @Override
+    public int compareTo(Object another) {
+        MarkerData compareData = (MarkerData) another;
+        if(reminder == null && compareData.noReminder()){
+            return 0;
+        }else if(reminder == null){
+            return 1;
+        }else if(compareData.noReminder()){
+            return -1;
+        }else{
+            return reminder.compareTo(compareData.getReminder());
+        }
     }
 }

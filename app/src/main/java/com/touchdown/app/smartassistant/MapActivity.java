@@ -21,24 +21,27 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.touchdown.app.smartassistant.data.DbHelper;
+import com.touchdown.app.smartassistant.data.DataOperation;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.models.ReminderDao;
+import com.touchdown.app.smartassistant.services.MyLocationProvider;
+import com.touchdown.app.smartassistant.services.ReminderManager;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
 import com.touchdown.app.smartassistant.services.MarkerManager;
-import com.touchdown.app.smartassistant.services.ProximityAlarmManager;
 import com.touchdown.app.smartassistant.views.DetailsActivity;
 
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLongClickListener,
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMarkerDragListener{
+        GoogleMap.OnMarkerDragListener, Observer{
 
-    private LocationManager locationManager;
     private MarkerManager markerManager;
-    private ReminderDao reminderManager;
+    private ReminderManager reminderManager;
+    private boolean onCreateRan;
+    private MyLocationProvider locProvider;
 
     // Google Map
     private GoogleMap googleMap;
@@ -48,9 +51,9 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        this.reminderManager = new ReminderDao(new DbHelper(this));
+        reminderManager = ReminderManager.getInstance(this);
 
-        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        locProvider = new MyLocationProvider(this);
         Button findLocationBtn = (Button) findViewById(R.id.findLocationBtn);
         findLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +65,9 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                 }
             }
         });
+        initializeMap();
+        markerManager = new MarkerManager(googleMap, reminderManager);
+        onCreateRan = true;
     }
 
     /**
@@ -82,7 +88,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             googleMap.setOnMarkerClickListener(this);
             googleMap.setOnInfoWindowClickListener(this);
             googleMap.setOnMarkerDragListener(this);
-            Location loc = getLocation();
+            Location loc = locProvider.getLocation();
             animateToLocation(loc);
 
             // check if map is created successfully or not
@@ -93,38 +99,6 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                         .show();*/
             }
         }
-    }
-
-
-    private Location getLocation(){
-        int minTime = 0;
-        List<String> matchingProviders = locationManager.getAllProviders();
-        String prov = matchingProviders.get(0);
-        Location loc = locationManager.getLastKnownLocation(prov);
-        float bestAccuracy = loc.getAccuracy();
-        Location bestResult = loc;
-        long bestTime = loc.getTime();
-
-        for (String provider: matchingProviders) {
-            Location location = locationManager.getLastKnownLocation(provider);
-
-            if (location != null) {
-                float accuracy = location.getAccuracy();
-                long time = location.getTime();
-
-                if ((time > minTime && accuracy < bestAccuracy)) {
-                    bestResult = location;
-                    bestAccuracy = accuracy;
-                    bestTime = time;
-                }
-                else if (time < minTime &&
-                        bestAccuracy == Float.MAX_VALUE && time > bestTime){
-                    bestResult = location;
-                    bestTime = time;
-                }
-            }
-        }
-        return bestResult;
     }
 
     private void animateToLocation(Location loc){
@@ -222,11 +196,19 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     @Override
     protected void onResume() {
-        initializeMap();
-
-        markerManager = new MarkerManager(googleMap, reminderManager);
+        if(!onCreateRan){
+            markerManager.updateMarkerData();
+        }
+        reminderManager.addObserver(this);
 
         super.onResume();
+    }
+
+    @Override
+    protected void onPause(){
+        onCreateRan = false;
+        reminderManager.deleteObserver(this);
+        super.onPause();
     }
 
     @Override
@@ -260,19 +242,24 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     }
 
     @Override
-    public void onMarkerDragEnd(Marker marker) {
+    public synchronized void onMarkerDragEnd(Marker marker) {
         Reminder reminder = markerManager.getReminder(marker);
         if(reminder != null){
             LocationDao loc = reminder.getLocation();
             loc.setLocation(marker.getPosition());
-            //loc.update(new DbHelper(this));
-            reminderManager.update(reminder);
             markerManager.selectMarker(marker);
             markerManager.updateRadius(marker);
-            //markerManager.updateData();
-            //ProximityAlarmManager.updateAlert(reminder);
+            reminderManager.update(reminder);
         }
     }
 
-
+    @Override
+    public void update(Observable observable, Object data) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                markerManager.updateMarkerData();
+            }
+        });
+    }
 }

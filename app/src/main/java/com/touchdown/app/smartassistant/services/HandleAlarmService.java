@@ -2,11 +2,9 @@ package com.touchdown.app.smartassistant.services;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.Context;
 
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.models.ReminderDao;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -36,7 +34,7 @@ public class HandleAlarmService extends IntentService {
             long id = intent.getLongExtra("reminderID", -1);
 
             if(id != -1){
-                ReminderDao reminderManager = new ReminderDao(new DbHelper(getApplicationContext()));
+                ReminderManager reminderManager = ReminderManager.getInstance(this);
                 Reminder reminder = reminderManager.getOne(id);
                 reminder.turnOff();
                 reminderManager.update(reminder);

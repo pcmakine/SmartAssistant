@@ -9,7 +9,7 @@ import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.models.ReminderDao;
+import com.touchdown.app.smartassistant.services.ReminderManager;
 
 /**
  * Created by Pete on 4.8.2014.
@@ -20,12 +20,12 @@ public class TestReminderDao extends AndroidTestCase {
     public static final double TESTLAT = 64.772;
     public static final double TESTLONG = -147.335;
     DbHelper dbHelper;
-    ReminderDao reminderManager;
+    ReminderManager reminderManager;
 
 
     @Override
     public void setUp(){
-        reminderManager = new ReminderDao(new DbHelper(mContext));
+        reminderManager = ReminderManager.getInstance(mContext);
         Util.clearDb(dbHelper, mContext);
     }
 

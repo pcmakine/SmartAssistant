@@ -12,7 +12,6 @@ import android.support.v4.app.NotificationCompat;
 import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.models.ReminderDao;
 
 /**
  * Created by Pete on 11.8.2014.

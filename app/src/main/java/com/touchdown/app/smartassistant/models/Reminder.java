@@ -3,7 +3,7 @@ package com.touchdown.app.smartassistant.models;
 /**
  * Created by Pete on 13.8.2014.
  */
-public class Reminder {
+public class Reminder implements Comparable{
 
     private long id;
     private String content;
@@ -19,7 +19,6 @@ public class Reminder {
     public boolean isOn(){
         return isOn;
     }
-
 
     public void setOn(boolean on){
         this.isOn = on;
@@ -53,5 +52,33 @@ public class Reminder {
         this.id = id;
     }
 
+    //todo check somewhere that this is a good way to implement equals
+    @Override
+    public boolean equals(Object obj){
+        if(!(obj instanceof Reminder)){
+            return false;
+        }
+        Reminder reminder = (Reminder) obj;
 
+        return id == reminder.getId() && content == reminder.getContent();
+    }
+
+    @Override
+    public int hashCode() {
+        int constant = 7;
+        int hash = content.hashCode() + constant;
+        return hash;
+    }
+
+
+    @Override
+    public int compareTo(Object another) {
+        Reminder reminder = (Reminder) another;
+        if(id < reminder.getId()){
+            return -1;
+        }else if(id > reminder.getId()){
+            return 1;
+        }
+        return 0;
+    }
 }

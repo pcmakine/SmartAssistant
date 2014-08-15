@@ -1,6 +1,5 @@
 package com.touchdown.app.smartassistant.views;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
@@ -19,18 +18,16 @@ import android.widget.Toast;
 
 import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.Util;
-import com.touchdown.app.smartassistant.data.Dao;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.models.ReminderDao;
+import com.touchdown.app.smartassistant.services.ReminderManager;
 
 
 public class ListActivity extends ActionBarActivity {
     public static final String LOG_TAG = ListActivity.class.getSimpleName();
     private SimpleCursorAdapter adapter;
     private ListView listView;
-    private ReminderDao reminderManager;
+    private ReminderManager reminderManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +44,7 @@ public class ListActivity extends ActionBarActivity {
        // Util.clearDb(dbHelper, this);
     //    Util.clearAndInsertTestData(dbHelper, this);
 
-        reminderManager = new ReminderDao(new DbHelper(getApplicationContext()));
+        reminderManager = ReminderManager.getInstance(this);
 
         Cursor cursor =  reminderManager.getAll();
 

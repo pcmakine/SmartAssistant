@@ -1,6 +1,5 @@
 package com.touchdown.app.smartassistant.services;
 
-import android.content.Context;
 import android.graphics.Color;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -10,17 +9,20 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.touchdown.app.smartassistant.data.DbHelper;
+import com.touchdown.app.smartassistant.data.DataOperation;
 import com.touchdown.app.smartassistant.data.MarkerData;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.models.ReminderDao;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Created by Pete on 6.8.2014.
@@ -32,15 +34,15 @@ public class MarkerManager {
     private static final float EMPTY_MARKER_COLOR = BitmapDescriptorFactory.HUE_RED;
 
     private GoogleMap map;
-  //  private Map<Marker, ReminderDao> markerReminderMap;
-   // private HashMap<LatLng, Circle> centerRadiusMap;
+    //  private Map<Marker, ReminderDao> markerReminderMap;
+    // private HashMap<LatLng, Circle> centerRadiusMap;
     private Marker selectedMarker;
 
-    private HashMap<Marker, MarkerData> markerDataMap;
+    private Map<Marker, MarkerData> markerDataMap;
 
-    private ReminderDao reminderManager;
+    private ReminderManager reminderManager;
 
-    public MarkerManager(GoogleMap map, ReminderDao reminderManager){
+    public MarkerManager(GoogleMap map, ReminderManager reminderManager){
         this.map = map;
         this.reminderManager = reminderManager;
         this.markerDataMap = new HashMap<Marker, MarkerData>();
@@ -48,19 +50,71 @@ public class MarkerManager {
         this.selectedMarker = null;
     }
 
- /*   public void updateData(){
+    public void updateMarkerData(){
         List<Reminder> reminderList = reminderManager.cursorDataAsList(reminderManager.getAll());
+
+        map.clear();
+
+        markerDataMap.clear();
+
+        populateMapWithMarkers(reminderList);
+
+    }
+
+ /*   public void updateMarkerData(DataOperation op){
+        List<Reminder> reminderList = reminderManager.cursorDataAsList(reminderManager.getAll());
+
+        Map<Marker, MarkerData> data = MapSort.sortByValue(markerDataMap);
+        Set<Marker> keyset = data.keySet();
+        Iterator<Marker> iterator = keyset.iterator();
+
+
+        for(Reminder reminder: reminderList){
+            MarkerData markerData;
+            if(iterator.hasNext()){
+                markerData = iterator.next();
+                if(reminder.equals(markerData.getReminder())){
+
+                }
+            }
+
+        }
         this.selectedMarker = null;
     }
-*/
-    public void populateMapWithMarkers(){
-        List<Reminder> reminderList = reminderManager.cursorDataAsList(reminderManager.getAll());
+
+    private void updateMarkerDataOnRemove(Set<Marker> data, Iterator<Marker> iterator, List<Reminder> reminderList){
+
+        while(iterator.hasNext()){
+            if(){
+
+            }
+        }
+
+        for(Reminder reminder: reminderList){
+            MarkerData markerData;
+            if(iterator.hasNext()){
+                markerData = iterator.next();
+                if(reminder.equals(markerData.getReminder())){
+
+                }
+            }
+
+        }
+
+    }*/
+
+    public void populateMapWithMarkers(List<Reminder> reminderList){
         for (Reminder reminder: reminderList){
             if(reminder.getLocation() != null){
                 saveMarker(generateMarker(reminder.getContent(), reminder.getLocation().getLatLng(), NON_EMPTY_MARKER_ON), reminder);
             }
         }
         updateMarkerColors();
+    }
+
+    public void populateMapWithMarkers(){
+        List<Reminder> reminderList = reminderManager.cursorDataAsList(reminderManager.getAll());
+        populateMapWithMarkers(reminderList);
     }
 
     public Marker generateMarker(String text, LatLng loc, float color){
@@ -79,7 +133,6 @@ public class MarkerManager {
         }
         markerDataMap.put(marker, new MarkerData(reminder, radius));
 
-       // markerReminderMap.put(marker, reminder);
     }
 
     public void updateRadius(Marker marker){
@@ -110,7 +163,6 @@ public class MarkerManager {
         for(Marker marker: markersOnMap){
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(getMarkerColor(marker)));
         }
-        //   removeRadiusFromMap();
     }
 
     private float getMarkerColor(Marker marker){

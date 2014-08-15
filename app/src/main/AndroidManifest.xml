@@ -57,9 +57,6 @@
             android:name=".services.HandleAlarmService"
             android:exported="false" >
         </service>
-        <provider
-            android:authorities = "com.touchdown.app.smartassistant"
-            android:name = ".services.ReminderProvider" />
     </application>
 
 </manifest>
