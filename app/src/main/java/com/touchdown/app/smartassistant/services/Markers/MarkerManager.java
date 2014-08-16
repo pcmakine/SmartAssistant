@@ -1,6 +1,7 @@
-package com.touchdown.app.smartassistant.services;
+package com.touchdown.app.smartassistant.services.Markers;
 
 import android.graphics.Color;
+import android.location.Location;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -9,20 +10,16 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.touchdown.app.smartassistant.data.DataOperation;
-import com.touchdown.app.smartassistant.data.MarkerData;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.Reminder;
+import com.touchdown.app.smartassistant.services.ReminderManager;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * Created by Pete on 6.8.2014.
@@ -34,8 +31,6 @@ public class MarkerManager {
     private static final float EMPTY_MARKER_COLOR = BitmapDescriptorFactory.HUE_RED;
 
     private GoogleMap map;
-    //  private Map<Marker, ReminderDao> markerReminderMap;
-    // private HashMap<LatLng, Circle> centerRadiusMap;
     private Marker selectedMarker;
 
     private Map<Marker, MarkerData> markerDataMap;
@@ -131,17 +126,12 @@ public class MarkerManager {
         if(reminder != null){
             radius = addRadius(reminder.getLocation());
         }
-        markerDataMap.put(marker, new MarkerData(reminder, radius));
+        markerDataMap.put(marker, new MarkerData(reminder, radius, marker));
 
     }
 
-    public void updateRadius(Marker marker){
-        MarkerData data = markerDataMap.get(marker);
-        if(data.getReminder() != null &&
-                data.getReminder().getLocation() != null){
-            Circle radius = addRadius(data.getReminder().getLocation());
-            data.setRadius(radius);
-        }
+    public void showRadius(Marker marker){
+        markerDataMap.get(marker).showRadius();
     }
 
     private Circle addRadius(LocationDao loc){
@@ -180,19 +170,13 @@ public class MarkerManager {
 
     public void selectMarker(Marker marker){
         selectedMarker = marker;
-        int markerHash = marker.hashCode();
-        Marker mapMarker = markerDataMap.keySet().iterator().next();
-        int mapMarkerHash = mapMarker.hashCode();
-        int selectedHash = selectedMarker.hashCode();
         updateMarkerColors();
-        //removeRadiusFromMap();
         showMarkerInfoWindow(marker);
     }
 
     public void unSelectMarker(){
         selectedMarker = null;
         updateMarkerColors();
-        //removeRadiusFromMap();
     }
 
     private void showMarkerInfoWindow(Marker marker){
@@ -203,8 +187,8 @@ public class MarkerManager {
         }
     }
 
-    public void removeRadius(Marker marker){
-        markerDataMap.get(marker).removeRadius();
+    public void hideRadius(Marker marker){
+        markerDataMap.get(marker).hideRadius();
     }
 
     public boolean removeSelectedIfEmpty(){
@@ -233,6 +217,21 @@ public class MarkerManager {
 
     public Marker getSelectedMarker(){
         return selectedMarker;
+    }
+
+    public Marker getMarkerFromRadiusClick(LatLng position){
+        Set<Map.Entry<Marker, MarkerData>> markerDataSet = markerDataMap.entrySet();
+        for(Map.Entry<Marker, MarkerData> data: markerDataSet){
+            MarkerData mData = data.getValue();
+            LocationDao location = mData.getLocation();
+            Circle radius = mData.getRadius();
+            float[] distance = new float[1];
+            Location.distanceBetween(position.latitude, position.longitude, position.latitude, position.longitude, distance);
+            if(distance[0] < radius.getRadius()){
+                return mData.getMarker();
+            }
+        }
+        return null;
     }
 
     public boolean userHasSelectedMarker(){

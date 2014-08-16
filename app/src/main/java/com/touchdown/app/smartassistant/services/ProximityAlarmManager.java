@@ -40,7 +40,6 @@ public class ProximityAlarmManager {
         locationManager.removeProximityAlert(pIndent);
     }
 
-    //todo find out how to make sure that the app context is always available (put it to the launcher activity maybe?)
     private static PendingIntent constructPendingIntent(long reminderId){
         Intent intent = new Intent(ApplicationContextProvider.getAppContext(), ProximityIntentReceiver.class);
         intent.putExtra("reminderID", reminderId);

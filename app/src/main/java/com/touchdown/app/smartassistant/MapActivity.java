@@ -1,11 +1,9 @@
 package com.touchdown.app.smartassistant;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -21,16 +19,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.touchdown.app.smartassistant.data.DataOperation;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.services.MyLocationProvider;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
-import com.touchdown.app.smartassistant.services.MarkerManager;
+import com.touchdown.app.smartassistant.services.Markers.MarkerManager;
 import com.touchdown.app.smartassistant.views.DetailsActivity;
 
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -174,10 +170,10 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        reminderManager.remove(markerManager.getReminder(markerManager.getSelectedMarker()).getId());
-                        //   ProximityAlarmManager.removeAlert(markerManager.getReminder(markerManager.getSelectedMarker()));
-
+                        long id = markerManager.getReminder(markerManager.getSelectedMarker()).getId();
                         markerManager.removeSelectedMarker();
+                        reminderManager.remove(id);
+
                         supportInvalidateOptionsMenu();
                     }
                 })
@@ -198,6 +194,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     protected void onResume() {
         if(!onCreateRan){
             markerManager.updateMarkerData();
+            markerManager.unSelectMarker();
         }
         reminderManager.addObserver(this);
 
@@ -221,6 +218,10 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     @Override
     public void onMapClick(LatLng latLng) {
         markerManager.unSelectMarker();
+/*        Marker mark = markerManager.getMarkerFromRadiusClick(latLng);
+        if(mark != null){
+            onMarkerDragStart(mark);
+        }*/
     }
 
     @Override
@@ -233,7 +234,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     @Override
     public void onMarkerDragStart(Marker marker) {
-        markerManager.removeRadius(marker);
+        markerManager.hideRadius(marker);
     }
 
     @Override
@@ -248,8 +249,9 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             LocationDao loc = reminder.getLocation();
             loc.setLocation(marker.getPosition());
             markerManager.selectMarker(marker);
-            markerManager.updateRadius(marker);
-            reminderManager.update(reminder);
+            markerManager.showRadius(marker);
+            reminderManager.update(reminder);   //todo how to save the selected marker... the update will overwrite it
+
         }
     }
 

@@ -1,7 +1,6 @@
-package com.touchdown.app.smartassistant.services;
+package com.touchdown.app.smartassistant.services.Markers;
 
 import com.google.android.gms.maps.model.Marker;
-import com.touchdown.app.smartassistant.data.MarkerData;
 
 import java.util.Comparator;
 import java.util.Map;

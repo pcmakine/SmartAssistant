@@ -6,18 +6,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.touchdown.app.smartassistant.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.services.ProximityAlarmManager;
+import com.touchdown.app.smartassistant.views.OnGoingNotification;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
 
 /**
  * Created by Pete on 3.8.2014.
@@ -49,6 +47,8 @@ public class ReminderManager extends Observable{
         if(reminder.isOn() && reminder.getLocation() != null){
             ProximityAlarmManager.saveAlert(reminder);
         }
+
+        OnGoingNotification.updateNotification();
 
         return id;
     }
@@ -98,6 +98,8 @@ public class ReminderManager extends Observable{
         notifyDataObservers();
 
         updateProximityAlarm(reminder);
+
+        OnGoingNotification.updateNotification();
 
         return numOfRowsAffected > 0;
     }
@@ -149,6 +151,8 @@ public class ReminderManager extends Observable{
 
         ProximityAlarmManager.removeAlert(id);
 
+        OnGoingNotification.updateNotification();
+
         return rowsAffected;
     }
 
@@ -171,6 +175,16 @@ public class ReminderManager extends Observable{
             }
         }
         return list;
+    }
+
+    public int getActiveReminderCount(){
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor mCount= db.rawQuery("select count(*) from " + DbContract.ReminderEntry.TABLE_NAME +
+                " where " + DbContract.ReminderEntry.COLUMN_NAME_ON + " = ?", new String[] {"1"});
+        mCount.moveToFirst();
+        int count= mCount.getInt(0);
+        mCount.close();
+        return count;
     }
 
 
@@ -196,6 +210,5 @@ public class ReminderManager extends Observable{
         setChanged();
         notifyObservers();
         clearChanged();
-
     }
 }
