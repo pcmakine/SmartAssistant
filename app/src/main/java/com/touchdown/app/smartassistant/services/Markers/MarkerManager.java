@@ -225,8 +225,9 @@ public class MarkerManager {
             MarkerData mData = data.getValue();
             LocationDao location = mData.getLocation();
             Circle radius = mData.getRadius();
+            LatLng center = radius.getCenter();
             float[] distance = new float[1];
-            Location.distanceBetween(position.latitude, position.longitude, position.latitude, position.longitude, distance);
+            Location.distanceBetween(center.latitude, center.longitude, position.latitude, position.longitude, distance);
             if(distance[0] < radius.getRadius()){
                 return mData.getMarker();
             }

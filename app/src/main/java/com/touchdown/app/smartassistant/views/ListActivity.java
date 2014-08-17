@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
+import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.services.ReminderManager;
@@ -41,8 +42,8 @@ public class ListActivity extends ActionBarActivity {
 
 
 
-       // Util.clearDb(dbHelper, this);
-    //    Util.clearAndInsertTestData(dbHelper, this);
+       // Util.clearDb(new DbHelper(this), this);
+        Util.clearAndInsertTestData(new DbHelper(this), this);
 
         reminderManager = ReminderManager.getInstance(this);
 

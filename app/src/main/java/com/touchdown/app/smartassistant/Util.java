@@ -33,6 +33,13 @@ public class Util {
 
             reminderManager.insert(reminder);
         }
+    }
 
+    public static int booleanAsInt(boolean truthVal){
+       return (truthVal)? 1: 0;
+    }
+
+    public static boolean intAsBoolean(int value){
+        return value == 1;
     }
 }

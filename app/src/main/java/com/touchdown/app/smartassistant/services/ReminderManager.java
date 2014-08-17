@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.touchdown.app.smartassistant.Util;
+import com.touchdown.app.smartassistant.data.DataHandler;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.LocationDao;
@@ -27,9 +29,11 @@ import java.util.Observable;
 public class ReminderManager extends Observable{
     private SQLiteOpenHelper dbHelper;
     private static ReminderManager sInstance;
+    private DataHandler dataHandler;
 
     private ReminderManager(SQLiteOpenHelper dbHelper){
         this.dbHelper = dbHelper;
+        this.dataHandler = new DataHandler(dbHelper);
     }
 
     public synchronized static ReminderManager getInstance(Context context){
@@ -40,8 +44,9 @@ public class ReminderManager extends Observable{
     }
 
     public long insert(Reminder reminder){
-        long id = insertReminderInDatabase(reminder);
-        insertRemindersLocationInDatabase(reminder);
+        long id = testInsertReminderInDatabase(reminder); //insertReminderInDatabase(reminder);
+        reminder.setId(id);
+        testInsertRemindersLocationInDatabase(reminder);
         notifyDataObservers();
 
         if(reminder.isOn() && reminder.getLocation() != null){
@@ -51,6 +56,10 @@ public class ReminderManager extends Observable{
         OnGoingNotification.updateNotification();
 
         return id;
+    }
+
+    private long testInsertReminderInDatabase(Reminder reminder){
+        return dataHandler.insert(reminder, DbContract.ReminderEntry.TABLE_NAME);
     }
 
     private long insertReminderInDatabase(Reminder reminder){
@@ -63,6 +72,14 @@ public class ReminderManager extends Observable{
             return reminder.getId();
         }
         return -1;
+    }
+
+    private void testInsertRemindersLocationInDatabase(Reminder reminder){
+        LocationDao location = reminder.getLocation();
+        if(location != null){
+            location.setReminderId(reminder.getId());
+            dataHandler.insert(location, DbContract.LocationEntry.TABLE_NAME);
+        }
     }
 
     private void insertRemindersLocationInDatabase(Reminder reminder){
@@ -90,7 +107,7 @@ public class ReminderManager extends Observable{
     }
 
     public boolean update(Reminder reminder) {
-        int numOfRowsAffected = updateReminderInDatabase(reminder);
+        int numOfRowsAffected = testUpdateReminderInDatabase(reminder);
 
         if(reminder.getLocation() != null){
             reminder.getLocation().update(dbHelper);
@@ -102,6 +119,10 @@ public class ReminderManager extends Observable{
         OnGoingNotification.updateNotification();
 
         return numOfRowsAffected > 0;
+    }
+
+    private int testUpdateReminderInDatabase(Reminder reminder){
+        return dataHandler.update(reminder, DbContract.ReminderEntry.TABLE_NAME, DbContract.ReminderEntry.class);
     }
 
     private int updateReminderInDatabase(Reminder reminder){
@@ -125,7 +146,7 @@ public class ReminderManager extends Observable{
     public ContentValues values(Reminder reminder){
         ContentValues vals = new ContentValues();
         vals.put(DbContract.ReminderEntry.COLUMN_NAME_CONTENT, reminder.getContent());
-        int onInteger = (reminder.isOn())? 1: 0;
+        int onInteger = Util.booleanAsInt(reminder.isOn());
         vals.put(DbContract.ReminderEntry.COLUMN_NAME_ON, onInteger);
 
         return vals;
@@ -197,7 +218,7 @@ public class ReminderManager extends Observable{
     private static Reminder constructReminderFromData(Cursor cursor, LocationDao location){
         Long id = cursor.getLong(cursor.getColumnIndex(DbContract.ReminderEntry._ID));
         String content = cursor.getString(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_CONTENT));
-        boolean reminderOn = (cursor.getInt(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_ON)) == 1);
+        boolean reminderOn = Util.intAsBoolean((cursor.getInt(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_ON))));
 
         Reminder reminder = new Reminder(id, content, location);
 

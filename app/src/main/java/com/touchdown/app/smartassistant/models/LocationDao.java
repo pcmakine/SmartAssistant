@@ -16,18 +16,20 @@ import java.util.List;
  * Created by Pete on 3.8.2014.
  */
 public class LocationDao {
-    public static final int DEFAULT_RADIUS = 100;
-
-    private LatLng latLng;
     private long id;
     private long reminderId;
+    private double lat;
+    private double lng;
     private int radius;     //meters
 
+    public static final int DEFAULT_RADIUS = 100;
 
     public LocationDao(long id, long reminderId, LatLng location, int radius){
-        this.latLng = location;
-        this.id = id;
         this.reminderId = reminderId;
+        this.id = id;
+        this.lat = location.latitude;
+        this.lng = location.longitude;
+
         if(radius == 0){
             this.radius = DEFAULT_RADIUS;
         }else{
@@ -36,7 +38,7 @@ public class LocationDao {
     }
 
     public LatLng getLatLng() {
-        return latLng;
+        return new LatLng(lat, lng);
     }
 
     public long getId() {
@@ -60,13 +62,14 @@ public class LocationDao {
     }
 
     public void setLocation(LatLng location) {
-        this.latLng = location;
+        this.lat = location.latitude;
+        this.lng = location.longitude;
     }
 
     public ContentValues values(){
         ContentValues vals = new ContentValues();
-        vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, this.latLng.latitude);
-        vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, this.latLng.longitude);
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, this.lat);
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, this.lng);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID, this.reminderId);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_RADIUS, this.radius);
 

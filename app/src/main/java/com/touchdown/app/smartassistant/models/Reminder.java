@@ -1,14 +1,24 @@
 package com.touchdown.app.smartassistant.models;
 
+import com.touchdown.app.smartassistant.data.Entity;
+
 /**
  * Created by Pete on 13.8.2014.
  */
 public class Reminder implements Comparable{
 
+    /**
+     * THE DATAHANDLER CLASS INSERTS THIS OBJECT INTO THE DATABASE BY USING REFLECTION
+     * BECAUSE OF THAT THE ORDER OF THE FIELDS MUST BE KEPT IN SYNC WITH THE DBCONTRACT CLASS
+     * ALWAYS HAVE THE ID AS THE FIRST ONE AND THE REST ACCORDING TO THE RESPECTIVE DB ENTRY CLASS
+     * IN DBCONTRACT
+     */
     private long id;
     private String content;
+    private boolean alarm_on;
+
+    @Entity
     private LocationDao location;
-    private boolean isOn;
 
     public Reminder(long id, String content, LocationDao location){
         this.content = content;
@@ -17,19 +27,19 @@ public class Reminder implements Comparable{
     }
 
     public boolean isOn(){
-        return isOn;
+        return alarm_on;
     }
 
-    public void setOn(boolean on){
-        this.isOn = on;
+    public void setOn(boolean alarm_on){
+        this.alarm_on = alarm_on;
     }
 
     public void turnOn(){
-        this.isOn = true;
+        this.alarm_on = true;
     }
 
     public void turnOff(){
-        this.isOn = false;
+        this.alarm_on = false;
     }
 
     public String getContent() {
