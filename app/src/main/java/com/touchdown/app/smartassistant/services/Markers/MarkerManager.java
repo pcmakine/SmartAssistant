@@ -1,7 +1,6 @@
 package com.touchdown.app.smartassistant.services.Markers;
 
 import android.graphics.Color;
-import android.location.Location;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -10,7 +9,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 
@@ -46,7 +45,7 @@ public class MarkerManager {
     }
 
     public void updateMarkerData(){
-        List<Reminder> reminderList = reminderManager.cursorDataAsList(reminderManager.getAll());
+        List<Reminder> reminderList = reminderManager.getReminderList();
 
         map.clear();
 
@@ -57,7 +56,7 @@ public class MarkerManager {
     }
 
  /*   public void updateMarkerData(DataOperation op){
-        List<Reminder> reminderList = reminderManager.cursorDataAsList(reminderManager.getAll());
+        List<Reminder> reminderList = reminderManager.getReminderList(reminderManager.getAll());
 
         Map<Marker, MarkerData> data = MapSort.sortByValue(markerDataMap);
         Set<Marker> keyset = data.keySet();
@@ -100,15 +99,15 @@ public class MarkerManager {
 
     public void populateMapWithMarkers(List<Reminder> reminderList){
         for (Reminder reminder: reminderList){
-            if(reminder.getLocation() != null){
-                saveMarker(generateMarker(reminder.getContent(), reminder.getLocation().getLatLng(), NON_EMPTY_MARKER_ON), reminder);
+            if(reminder.getReminderLocation() != null){
+                saveMarker(generateMarker(reminder.getContent(), reminder.getReminderLocation().getLatLng(), NON_EMPTY_MARKER_ON), reminder);
             }
         }
         updateMarkerColors();
     }
 
     public void populateMapWithMarkers(){
-        List<Reminder> reminderList = reminderManager.cursorDataAsList(reminderManager.getAll());
+        List<Reminder> reminderList = reminderManager.getReminderList();
         populateMapWithMarkers(reminderList);
     }
 
@@ -124,7 +123,7 @@ public class MarkerManager {
     public void saveMarker(Marker marker, Reminder reminder){    //reminder may be null
         Circle radius = null;
         if(reminder != null){
-            radius = addRadius(reminder.getLocation());
+            radius = addRadius(reminder.getReminderLocation());
         }
         markerDataMap.put(marker, new MarkerData(reminder, radius, marker));
 
@@ -134,7 +133,7 @@ public class MarkerManager {
         markerDataMap.get(marker).showRadius();
     }
 
-    private Circle addRadius(LocationDao loc){
+    private Circle addRadius(ReminderLocation loc){
         int radius;
         radius = loc.getRadius();
 
@@ -181,7 +180,7 @@ public class MarkerManager {
 
     private void showMarkerInfoWindow(Marker marker){
         Reminder reminder = markerDataMap.get(marker).getReminder();
-        if(reminder != null && reminder.getLocation() != null){
+        if(reminder != null && reminder.getReminderLocation() != null){
             marker.setTitle(StringUtils.abbreviate(reminder.getContent(), 20));
             marker.showInfoWindow();
         }
@@ -223,11 +222,11 @@ public class MarkerManager {
         Set<Map.Entry<Marker, MarkerData>> markerDataSet = markerDataMap.entrySet();
         for(Map.Entry<Marker, MarkerData> data: markerDataSet){
             MarkerData mData = data.getValue();
-            LocationDao location = mData.getLocation();
+            ReminderLocation reminderLocation = mData.getLocation();
             Circle radius = mData.getRadius();
             LatLng center = radius.getCenter();
             float[] distance = new float[1];
-            Location.distanceBetween(center.latitude, center.longitude, position.latitude, position.longitude, distance);
+            android.location.Location.distanceBetween(center.latitude, center.longitude, position.latitude, position.longitude, distance);
             if(distance[0] < radius.getRadius()){
                 return mData.getMarker();
             }

@@ -9,7 +9,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 
@@ -80,9 +80,9 @@ public class TestDb extends AndroidTestCase {
             fail("No values for reminder returned");
         }
 
-        LocationDao location = new LocationDao(-1, reminderId, new LatLng(TESTLAT, TESTLONG), 100);
-        long rowId = location.insert(dbHelper);
-        vals = location.values();
+        ReminderLocation reminderLocation = new ReminderLocation(-1, reminderId, new LatLng(TESTLAT, TESTLONG), 100);
+        long rowId = reminderLocation.insert(dbHelper);
+        vals = reminderLocation.values();
 
         assertTrue(rowId != -1);
 

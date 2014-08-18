@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.util.Log;
 
 import com.touchdown.app.smartassistant.Util;
-import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
 
 import java.lang.annotation.Annotation;
@@ -50,19 +50,24 @@ public class FieldExtractor {
 
     public ContentValues getContentValues(Object obj){
         this.obj = obj;
-        Class objectType = obj.getClass();
-        List<Field> fieldsList = sortFieldsByName(objectType.getDeclaredFields());
-        ContentValues vals = extractValuesFromFieldList(fieldsList, objectType);
+        List<Field> fieldsList = getFieldsSortedByName(obj.getClass());
+        ContentValues vals = extractValuesFromFieldList(fieldsList, obj.getClass());
         resetColumnPointersToBeginning();
         return vals;
     }
+
+
+    public List<Field> getFieldsSortedByName(Class cls){
+        return sortFieldsByName(cls.getDeclaredFields());
+    }
+
     private ContentValues extractValuesFromFieldList(List<Field> fieldsList, Class objectType){
         ContentValues vals = new ContentValues();
         for(Field field: fieldsList){
             if(noAnnotations(field)){
                 if(objectType == Reminder.class){
                     addFieldToContentValues(field, vals, reminderColumns);
-                }else if(objectType == LocationDao.class){
+                }else if(objectType == ReminderLocation.class){
                     addFieldToContentValues(field, vals, locationColumns);
                 }
             }
@@ -158,6 +163,14 @@ public class FieldExtractor {
     private void resetColumnPointersToBeginning(){
         this.reminderColumns.resetPointerToBeginning();
         this.locationColumns.resetPointerToBeginning();
+    }
+
+    public ColumnList getReminderColumns(){
+        return reminderColumns;
+    }
+
+    public ColumnList getLocationColumns(){
+        return locationColumns;
     }
 
 }

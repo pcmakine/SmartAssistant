@@ -24,8 +24,10 @@ public class DbContract {
     }
 
     public static final class TimeEntry implements BaseColumns {
+
         public static final String TABLE_NAME = "time";
         public static final String COLUMN_NAME_REMINDER_ID = "reminderId";
         public static final String COLUMN_NAME_DATE = "date";
+
     }
 }

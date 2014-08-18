@@ -3,7 +3,6 @@ package com.touchdown.app.smartassistant;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,7 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.services.MyLocationProvider;
 import com.touchdown.app.smartassistant.services.ReminderManager;
@@ -84,7 +83,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             googleMap.setOnMarkerClickListener(this);
             googleMap.setOnInfoWindowClickListener(this);
             googleMap.setOnMarkerDragListener(this);
-            Location loc = locProvider.getLocation();
+            android.location.Location loc = locProvider.getLocation();
             animateToLocation(loc);
 
             // check if map is created successfully or not
@@ -97,7 +96,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
         }
     }
 
-    private void animateToLocation(Location loc){
+    private void animateToLocation(android.location.Location loc){
         CameraPosition pos = new CameraPosition.Builder().target(new LatLng(loc.getLatitude(), loc.getLongitude())).zoom(15).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos));
     }
@@ -246,7 +245,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     public synchronized void onMarkerDragEnd(Marker marker) {
         Reminder reminder = markerManager.getReminder(marker);
         if(reminder != null){
-            LocationDao loc = reminder.getLocation();
+            ReminderLocation loc = reminder.getReminderLocation();
             loc.setLocation(marker.getPosition());
             markerManager.selectMarker(marker);
             markerManager.showRadius(marker);

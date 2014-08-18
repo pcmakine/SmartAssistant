@@ -20,7 +20,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 import com.touchdown.app.smartassistant.services.GetAddressTask;
@@ -91,7 +91,7 @@ public class DetailsActivity extends ActionBarActivity {
     private void makeNewReminder(){
         this.location = getIntent().getParcelableExtra("location");
         if(location != null){
-            this.reminder = new Reminder(-1, null, new LocationDao(-1, -1, location, radius));
+            this.reminder = new Reminder(-1, null, new ReminderLocation(-1, -1, location, radius));
         }else{
             this.reminder = new Reminder(-1, null, null);
         }
@@ -102,7 +102,7 @@ public class DetailsActivity extends ActionBarActivity {
 
     private void useExistingReminder(Reminder reminder){
         this.reminder = reminder;
-        this.location = reminder.getLocation().getLatLng();
+        this.location = reminder.getReminderLocation().getLatLng();
         contentToSaveTW.setText(reminder.getContent());
         onSwitch.setChecked(reminder.isOn());
         editMode = true;
@@ -144,8 +144,8 @@ public class DetailsActivity extends ActionBarActivity {
 
     private void setUpSeekBar(){
         radiusBar = (SeekBar)findViewById(R.id.seekBar);
-        if(reminder.getLocation() != null){
-            int rad = reminder.getLocation().getRadius();
+        if(reminder.getReminderLocation() != null){
+            int rad = reminder.getReminderLocation().getRadius();
             radiusBar.setProgress(metersToProgress(rad));
         }
 
@@ -160,8 +160,8 @@ public class DetailsActivity extends ActionBarActivity {
                     radius = SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD + (progress - progressMultiplierTreshold) * SEEKBAR_MULTIPLIER_OVER_KILOMETER;
                 }
                 radiusTW.setText(getRadiusText());
-                if(reminder.getLocation() != null){
-                    reminder.getLocation().setRadius(radius);
+                if(reminder.getReminderLocation() != null){
+                    reminder.getReminderLocation().setRadius(radius);
                 }
             }
 

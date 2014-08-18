@@ -2,7 +2,7 @@ package com.touchdown.app.smartassistant.services.Markers;
 
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.Marker;
-import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
 
 /**
@@ -51,9 +51,9 @@ public class MarkerData implements Comparable{
         return reminder;
     }
 
-    public LocationDao getLocation(){
+    public ReminderLocation getLocation(){
         if(reminder != null){
-            return reminder.getLocation();
+            return reminder.getReminderLocation();
         }
         return null;
     }

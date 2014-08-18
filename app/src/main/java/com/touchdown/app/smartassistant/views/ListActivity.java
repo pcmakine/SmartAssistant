@@ -47,7 +47,7 @@ public class ListActivity extends ActionBarActivity {
 
         reminderManager = ReminderManager.getInstance(this);
 
-        Cursor cursor =  reminderManager.getAll();
+        Cursor cursor =  reminderManager.getAllReminderData();
 
         adapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,
                 new String[] {DbContract.ReminderEntry.COLUMN_NAME_CONTENT}, new int[] {R.id.itemText},
@@ -101,7 +101,7 @@ public class ListActivity extends ActionBarActivity {
     }
 
     public void updateList(){
-        Cursor newCursor = reminderManager.getAll();
+        Cursor newCursor = reminderManager.getAllReminderData();
 
         adapter.swapCursor(newCursor);
     }

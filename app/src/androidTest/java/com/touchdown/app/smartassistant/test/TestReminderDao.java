@@ -7,7 +7,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.models.LocationDao;
+import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 
@@ -53,20 +53,20 @@ public class TestReminderDao extends AndroidTestCase {
         Reminder reminder = reminderManager.getOne(firstId);
 
         assertEquals("test reminder", reminder.getContent());
-        assertEquals(testlatlng, reminder.getLocation().getLatLng());
+        assertEquals(testlatlng, reminder.getReminderLocation().getLatLng());
         assertEquals(firstId, reminder.getId());
-        assertEquals(firstId, reminder.getLocation().getReminderId());
+        assertEquals(firstId, reminder.getReminderLocation().getReminderId());
 
         reminder = reminderManager.getOne(secondId);
 
         assertEquals("test reminder 2", reminder.getContent());
-        assertEquals(new LatLng(4, 9), reminder.getLocation().getLatLng());
-        assertEquals(secondId, reminder.getLocation().getReminderId());
+        assertEquals(new LatLng(4, 9), reminder.getReminderLocation().getLatLng());
+        assertEquals(secondId, reminder.getReminderLocation().getReminderId());
     }
 
     private long insertTestReminder(String text, LatLng loc){
 
-        Reminder reminder = new Reminder(-1, text, new LocationDao(-1, -1, loc, 50));
+        Reminder reminder = new Reminder(-1, text, new ReminderLocation(-1, -1, loc, 50));
 
         long rowId = reminderManager.insert(reminder);
         return rowId;
@@ -74,7 +74,7 @@ public class TestReminderDao extends AndroidTestCase {
 
     public void testGetAllReturnsCorrectNumberofReminders(){
         Util.insertTestData(mContext, Util.TEST_REMINDER_DEFAULT_COUNT);
-        Cursor c = reminderManager.getAll();
+        Cursor c = reminderManager.getAllReminderData();
         assertEquals(Util.TEST_REMINDER_DEFAULT_COUNT, c.getCount());
     }
 

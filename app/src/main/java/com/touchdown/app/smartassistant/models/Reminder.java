@@ -7,23 +7,17 @@ import com.touchdown.app.smartassistant.data.Entity;
  */
 public class Reminder implements Comparable{
 
-    /**
-     * THE DATAHANDLER CLASS INSERTS THIS OBJECT INTO THE DATABASE BY USING REFLECTION
-     * BECAUSE OF THAT THE ORDER OF THE FIELDS MUST BE KEPT IN SYNC WITH THE DBCONTRACT CLASS
-     * ALWAYS HAVE THE ID AS THE FIRST ONE AND THE REST ACCORDING TO THE RESPECTIVE DB ENTRY CLASS
-     * IN DBCONTRACT
-     */
     private long id;
     private String content;
     private boolean alarm_on;
 
     @Entity
-    private LocationDao location;
+    private ReminderLocation reminderLocation;
 
-    public Reminder(long id, String content, LocationDao location){
+    public Reminder(long id, String content, ReminderLocation reminderLocation){
         this.content = content;
         this.id = id;       //remember that id may be -1 and location may be null
-        this.location = location;
+        this.reminderLocation = reminderLocation;
     }
 
     public boolean isOn(){
@@ -50,8 +44,8 @@ public class Reminder implements Comparable{
         this.content = content;
     }
 
-    public LocationDao getLocation() {
-        return location;
+    public ReminderLocation getReminderLocation() {
+        return reminderLocation;
     }
 
     public long getId(){
