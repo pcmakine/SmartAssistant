@@ -55,48 +55,6 @@ public class MarkerManager {
 
     }
 
- /*   public void updateMarkerData(DataOperation op){
-        List<Reminder> reminderList = reminderManager.getReminderList(reminderManager.getAll());
-
-        Map<Marker, MarkerData> data = MapSort.sortByValue(markerDataMap);
-        Set<Marker> keyset = data.keySet();
-        Iterator<Marker> iterator = keyset.iterator();
-
-
-        for(Reminder reminder: reminderList){
-            MarkerData markerData;
-            if(iterator.hasNext()){
-                markerData = iterator.next();
-                if(reminder.equals(markerData.getReminder())){
-
-                }
-            }
-
-        }
-        this.selectedMarker = null;
-    }
-
-    private void updateMarkerDataOnRemove(Set<Marker> data, Iterator<Marker> iterator, List<Reminder> reminderList){
-
-        while(iterator.hasNext()){
-            if(){
-
-            }
-        }
-
-        for(Reminder reminder: reminderList){
-            MarkerData markerData;
-            if(iterator.hasNext()){
-                markerData = iterator.next();
-                if(reminder.equals(markerData.getReminder())){
-
-                }
-            }
-
-        }
-
-    }*/
-
     public void populateMapWithMarkers(List<Reminder> reminderList){
         for (Reminder reminder: reminderList){
             if(reminder.getReminderLocation() != null){

@@ -89,6 +89,4 @@ public abstract class Dao<T> {
     protected abstract ContentValues values(T t);
 
     protected abstract T buildObject(Cursor data);
-
-    public abstract List<T> getList();
 }

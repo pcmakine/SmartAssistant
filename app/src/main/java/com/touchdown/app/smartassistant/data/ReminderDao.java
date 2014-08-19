@@ -55,8 +55,4 @@ public class ReminderDao extends Dao<Reminder> {
         return reminder;
     }
 
-    @Override
-    public List<Reminder> getList() {
-        return null;
-    }
 }

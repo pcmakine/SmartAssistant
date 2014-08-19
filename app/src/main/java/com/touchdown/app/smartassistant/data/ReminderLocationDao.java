@@ -21,7 +21,7 @@ public class ReminderLocationDao extends Dao<ReminderLocation> {
     }
 
     public ReminderLocation getReminderLocation(long id){
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+      /*  SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(DbContract.LocationEntry.TABLE_NAME, null,
                 DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID + " = ?",
                 new String[] {String.valueOf(id)}, null, null, null, null);
@@ -30,7 +30,8 @@ public class ReminderLocationDao extends Dao<ReminderLocation> {
         }else{
             return null;
         }
-        return buildObject(cursor);
+        return buildObject(cursor);*/
+        return null;
     }
 
     @Override
@@ -38,7 +39,7 @@ public class ReminderLocationDao extends Dao<ReminderLocation> {
         ContentValues vals = new ContentValues();
         vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, reminderLocation.getLatLng().latitude);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, reminderLocation.getLatLng().longitude);
-        vals.put(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID, reminderLocation.getReminderId());
+       // vals.put(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID, reminderLocation.getReminderId());
         vals.put(DbContract.LocationEntry.COLUMN_NAME_RADIUS, reminderLocation.getRadius());
 
         return vals;
@@ -47,17 +48,13 @@ public class ReminderLocationDao extends Dao<ReminderLocation> {
     @Override
     protected ReminderLocation buildObject(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndex(DbContract.LocationEntry._ID));
-        long reminderId = cursor.getLong(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID));
+       // long reminderId = cursor.getLong(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_REMINDER_ID));
         double lat = cursor.getDouble(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LAT));
         double longitude = cursor.getDouble(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LONG));
 
         int radiusIndex = cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_RADIUS);
         int radius = cursor.getInt(radiusIndex);
-        return new ReminderLocation(id, reminderId, new LatLng(lat, longitude), radius);
-    }
-
-    @Override
-    public List<ReminderLocation> getList() {
+        //return new ReminderLocation(id, reminderId, new LatLng(lat, longitude), radius);
         return null;
     }
 }

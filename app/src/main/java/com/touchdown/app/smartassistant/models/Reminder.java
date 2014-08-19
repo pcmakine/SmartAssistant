@@ -1,7 +1,5 @@
 package com.touchdown.app.smartassistant.models;
 
-import com.touchdown.app.smartassistant.data.Entity;
-
 /**
  * Created by Pete on 13.8.2014.
  */
@@ -11,7 +9,6 @@ public class Reminder implements Comparable{
     private String content;
     private boolean alarm_on;
 
-    @Entity
     private ReminderLocation reminderLocation;
 
     public Reminder(long id, String content, ReminderLocation reminderLocation){

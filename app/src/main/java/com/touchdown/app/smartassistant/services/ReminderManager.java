@@ -2,11 +2,8 @@ package com.touchdown.app.smartassistant.services;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.touchdown.app.smartassistant.Util;
-import com.touchdown.app.smartassistant.data.DataHandler;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.data.ReminderDao;
@@ -14,9 +11,6 @@ import com.touchdown.app.smartassistant.data.ReminderLocationDao;
 import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.views.OnGoingNotification;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 
