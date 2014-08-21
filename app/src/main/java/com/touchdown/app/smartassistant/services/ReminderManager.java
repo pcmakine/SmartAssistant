@@ -41,8 +41,8 @@ public class ReminderManager extends Observable{
     }
 
     public long insert(Reminder reminder){
-        long id = reminderDao.insert(reminder); //insertReminderInDatabase(reminder);
-        reminder.setId(id);
+        //long id = reminderDao.insert(reminder); //insertReminderInDatabase(reminder);
+/*        reminder.setId(id);
         insertRemindersLocationInDatabase(reminder);
         notifyDataObservers();
 
@@ -50,25 +50,26 @@ public class ReminderManager extends Observable{
             ProximityAlarmManager.saveAlert(reminder);
         }
 
-        OnGoingNotification.updateNotification();
+        OnGoingNotification.updateNotification();*/
 
-        return id;
+        return -1;
     }
 
     private void insertRemindersLocationInDatabase(Reminder reminder){
-        ReminderLocation reminderLocation = reminder.getReminderLocation();
+/*        ReminderLocation reminderLocation = reminder.getReminderLocation();
         if(reminderLocation != null){
             reminderLocation.setReminderId(reminder.getId());
             locationDao.insert(reminderLocation);
-        }
+        }*/
     }
 
     public Cursor getAllReminderData(){
-        return reminderDao.getAll();
+        return null;
+        // return reminderDao.getAll();
     }
 
     public boolean update(Reminder reminder) {
-        int numOfRowsAffected = reminderDao.update(reminder, reminder.getId());
+/*        int numOfRowsAffected = reminderDao.update(reminder, reminder.getId());
 
         if(reminder.getReminderLocation() != null){
             locationDao.update(reminder.getReminderLocation(),
@@ -78,9 +79,9 @@ public class ReminderManager extends Observable{
 
         updateProximityAlarm(reminder);
 
-        OnGoingNotification.updateNotification();
+        OnGoingNotification.updateNotification();*/
 
-        return numOfRowsAffected > 0;
+        return true; //numOfRowsAffected > 0;
     }
 
     private void updateProximityAlarm(Reminder reminder){
@@ -92,22 +93,24 @@ public class ReminderManager extends Observable{
     }
 
     public Reminder getOne(long id){
-        return reminderDao.getOne(id);
+        return null;
+       // return reminderDao.getOne(id);
     }
 
     public int remove(long id){
-        int rowsAffected = reminderDao.remove(id);
+/*        int rowsAffected = reminderDao.remove(id);
         notifyDataObservers();
 
         ProximityAlarmManager.removeAlert(id);
 
-        OnGoingNotification.updateNotification();
+        OnGoingNotification.updateNotification();*/
 
-        return rowsAffected;
+        return 0; //rowsAffected;
     }
 
     public List<Reminder> getReminderList(){
-        return reminderDao.getAllAsList();
+        return null;
+       // return reminderDao.getAllAsList();
     }
 
     public int getActiveReminderCount(){

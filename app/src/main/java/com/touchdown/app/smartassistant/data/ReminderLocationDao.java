@@ -34,7 +34,6 @@ public class ReminderLocationDao extends Dao<ReminderLocation> {
         return null;
     }
 
-    @Override
     protected ContentValues values(ReminderLocation reminderLocation) {
         ContentValues vals = new ContentValues();
         vals.put(DbContract.LocationEntry.COLUMN_NAME_LAT, reminderLocation.getLatLng().latitude);

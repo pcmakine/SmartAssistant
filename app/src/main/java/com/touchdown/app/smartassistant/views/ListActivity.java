@@ -43,7 +43,7 @@ public class ListActivity extends ActionBarActivity {
 
 
        // Util.clearDb(new DbHelper(this), this);
-        Util.clearAndInsertTestData(new DbHelper(this), this);
+        Util.clearAndInsertTestData(this, new DbHelper(this));
 
         reminderManager = ReminderManager.getInstance(this);
 

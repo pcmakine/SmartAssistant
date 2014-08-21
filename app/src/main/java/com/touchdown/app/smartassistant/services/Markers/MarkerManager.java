@@ -52,7 +52,6 @@ public class MarkerManager {
         markerDataMap.clear();
 
         populateMapWithMarkers(reminderList);
-
     }
 
     public void populateMapWithMarkers(List<Reminder> reminderList){

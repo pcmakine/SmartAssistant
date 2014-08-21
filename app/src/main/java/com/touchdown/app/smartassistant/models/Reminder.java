@@ -8,7 +8,6 @@ public class Reminder implements Comparable{
     private long id;
     private String content;
     private boolean alarm_on;
-
     private ReminderLocation reminderLocation;
 
     public Reminder(long id, String content, ReminderLocation reminderLocation){

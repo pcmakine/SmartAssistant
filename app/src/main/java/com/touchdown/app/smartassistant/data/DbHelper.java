@@ -24,7 +24,12 @@ public class DbHelper extends SQLiteOpenHelper{
                 + " (" + ReminderEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 
                 ReminderEntry.COLUMN_NAME_CONTENT + " TEXT NOT NULL, " +
-                ReminderEntry.COLUMN_NAME_ON + " INTEGER NOT NULL)";
+                ReminderEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL UNIQUE, " +
+                ReminderEntry.COLUMN_NAME_ON + " INTEGER NOT NULL, " +
+                ReminderEntry.COLUMN_NAME_TYPE + " INTEGER NOT NULL, " +
+                " FOREIGN KEY (" + ReminderEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
+                TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ")" +
+                " ON DELETE CASCADE)";
 
         final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + LocationEntry.TABLE_NAME +
                 " (" + LocationEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -33,32 +38,33 @@ public class DbHelper extends SQLiteOpenHelper{
                 LocationEntry.COLUMN_NAME_LAT + " REAL NOT NULL, " +
                 LocationEntry.COLUMN_NAME_LONG + " REAL NOT NULL, " +
                 LocationEntry.COLUMN_NAME_RADIUS + " INTEGER NOT NULL, " +
-                LocationEntry.COLUMN_NAME_PARENT_ID + " INTEGER NOT NULL, " +
-                " FOREIGN KEY (" + LocationEntry.COLUMN_NAME_PARENT_ID + ") REFERENCES " +
-                TriggerEntry.TABLE_NAME + "(" + TriggerEntry._ID + ") " +
+                LocationEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL, " +
+                " FOREIGN KEY (" + LocationEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
+                TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ") " +
                 " ON DELETE CASCADE)";
 
-        final String SQL_CREATE_ACTION_TRIGGER_TABLE = "CREATE TABLE " + ActionTriggerEntry.TABLE_NAME +
-                " (" + ActionTriggerEntry.COLUMN_NAME_ACTION_ID + " INTEGER NOT NULL, " +
+/*        final String SQL_CREATE_ACTION_TRIGGER_TABLE = "CREATE TABLE " + ActionTriggerEntry.TABLE_NAME +
+                " (" + ActionTriggerEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL, " +
                 ActionTriggerEntry.COLUMN_NAME_TRIGGER_ID + " INTEGER NOT NULL, " +
-                " PRIMARY KEY (" + ActionTriggerEntry.COLUMN_NAME_ACTION_ID + ", " +
+                " PRIMARY KEY (" + ActionTriggerEntry.COLUMN_NAME_TASK_ID + ", " +
                 ActionTriggerEntry.COLUMN_NAME_TRIGGER_ID + ")" +
-                " FOREIGN KEY (" + ActionTriggerEntry.COLUMN_NAME_ACTION_ID + ") REFERENCES "
+                " FOREIGN KEY (" + ActionTriggerEntry.COLUMN_NAME_TASK_ID + ") REFERENCES "
                 + ActionEntry.TABLE_NAME + "(" + ActionEntry._ID +")" +
                 " FOREIGN KEY (" + ActionTriggerEntry.COLUMN_NAME_TRIGGER_ID + ") REFERENCES "
                 + TriggerEntry.TABLE_NAME + "(" + TriggerEntry._ID + ") " +
-                "ON DELETE CASCADE)";
+                "ON DELETE CASCADE)";*/
 
-        final String SQL_CREATE_TRIGGER_TABLE = "CREATE TABLE " + TriggerEntry.TABLE_NAME +
+ /*       final String SQL_CREATE_TRIGGER_TABLE = "CREATE TABLE " + TriggerEntry.TABLE_NAME +
                 " (" + TriggerEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 
-                TriggerEntry.COLUMN_NAME_TRIGGER_TYPE + " INTEGER NOT NULL)";
+                TriggerEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL, " +
+                TriggerEntry.COLUMN_NAME_TRIGGER_TYPE + " INTEGER NOT NULL, " +
+                "FOREIGN KEY (" + TriggerEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
+                TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + "))";*/
 
-        final String SQL_CREATE_ACTION_TABLE = "CREATE TABLE " + ActionEntry.TABLE_NAME +
-                " (" + ActionEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-
-                ActionEntry.COLUMN_NAME_ACTION_NAME + " TEXT NOT NULL, " +
-                ActionEntry.COLUMN_NAME_ACTION_TYPE + " INTEGER NOT NULL)";
+        final String SQL_CREATE_TASK_TABLE = "CREATE TABLE " + TaskEntry.TABLE_NAME +
+                " (" + TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                TaskEntry.COLUMN_NAME_TASK_NAME + " TEXT NOT NULL)";
 
 /*        final String SQL_CREATE_TIME_TABLE = "CREATE TABLE " + DbContract.TimeEntry.TABLE_NAME +
                 " (" + DbContract.TimeEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -72,15 +78,21 @@ public class DbHelper extends SQLiteOpenHelper{
        // db.execSQL(SQL_CREATE_REMINDER_TABLE);
        // db.execSQL(SQL_CREATE_LOCATION_TABLE);
 
-        db.execSQL(SQL_CREATE_TRIGGER_TABLE);
+        db.execSQL(SQL_CREATE_TASK_TABLE);
         db.execSQL(SQL_CREATE_LOCATION_TABLE);
-        db.execSQL(SQL_CREATE_ACTION_TABLE);
-        db.execSQL(SQL_CREATE_ACTION_TRIGGER_TABLE);
+        db.execSQL(SQL_CREATE_REMINDER_TABLE);
 
-        Log.d(LOG_TAG, SQL_CREATE_TRIGGER_TABLE);
         Log.d(LOG_TAG, SQL_CREATE_LOCATION_TABLE);
-        Log.d(LOG_TAG, SQL_CREATE_ACTION_TRIGGER_TABLE);
         Log.d(LOG_TAG, SQL_CREATE_REMINDER_TABLE);
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly()) {
+            // Enable foreign key constraints
+            db.execSQL("PRAGMA foreign_keys=ON;");
+        }
     }
 
     @Override
