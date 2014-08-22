@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,10 +20,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.touchdown.app.smartassistant.models.ReminderLocation;
-import com.touchdown.app.smartassistant.models.Reminder;
+import com.touchdown.app.smartassistant.newdb.Task;
+import com.touchdown.app.smartassistant.newdb.TaskManager;
+import com.touchdown.app.smartassistant.newdb.TriggerLocation;
 import com.touchdown.app.smartassistant.services.MyLocationProvider;
-import com.touchdown.app.smartassistant.services.ReminderManager;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
 import com.touchdown.app.smartassistant.services.Markers.MarkerManager;
 import com.touchdown.app.smartassistant.views.DetailsActivity;
@@ -33,10 +35,13 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMarkerDragListener, Observer{
 
+    public static final String LOG_TAG = MapActivity.class.getSimpleName();
+
     private MarkerManager markerManager;
-    private ReminderManager reminderManager;
+    private TaskManager taskManager;
     private boolean onCreateRan;
     private MyLocationProvider locProvider;
+    private EditText addressField;
 
     // Google Map
     private GoogleMap googleMap;
@@ -46,10 +51,10 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        reminderManager = ReminderManager.getInstance(this);
+        taskManager = TaskManager.getInstance(this);
 
         locProvider = new MyLocationProvider(this);
-        Button findLocationBtn = (Button) findViewById(R.id.findLocationBtn);
+        final Button findLocationBtn = (Button) findViewById(R.id.findLocationBtn);
         findLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,8 +66,21 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             }
         });
         initializeMap();
-        markerManager = new MarkerManager(googleMap, reminderManager);
+        markerManager = new MarkerManager(googleMap, taskManager);
         onCreateRan = true;
+
+        addressField = (EditText) findViewById(R.id.locationInput);
+        addressField.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.d(LOG_TAG, "keycode: " + keyCode);
+                if(event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_ENTER){
+                    findLocationBtn.performClick();
+                    return false;
+                }
+                return false;
+            }
+        });
     }
 
     /**
@@ -122,7 +140,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
         }
     }
 
-    public void startEdit(Reminder r){
+    public void startEdit(Task r){
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra("reminderID", r.getId());
         startActivity(intent);
@@ -169,9 +187,9 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        long id = markerManager.getReminder(markerManager.getSelectedMarker()).getId();
+                        long id = markerManager.getTask(markerManager.getSelectedMarker()).getId();
                         markerManager.removeSelectedMarker();
-                        reminderManager.remove(id);
+                        taskManager.removeTask(id);
 
                         supportInvalidateOptionsMenu();
                     }
@@ -195,7 +213,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             markerManager.updateMarkerData();
             markerManager.unSelectMarker();
         }
-        reminderManager.addObserver(this);
+        taskManager.addObserver(this);
 
         super.onResume();
     }
@@ -203,7 +221,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     @Override
     protected void onPause(){
         onCreateRan = false;
-        reminderManager.deleteObserver(this);
+        taskManager.deleteObserver(this);
         super.onPause();
     }
 
@@ -225,9 +243,9 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Reminder reminder = markerManager.getReminder(marker);
-        if(reminder != null){
-            startEdit(reminder);
+        Task task = markerManager.getTask(marker);
+        if(task != null){
+            startEdit(task);
         }
     }
 
@@ -243,14 +261,14 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     @Override
     public synchronized void onMarkerDragEnd(Marker marker) {
-        Reminder reminder = markerManager.getReminder(marker);
-        if(reminder != null){
-            ReminderLocation loc = reminder.getReminderLocation();
-            loc.setLocation(marker.getPosition());
+        Task task = markerManager.getTask(marker);
+        if(task != null){
+            TriggerLocation loc = (TriggerLocation) task.getTrigger();
+            loc.setLatLng(marker.getPosition());
             markerManager.selectMarker(marker);
-            markerManager.showRadius(marker);
-            reminderManager.update(reminder);   //todo how to save the selected marker... the update will overwrite it
-
+            markerManager.updateRadiusLocation(marker);
+            //markerManager.showRadius(marker);
+            taskManager.update(task);   //todo how to save the selected marker... the update will overwrite it
         }
     }
 

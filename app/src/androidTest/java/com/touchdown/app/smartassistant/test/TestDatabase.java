@@ -50,7 +50,7 @@ public class TestDatabase extends AndroidTestCase {
         locationDao = new LocDao(dbHelper);
         taskDao = new TaskDao(dbHelper);
         wDao = new WriterDao(dbHelper);
-        taskManager = TaskManager.getInstance(dbHelper);
+        taskManager = TaskManager.getInstance(mContext);
     }
 
     public void testInsertActionDirectlyInTheDatabase(){
@@ -85,10 +85,6 @@ public class TestDatabase extends AndroidTestCase {
 
         location.setActionId(tasks.get(0).getId());
         return wDao.insert(location);
-    }
-
-    private TriggerLocation getDefaultTestLocation(){
-        return new TriggerLocation(-1, new LatLng(TEST_LAT, TEST_LONG), TriggerLocation.DEFAULT_RADIUS, -1);
     }
 
     public void testGetLocation(){
@@ -132,7 +128,6 @@ public class TestDatabase extends AndroidTestCase {
     }
 
     public void testGetAllDataDirectlyFromDb(){
-        Util.clearDb(mContext, dbHelper);
         insertTwoTasks("1st task", "2nd task");
 
         Cursor cursor = taskDao.getAll(TaskEntry.TABLE_NAME, TaskEntry._ID);
@@ -229,7 +224,7 @@ public class TestDatabase extends AndroidTestCase {
     public void testRemoveWorks(){
         List<Task> tasks = insertTwoTasks("first", "second");
 
-        int rowsAffected = taskManager.remove(tasks.get(0));
+        int rowsAffected = taskManager.removeTask(tasks.get(0).getId());
 
         Cursor cursor = taskManager.getAllTaskData();
 
@@ -243,7 +238,7 @@ public class TestDatabase extends AndroidTestCase {
 
         assertTrue(numberOfRemindersInDb == 1);
 
-        rowsAffected = taskManager.remove(tasks.get(1));
+        rowsAffected = taskManager.removeTask(tasks.get(1).getId());
 
         assertTrue(rowsAffected == 1);
         assertTrue(taskManager.getAllTaskData().getCount() == 0);
@@ -268,5 +263,7 @@ public class TestDatabase extends AndroidTestCase {
         return new ActionReminder(-1, 0, "test reminder content", true, -1);
     }
 
-
+    private TriggerLocation getDefaultTestLocation(){
+        return new TriggerLocation(-1, new LatLng(TEST_LAT, TEST_LONG), TriggerLocation.DEFAULT_RADIUS, -1);
+    }
 }

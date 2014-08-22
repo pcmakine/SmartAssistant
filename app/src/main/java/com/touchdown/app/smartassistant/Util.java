@@ -9,14 +9,20 @@ import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
+import com.touchdown.app.smartassistant.newdb.ActionReminder;
+import com.touchdown.app.smartassistant.newdb.Task;
 import com.touchdown.app.smartassistant.newdb.TaskManager;
+import com.touchdown.app.smartassistant.newdb.TriggerLocation;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 
 /**
  * Created by Pete on 4.8.2014.
  */
 public class Util {
-    public static final int TEST_REMINDER_DEFAULT_COUNT = 10;
+    public static final int TEST_REMINDER_DEFAULT_COUNT = 5;
+
+    private static final double TEST_LAT = 60;
+    private static final double TEST_LONG = 25;
 
     public static void clearAndInsertTestData(Context context, SQLiteOpenHelper dbHelper){
         clearDb(context, dbHelper);
@@ -31,13 +37,28 @@ public class Util {
     }
 
     public static void insertTestData(Context context, int numberOfRecords){
-        ReminderManager reminderManager = ReminderManager.getInstance(context);
+        TaskManager taskManager = TaskManager.getInstance(context);
+
         for (int i = 0; i < numberOfRecords; i++){
             double lat = 60 + i*0.1;
-            Reminder reminder = new Reminder(-1, i + ". reminder", new ReminderLocation(-1, -1, new LatLng(lat, 25), 100));
+            TriggerLocation location = new TriggerLocation(-1, new LatLng(lat, TEST_LONG), TriggerLocation.DEFAULT_RADIUS, -1);
+            Task task = new Task(-1, i + ". task", location, getDefaultTestReminder());
 
-            reminderManager.insert(reminder);
+            taskManager.insert(task);
+
+         //   Reminder reminder = new Reminder(-1, i + ". reminder", new ReminderLocation(-1, -1, new LatLng(lat, 25), 100));
+
+          //  reminderManager.insert(reminder);
         }
+    }
+
+
+    public static ActionReminder getDefaultTestReminder(){
+        return new ActionReminder(-1, 0, "test reminder content", true, -1);
+    }
+
+    public static TriggerLocation getDefaultTestLocation(){
+        return new TriggerLocation(-1, new LatLng(TEST_LAT, TEST_LONG), TriggerLocation.DEFAULT_RADIUS, -1);
     }
 
     public static int booleanAsInt(boolean truthVal){

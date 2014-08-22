@@ -1,8 +1,10 @@
 package com.touchdown.app.smartassistant.views;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
@@ -11,24 +13,26 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.models.ReminderLocation;
-import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.services.ReminderManager;
+import com.touchdown.app.smartassistant.newdb.ActionReminder;
+import com.touchdown.app.smartassistant.newdb.Task;
+import com.touchdown.app.smartassistant.newdb.TaskManager;
+import com.touchdown.app.smartassistant.newdb.TriggerLocation;
 import com.touchdown.app.smartassistant.services.GetAddressTask;
 
 import java.util.Calendar;
 
 
-public class DetailsActivity extends ActionBarActivity {
+public class DetailsActivity extends ActionBarActivity implements NotificationReminderFragment.OnFragmentInteractionListener {
     public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
 
     private static final int MIN_RADIUS_METERS = 50;
@@ -37,9 +41,8 @@ public class DetailsActivity extends ActionBarActivity {
     private static final int SEEKBAR_MULTIPLIER_OVER_KILOMETER = 100;
     private static final int SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD = 1000;
 
-    private SQLiteOpenHelper dbHelper;
     private LatLng location;
-    private String reminderText;
+    private String nameInput;
     private SeekBar radiusBar;
     private int radius;
 
@@ -47,41 +50,53 @@ public class DetailsActivity extends ActionBarActivity {
     private ProgressBar activityIndicator;
     private CountDownTimer timer;
 
-    private TextView contentToSaveTW;
+    private TextView nameTw;
     private TextView radiusTW;
     private CompoundButton onSwitch;
     private TextView locationText;
-    private Reminder reminder;
+    private Task task;
     private boolean editMode;
 
-    private ReminderManager reminderManager;
+    private TaskManager taskManager;
+    private ArrayAdapter<CharSequence> spinnerAdapter;
+    private Spinner actionPicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.e(LOG_TAG, "oncreate called");
         setContentView(R.layout.activity_details);
-        dbHelper = new DbHelper(this);
-        reminderManager = ReminderManager.getInstance(this);
+        taskManager = TaskManager.getInstance(this);
 
         locationText = (TextView) findViewById(R.id.location);
         locationText.setText("");
         this.activityIndicator = (ProgressBar) findViewById(R.id.address_progress);
-        contentToSaveTW = (TextView) findViewById(R.id.contentToSave);
+        nameTw = (TextView) findViewById(R.id.contentToSave);
         radiusTW = (TextView) findViewById(R.id.radius);
 
-        setUpCompoundButton();
+       // setUpCompoundButton();
 
         Intent intent = getIntent();
         if(noReminderIdInExtras(intent)){
             makeNewReminder();
         }else{
             long id = intent.getLongExtra("reminderID", -1);
-            Reminder reminder = reminderManager.getOne(id);
-            useExistingReminder(reminder);
+            Task task = taskManager.findTaskById(id);
+            useExistingReminder(task);
         }
         fetchAddress();
         setUpSeekBar();
+        setUpSpinner();
+    }
+
+    private void setUpSpinner(){
+        actionPicker = (Spinner) findViewById(R.id.action_picker);
+
+        spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.actions_array, android.R.layout.simple_spinner_item);
+
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        actionPicker.setAdapter(spinnerAdapter);
     }
 
     private boolean noReminderIdInExtras(Intent intent){
@@ -91,20 +106,20 @@ public class DetailsActivity extends ActionBarActivity {
     private void makeNewReminder(){
         this.location = getIntent().getParcelableExtra("location");
         if(location != null){
-            this.reminder = new Reminder(-1, null, new ReminderLocation(-1, -1, location, radius));
+            this.task = new Task(-1, "", new TriggerLocation(-1, location, radius, -1), null);
         }else{
-            this.reminder = new Reminder(-1, null, null);
+            this.task = new Task(-1, "", null, null);
         }
-        reminder.setOn(true);
-        onSwitch.setChecked(true);
+     //   task.setOn(true);
+      //  onSwitch.setChecked(true);
         editMode = false;
     }
 
-    private void useExistingReminder(Reminder reminder){
-        this.reminder = reminder;
-        this.location = reminder.getReminderLocation().getLatLng();
-        contentToSaveTW.setText(reminder.getContent());
-        onSwitch.setChecked(reminder.isOn());
+    private void useExistingReminder(Task task){
+        this.task = task;
+        this.location = ((TriggerLocation) task.getTrigger()).getLatLng();
+        nameTw.setText(task.getName());
+       // onSwitch.setChecked(reminder.isOn());
         editMode = true;
     }
 
@@ -144,8 +159,9 @@ public class DetailsActivity extends ActionBarActivity {
 
     private void setUpSeekBar(){
         radiusBar = (SeekBar)findViewById(R.id.seekBar);
-        if(reminder.getReminderLocation() != null){
-            int rad = reminder.getReminderLocation().getRadius();
+        TriggerLocation location = (TriggerLocation) task.getTrigger();
+        if(location != null){
+            int rad = location.getRadius();
             radiusBar.setProgress(metersToProgress(rad));
         }
 
@@ -160,8 +176,9 @@ public class DetailsActivity extends ActionBarActivity {
                     radius = SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD + (progress - progressMultiplierTreshold) * SEEKBAR_MULTIPLIER_OVER_KILOMETER;
                 }
                 radiusTW.setText(getRadiusText());
-                if(reminder.getReminderLocation() != null){
-                    reminder.getReminderLocation().setRadius(radius);
+                TriggerLocation location = (TriggerLocation) task.getTrigger();
+                if(location != null){
+                    location.setRadius(radius);
                 }
             }
 
@@ -196,27 +213,27 @@ public class DetailsActivity extends ActionBarActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    reminder.setOn(true);
+                    //reminder.setOn(true);
                 }else{
-                    reminder.setOn(false);
+                   // reminder.setOn(false);
                 }
             }
         });
     }
 
     public void addOrUpdate(View view){
-        reminderText  = contentToSaveTW.getText().toString();
-        reminder.setContent(reminderText);
-        if(!displayErrorToastOnEmptyReminder(reminderText)){
+        nameInput = nameTw.getText().toString();
+        task.setName(nameInput);
+        if(!displayErrorToastOnEmptyName(nameInput) && !displayErrorToastOnNoActions()){
             if(editMode){
-                updateReminder();
+                updateTask();
             }else{
-                addReminder();
+                addTask();
             }
         }
     }
 
-    private boolean displayErrorToastOnEmptyReminder(String reminderText){
+    private boolean displayErrorToastOnEmptyName(String reminderText){
         if(reminderText.equals("")){
             Toast.makeText(this, R.string.erro_no_reminder_text_entered, Toast.LENGTH_SHORT).show();
             return true;
@@ -224,8 +241,16 @@ public class DetailsActivity extends ActionBarActivity {
         return false;
     }
 
-    private void updateReminder(){
-        if(reminderManager.update(reminder)){
+    private boolean displayErrorToastOnNoActions(){
+        if(task.getActions().isEmpty()){
+            Toast.makeText(this, R.string.error_no_actions_added, Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
+    }
+
+    private void updateTask(){
+        if(taskManager.update(task)){
 /*            if(onSwitch.isChecked()){
                 ProximityAlarmManager.updateAlert(reminder);
             }else{
@@ -240,8 +265,8 @@ public class DetailsActivity extends ActionBarActivity {
         }
     }
 
-    private void addReminder(){
-        if(reminderManager.insert(reminder) != -1){
+    private void addTask(){
+        if(taskManager.insert(task) != -1){
             //ProximityAlarmManager.saveAlert(reminder);
             Toast toast = Toast.makeText(this, R.string.successfully_added, Toast.LENGTH_LONG);
             toast.show();
@@ -249,6 +274,18 @@ public class DetailsActivity extends ActionBarActivity {
         }else{
             Toast toast = Toast.makeText(this, R.string.reminder_not_added, Toast.LENGTH_LONG);
             toast.show();
+        }
+    }
+
+    public void addFragment(View view){
+        String actionName = (String) actionPicker.getSelectedItem();
+
+        if(actionName.equals(getResources().getString(R.string.reminder))){
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            NotificationReminderFragment notificationReminderFragment = new NotificationReminderFragment();
+            fragmentTransaction.add(R.id.fragment_container, notificationReminderFragment, "HELLO");
+            fragmentTransaction.commit();
         }
     }
 
@@ -261,8 +298,8 @@ public class DetailsActivity extends ActionBarActivity {
     @Override
     public void onBackPressed(){
         Bundle bundle = new Bundle();
-        bundle.putString("reminderText", reminderText);
-        bundle.putLong("reminderID", reminder.getId());
+        bundle.putString("reminderText", nameInput);
+        bundle.putLong("reminderID", task.getId());
         //   bundle.putBoolean("newReminder", !editMode);
         Intent intent = new Intent();
         intent.putExtras(bundle);
@@ -310,5 +347,10 @@ public class DetailsActivity extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFragmentInteraction(ActionReminder reminder) {
+
     }
 }

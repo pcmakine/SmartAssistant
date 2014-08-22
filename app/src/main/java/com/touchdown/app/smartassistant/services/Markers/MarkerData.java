@@ -1,21 +1,23 @@
 package com.touchdown.app.smartassistant.services.Markers;
 
 import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.touchdown.app.smartassistant.models.ReminderLocation;
-import com.touchdown.app.smartassistant.models.Reminder;
+import com.touchdown.app.smartassistant.newdb.Task;
+import com.touchdown.app.smartassistant.newdb.TriggerLocation;
 
 /**
  * Created by Pete on 8.8.2014.
  */
 public class MarkerData implements Comparable{
-    private Reminder reminder;
+    private Task task;
     private Circle radius;
     private Marker marker;
 
-    public MarkerData(Reminder reminder, Circle radius, Marker marker) {
+    public MarkerData(Task task, Circle radius, Marker marker) {
         this.radius = radius;
-        this.reminder = reminder;
+        this.task = task;
         this.marker = marker;
     }
 
@@ -43,24 +45,25 @@ public class MarkerData implements Comparable{
         this.radius = radius;
     }
 
-    public boolean noReminder(){
-        return reminder == null;
+
+    public boolean noTask(){
+        return task == null;
     }
 
-    public Reminder getReminder() {
-        return reminder;
+    public Task getTask() {
+        return task;
     }
 
-    public ReminderLocation getLocation(){
-        if(reminder != null){
-            return reminder.getReminderLocation();
+    public TriggerLocation getLocation(){
+        if(task != null){
+            return (TriggerLocation) task.getTrigger();
         }
         return null;
     }
 
-    public boolean hasActiveReminder(){
-        if(reminder != null){
-            return reminder.isOn();
+    public boolean hasActiveTask(){
+        if(task != null){
+            return task.isActive();
         }
         return false;
     }
@@ -77,14 +80,14 @@ public class MarkerData implements Comparable{
     @Override
     public int compareTo(Object another) {
         MarkerData compareData = (MarkerData) another;
-        if(reminder == null && compareData.noReminder()){
+        if(task == null && compareData.noTask()){
             return 0;
-        }else if(reminder == null){
+        }else if(task == null){
             return 1;
-        }else if(compareData.noReminder()){
+        }else if(compareData.noTask()){
             return -1;
         }else{
-            return reminder.compareTo(compareData.getReminder());
+            return task.compareTo(compareData.getTask());
         }
     }
 }

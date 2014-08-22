@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="actions_array">
+        <item>@string/reminder</item>
+        <item>@string/wifi</item>
+        <item>@string/ringtone_volume</item>
+    </string-array>
+
+</resources>

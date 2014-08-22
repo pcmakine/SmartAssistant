@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.touchdown.app.smartassistant"
-        minSdkVersion 10
+        minSdkVersion 11
         targetSdkVersion 19
         versionCode 1
         versionName "1.0"
@@ -23,8 +23,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
     // You must install or update the Support Repository through the SDK manager to use this dependency.
+    // You must install or update the Support Repository through the SDK manager to use this dependency.
     compile 'com.android.support:appcompat-v7:19.+'
     // You must install or update the Support Repository through the SDK manager to use this dependency.
-    compile 'com.android.support:support-v4:19.0.0'
+    compile 'com.android.support:support-v4:19.+'
     compile 'com.google.android.gms:play-services:5.0.77'
 }

@@ -29,10 +29,10 @@ public class WriterDao {
         return numOfRowsAffected;
     }
 
-    public int remove(Data data){
+    public int remove(long id, String tableName, String idColumn){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int rowsAffected = db.delete(data.getTableName(), data.getIdColumn() + " =?",
-                new String[]{String.valueOf(data.getId())});
+        int rowsAffected = db.delete(tableName, idColumn + " =?",
+                new String[]{String.valueOf(id)});
         db.close();
         return rowsAffected;
     }

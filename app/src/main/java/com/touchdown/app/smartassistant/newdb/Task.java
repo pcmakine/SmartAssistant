@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Pete on 19.8.2014.
  */
-public class Task extends Data {
+public class Task extends Data implements Comparable<Task>{
     private static final String TABLE_NAME = DbContract.TaskEntry.TABLE_NAME;
     private static final String ID_COLUMN = DbContract.TaskEntry._ID;
 
@@ -64,6 +64,47 @@ public class Task extends Data {
             }
         }
     }
+
+    public boolean isActive(){
+        if(actions!= null && !actions.isEmpty()){
+            for(Action action: actions){
+                if(action.isOn()){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //todo check somewhere that this is a good way to implement equals
+    @Override
+    public boolean equals(Object obj){
+        if(!(obj instanceof Task)){
+            return false;
+        }
+        Task task = (Task) obj;
+
+        return getId() == task.getId() && name.equals(task.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        int constant = 7;
+        int hash = name.hashCode() + constant;
+        return hash;
+    }
+
+    @Override
+    public int compareTo(Task another) {
+        if(getId() < another.getId()){
+            return -1;
+        }else if(getId() > another.getId()){
+            return 1;
+        }
+        return 0;
+    }
+
+
 
     @Override
     public ContentValues getContentValues() {

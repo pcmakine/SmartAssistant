@@ -21,7 +21,6 @@ public class MarkerDataComparator implements Comparator<Marker> {
         Comparable valueA = map.get(keyA);
         Comparable valueB = map.get(keyB);
 
-
         return valueA.compareTo(valueB);
 
     }

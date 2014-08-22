@@ -1,9 +1,11 @@
 package com.touchdown.app.smartassistant.newdb;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.touchdown.app.smartassistant.data.DbContract;
+import com.touchdown.app.smartassistant.data.DbHelper;
 
 import java.util.List;
 import java.util.Observable;
@@ -19,16 +21,17 @@ public class TaskManager extends Observable{
     private WriterDao wDao;
     private SQLiteOpenHelper dbHelper;
 
-    private TaskManager(SQLiteOpenHelper dbHelper){
+    private TaskManager(Context context){
+        this.dbHelper = new DbHelper(context.getApplicationContext());
         this.taskDao = new TaskDao(dbHelper);
         this.reminderDao = new ActionReminderDao(dbHelper);
         this.locationDao = new LocDao(dbHelper);
         this.wDao = new WriterDao(dbHelper);
     }
 
-    public synchronized static TaskManager getInstance(SQLiteOpenHelper dbHelper){
+    public synchronized static TaskManager getInstance(Context context){
         if(sInstance == null){
-            sInstance = new TaskManager(dbHelper);
+            sInstance = new TaskManager(context);
         }
         return sInstance;
     }
@@ -68,19 +71,16 @@ public class TaskManager extends Observable{
         }
     }
 
-    private void notifyDataObservers(){
-        setChanged();
-        notifyObservers();
-        clearChanged();
-    }
-
-    public void update(Task task){
-        wDao.update(task);
+    public boolean update(Task task){
+        int rowsAffected = wDao.update(task);
 
         wDao.update(task.getTrigger());
 
         updateActions(task);
 
+        notifyDataObservers();
+
+        return rowsAffected > 0;
     }
 
     public void updateActions(Task task){
@@ -104,13 +104,23 @@ public class TaskManager extends Observable{
         return taskDao.getAllAsList(DbContract.TaskEntry.TABLE_NAME, DbContract.TaskEntry._ID);
     }
 
-    public int remove(Task task){
-        int rowsAffected = wDao.remove(task);
+    public List<Task> getAllTasksWithLocationTrigger(){
+        return getAllTasks();           //todo return only the tasks that really have a location trigger
+    }
+
+    public int removeTask(long id){
+        int rowsAffected = wDao.remove(id, DbContract.TaskEntry.TABLE_NAME, DbContract.TaskEntry._ID);
         return rowsAffected;
     }
 
     public int getActiveTaskCount(){
         return reminderDao.getActiveRemindersCount(DbContract.ReminderEntry.TABLE_NAME, DbContract.ReminderEntry.COLUMN_NAME_ON, 1);
+    }
+
+    private void notifyDataObservers(){
+        setChanged();
+        notifyObservers();
+        clearChanged();
     }
 
 }

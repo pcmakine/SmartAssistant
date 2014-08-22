@@ -21,6 +21,7 @@ import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
+import com.touchdown.app.smartassistant.newdb.TaskManager;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 
 
@@ -28,7 +29,7 @@ public class ListActivity extends ActionBarActivity {
     public static final String LOG_TAG = ListActivity.class.getSimpleName();
     private SimpleCursorAdapter adapter;
     private ListView listView;
-    private ReminderManager reminderManager;
+    private TaskManager taskManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,17 +41,15 @@ public class ListActivity extends ActionBarActivity {
 
         Toast.makeText(this, "Current db version: " + version, Toast.LENGTH_LONG).show();*/
 
-
-
        // Util.clearDb(new DbHelper(this), this);
         Util.clearAndInsertTestData(this, new DbHelper(this));
 
-        reminderManager = ReminderManager.getInstance(this);
+        taskManager = TaskManager.getInstance(this);
 
-        Cursor cursor =  reminderManager.getAllReminderData();
+        Cursor cursor =  taskManager.getAllTaskData();
 
         adapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,
-                new String[] {DbContract.ReminderEntry.COLUMN_NAME_CONTENT}, new int[] {R.id.itemText},
+                new String[] {DbContract.TaskEntry.COLUMN_NAME_TASK_NAME}, new int[] {R.id.itemText},
                 SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
         // Assign adapter to ListView
@@ -68,7 +67,7 @@ public class ListActivity extends ActionBarActivity {
                 // ListView Clicked item value
                 Cursor  c    = (Cursor) listView.getItemAtPosition(position);
                 c.moveToPosition(position);
-                String content = c.getString(c.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_CONTENT));
+                String name = c.getString(c.getColumnIndex(DbContract.TaskEntry.COLUMN_NAME_TASK_NAME));
 
                 toggleCheckBox(position);
 
@@ -76,7 +75,7 @@ public class ListActivity extends ActionBarActivity {
 
                 // Show Alert
                 Toast.makeText(getApplicationContext(),
-                        "Position :"+itemPosition+"  ListItem : " + content , Toast.LENGTH_LONG)
+                        "Position :"+itemPosition+"  ListItem : " + name , Toast.LENGTH_LONG)
                         .show();
             }
 
@@ -101,7 +100,7 @@ public class ListActivity extends ActionBarActivity {
     }
 
     public void updateList(){
-        Cursor newCursor = reminderManager.getAllReminderData();
+        Cursor newCursor = taskManager.getAllTaskData();
 
         adapter.swapCursor(newCursor);
     }
@@ -143,10 +142,10 @@ public class ListActivity extends ActionBarActivity {
                 for (int i = 0; i < listView.getAdapter().getCount(); i++) {
                     if (checked.get(i)) {
                         cursor = (Cursor) adapter.getItem(i);
-                        int idIndex = cursor.getColumnIndex(DbContract.ReminderEntry._ID);
-                        long reminderId = cursor.getLong(idIndex);
+                        int idIndex = cursor.getColumnIndex(DbContract.TaskEntry._ID);
+                        long taskId = cursor.getLong(idIndex);
 
-                        reminderManager.remove(reminderId);
+                        taskManager.removeTask(taskId);
 
                         listView.setItemChecked(i, false);
                         toggleCheckBox(i);
@@ -178,9 +177,9 @@ public class ListActivity extends ActionBarActivity {
                     for (int i = 0; i < listView.getAdapter().getCount(); i++) {
                         if (checked.get(i)) {
                             cursor = (Cursor) adapter.getItem(i);
-                            int idIndex = cursor.getColumnIndex(DbContract.ReminderEntry._ID);
-                            long reminderId = cursor.getLong(idIndex);
-                            startEdit(reminderId);
+                            int idIndex = cursor.getColumnIndex(DbContract.TaskEntry._ID);
+                            long taskId = cursor.getLong(idIndex);
+                            startEdit(taskId);
 
                         }
                     }

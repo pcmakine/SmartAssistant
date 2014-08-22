@@ -11,7 +11,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.touchdown.app.smartassistant.models.ReminderLocation;
 import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.services.ReminderManager;
+import com.touchdown.app.smartassistant.newdb.Task;
+import com.touchdown.app.smartassistant.newdb.TaskManager;
+import com.touchdown.app.smartassistant.newdb.TriggerLocation;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,38 +36,37 @@ public class MarkerManager {
 
     private Map<Marker, MarkerData> markerDataMap;
 
-    private ReminderManager reminderManager;
+    private TaskManager taskManager;
 
-    public MarkerManager(GoogleMap map, ReminderManager reminderManager){
+    public MarkerManager(GoogleMap map, TaskManager taskManager){
         this.map = map;
-        this.reminderManager = reminderManager;
+        this.taskManager = taskManager;
         this.markerDataMap = new HashMap<Marker, MarkerData>();
         populateMapWithMarkers();
         this.selectedMarker = null;
     }
 
     public void updateMarkerData(){
-        List<Reminder> reminderList = reminderManager.getReminderList();
+        List<Task> taskList = taskManager.getAllTasksWithLocationTrigger();
 
         map.clear();
 
         markerDataMap.clear();
 
-        populateMapWithMarkers(reminderList);
+        putTaskMarkersOnMap(taskList);
     }
 
-    public void populateMapWithMarkers(List<Reminder> reminderList){
-        for (Reminder reminder: reminderList){
-            if(reminder.getReminderLocation() != null){
-                saveMarker(generateMarker(reminder.getContent(), reminder.getReminderLocation().getLatLng(), NON_EMPTY_MARKER_ON), reminder);
-            }
+    private void putTaskMarkersOnMap(List<Task> taskList){
+        for (Task task: taskList){
+            TriggerLocation location = (TriggerLocation) task.getTrigger();
+            saveMarker(generateMarker(task.getName(), location.getLatLng(), NON_EMPTY_MARKER_ON), task);
         }
         updateMarkerColors();
     }
 
     public void populateMapWithMarkers(){
-        List<Reminder> reminderList = reminderManager.getReminderList();
-        populateMapWithMarkers(reminderList);
+        List<Task> taskList = taskManager.getAllTasksWithLocationTrigger();
+        putTaskMarkersOnMap(taskList);
     }
 
     public Marker generateMarker(String text, LatLng loc, float color){
@@ -77,20 +78,21 @@ public class MarkerManager {
         return marker;
     }
 
-    public void saveMarker(Marker marker, Reminder reminder){    //reminder may be null
+    public void saveMarker(Marker marker, Task task){    //reminder may be null
         Circle radius = null;
-        if(reminder != null){
-            radius = addRadius(reminder.getReminderLocation());
+        if(task != null){
+            TriggerLocation location = (TriggerLocation) task.getTrigger();
+            radius = addRadius(location);
         }
-        markerDataMap.put(marker, new MarkerData(reminder, radius, marker));
-
+        markerDataMap.put(marker, new MarkerData(task, radius, marker));
     }
 
     public void showRadius(Marker marker){
-        markerDataMap.get(marker).showRadius();
+        MarkerData data = markerDataMap.get(marker);
+        data.showRadius();
     }
 
-    private Circle addRadius(ReminderLocation loc){
+    private Circle addRadius(TriggerLocation loc){
         int radius;
         radius = loc.getRadius();
 
@@ -115,9 +117,9 @@ public class MarkerManager {
         if(marker.equals(selectedMarker)){
             return SELECTED_COLOR;
         }
-        else if(markerDataMap.get(marker).noReminder()){
+        else if(markerDataMap.get(marker).noTask()){
             return EMPTY_MARKER_COLOR;
-        }else if(markerDataMap.get(marker).hasActiveReminder()){
+        }else if(markerDataMap.get(marker).hasActiveTask()){
             return NON_EMPTY_MARKER_ON;
         }else {
             return NON_EMPTY_MARKER_OFF;
@@ -136,10 +138,13 @@ public class MarkerManager {
     }
 
     private void showMarkerInfoWindow(Marker marker){
-        Reminder reminder = markerDataMap.get(marker).getReminder();
-        if(reminder != null && reminder.getReminderLocation() != null){
-            marker.setTitle(StringUtils.abbreviate(reminder.getContent(), 20));
-            marker.showInfoWindow();
+        Task task = markerDataMap.get(marker).getTask();
+        if(task != null){
+            TriggerLocation location = (TriggerLocation) task.getTrigger();
+            if(location != null){
+                marker.setTitle(StringUtils.abbreviate(task.getName(), 20));
+                marker.showInfoWindow();
+            }
         }
     }
 
@@ -148,7 +153,7 @@ public class MarkerManager {
     }
 
     public boolean removeSelectedIfEmpty(){
-        if(markerDataMap.get(selectedMarker).getReminder() == null){
+        if(markerDataMap.get(selectedMarker).getTask() == null){
             selectedMarker.remove();
             markerDataMap.remove(selectedMarker);
             return true;
@@ -161,12 +166,18 @@ public class MarkerManager {
         markerDataMap.remove(selectedMarker); //todo what happens if the program stops here, before the next command
         data.remove(selectedMarker);
         selectedMarker = null;
-
     }
 
-    public Reminder getReminder(Marker marker){
+    public void updateRadiusLocation(Marker marker){
+        MarkerData data = markerDataMap.get(marker);
+
+        data.removeRadius();
+        data.setRadius(addRadius(data.getLocation()));
+    }
+
+    public Task getTask(Marker marker){
         if(marker != null){
-            return markerDataMap.get(marker).getReminder();
+            return markerDataMap.get(marker).getTask();
         }
         return null;
     }
@@ -179,7 +190,6 @@ public class MarkerManager {
         Set<Map.Entry<Marker, MarkerData>> markerDataSet = markerDataMap.entrySet();
         for(Map.Entry<Marker, MarkerData> data: markerDataSet){
             MarkerData mData = data.getValue();
-            ReminderLocation reminderLocation = mData.getLocation();
             Circle radius = mData.getRadius();
             LatLng center = radius.getCenter();
             float[] distance = new float[1];
@@ -196,7 +206,7 @@ public class MarkerManager {
     }
 
     public boolean userHasSelectedEmptyMarker(){
-        return userHasSelectedMarker() && markerDataMap.get(selectedMarker).getReminder() == null;
+        return userHasSelectedMarker() && markerDataMap.get(selectedMarker).getTask() == null;
     }
 
     public static float getSelectedColor(){
