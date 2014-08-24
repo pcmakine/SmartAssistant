@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--<solid android:color="#D6D6EF"/>-->
+    <stroke android:width="3dip"  android:color="@color/wallet_holo_blue_light" />
+    <!--android:color="#B1BCBE"-->
+    <corners android:radius="10dip"/>
+    <padding android:left="@dimen/activity_horizontal_margin"
+        android:top="@dimen/activity_vertical_margin"
+        android:right="@dimen/activity_horizontal_margin"
+        android:bottom="@dimen/activity_vertical_margin" />
+</shape>

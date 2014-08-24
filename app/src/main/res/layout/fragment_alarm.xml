@@ -1,0 +1,66 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".views.NotificationReminderFragment"
+
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/margin_between_items"
+    android:background="@drawable/layout_bg"
+    android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+        <FrameLayout
+            android:id = "@+id/onSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            >
+            <include layout="@layout/compound_button"
+                />
+        </FrameLayout>
+
+        <TextView
+            android:id = "@+id/alarmTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:text="@string/alarm_action_title"
+            android:textSize = "@dimen/text_medium"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <CheckBox
+            android:id = "@+id/notification"
+            android:layout_height="wrap_content"
+            android:layout_width = "wrap_content"
+            android:textSize = "@dimen/text_small"
+            android:text = "@string/notification_reminder_action_title"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/fullscreenAlarm">
+
+        </CheckBox>
+
+        <CheckBox
+            android:id = "@+id/fullscreenAlarm"
+            android:layout_height="wrap_content"
+            android:layout_width = "wrap_content"
+            android:text = "@string/fullscreen_alarm_title"
+            android:textSize = "@dimen/text_small"
+            android:layout_alignParentRight="true"
+            >
+
+        </CheckBox>
+    </RelativeLayout>
+
+</LinearLayout>

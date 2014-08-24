@@ -49,4 +49,12 @@
     <string name="ringtone_volume">Ringtone volume</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="notification_reminder_action_title">Notification</string>
+
+    <string name="location_trigger_title"><u>Location trigger</u></string>
+    <string name="entering">Entering</string>
+    <string name="exiting">Leaving</string>
+    <string name="alarm_action_title">Action: alarm</string>
+    <string name="fullscreen_alarm_title">Fullscreen alarm</string>
+
 </resources>

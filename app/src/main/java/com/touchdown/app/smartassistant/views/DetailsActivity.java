@@ -4,7 +4,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.location.Geocoder;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
@@ -32,7 +31,7 @@ import com.touchdown.app.smartassistant.services.GetAddressTask;
 import java.util.Calendar;
 
 
-public class DetailsActivity extends ActionBarActivity implements NotificationReminderFragment.OnFragmentInteractionListener {
+public class DetailsActivity extends ActionBarActivity implements AlarmFragment.OnFragmentInteractionListener {
     public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
 
     private static final int MIN_RADIUS_METERS = 50;
@@ -68,13 +67,13 @@ public class DetailsActivity extends ActionBarActivity implements NotificationRe
         setContentView(R.layout.activity_details);
         taskManager = TaskManager.getInstance(this);
 
-        locationText = (TextView) findViewById(R.id.location);
-        locationText.setText("");
-        this.activityIndicator = (ProgressBar) findViewById(R.id.address_progress);
+        //       locationText = (TextView) findViewById(R.id.location);
+        //       locationText.setText("");
+        //   this.activityIndicator = (ProgressBar) findViewById(R.id.address_progress);
         nameTw = (TextView) findViewById(R.id.contentToSave);
         radiusTW = (TextView) findViewById(R.id.radius);
 
-       // setUpCompoundButton();
+        // setUpCompoundButton();
 
         Intent intent = getIntent();
         if(noReminderIdInExtras(intent)){
@@ -84,19 +83,20 @@ public class DetailsActivity extends ActionBarActivity implements NotificationRe
             Task task = taskManager.findTaskById(id);
             useExistingReminder(task);
         }
-        fetchAddress();
+        //      fetchAddress();
         setUpSeekBar();
-        setUpSpinner();
+        addAlarmFragment();
+        // setUpSpinner();
     }
 
     private void setUpSpinner(){
-        actionPicker = (Spinner) findViewById(R.id.action_picker);
+/*        actionPicker = (Spinner) findViewById(R.id.action_picker);
 
         spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.actions_array, android.R.layout.simple_spinner_item);
 
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        actionPicker.setAdapter(spinnerAdapter);
+        actionPicker.setAdapter(spinnerAdapter);*/
     }
 
     private boolean noReminderIdInExtras(Intent intent){
@@ -110,8 +110,8 @@ public class DetailsActivity extends ActionBarActivity implements NotificationRe
         }else{
             this.task = new Task(-1, "", null, null);
         }
-     //   task.setOn(true);
-      //  onSwitch.setChecked(true);
+        //   task.setOn(true);
+        //  onSwitch.setChecked(true);
         editMode = false;
     }
 
@@ -119,7 +119,7 @@ public class DetailsActivity extends ActionBarActivity implements NotificationRe
         this.task = task;
         this.location = ((TriggerLocation) task.getTrigger()).getLatLng();
         nameTw.setText(task.getName());
-       // onSwitch.setChecked(reminder.isOn());
+        // onSwitch.setChecked(reminder.isOn());
         editMode = true;
     }
 
@@ -215,7 +215,7 @@ public class DetailsActivity extends ActionBarActivity implements NotificationRe
                 if(isChecked){
                     //reminder.setOn(true);
                 }else{
-                   // reminder.setOn(false);
+                    // reminder.setOn(false);
                 }
             }
         });
@@ -277,16 +277,13 @@ public class DetailsActivity extends ActionBarActivity implements NotificationRe
         }
     }
 
-    public void addFragment(View view){
-        String actionName = (String) actionPicker.getSelectedItem();
+    public void addAlarmFragment(){
 
-        if(actionName.equals(getResources().getString(R.string.reminder))){
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            NotificationReminderFragment notificationReminderFragment = new NotificationReminderFragment();
-            fragmentTransaction.add(R.id.fragment_container, notificationReminderFragment, "HELLO");
-            fragmentTransaction.commit();
-        }
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        AlarmFragment notificationReminderFragment = new AlarmFragment();
+        fragmentTransaction.add(R.id.fragment_container, notificationReminderFragment, "HELLO");
+        fragmentTransaction.commit();
     }
 
     public void deliverAddress(String address){
@@ -309,11 +306,11 @@ public class DetailsActivity extends ActionBarActivity implements NotificationRe
     @Override
     public void onResume(){
         super.onResume();
-        if((locationText.getText().equals("") ||
+ /*       if((locationText.getText().equals("") ||
                 locationText.getText().equals(getResources().getString(R.string.error_address_could_not_be_found)))
                 && addressTask.getStatus() != AsyncTask.Status.RUNNING){
             fetchAddress();
-        }
+        }*/
     }
 
     private void finishFetchingAddress(){
@@ -325,8 +322,8 @@ public class DetailsActivity extends ActionBarActivity implements NotificationRe
     @Override
     public void onPause(){
         super.onPause();
-        finishFetchingAddress();
-        timer.cancel();
+//        finishFetchingAddress();
+//        timer.cancel();
     }
 
 

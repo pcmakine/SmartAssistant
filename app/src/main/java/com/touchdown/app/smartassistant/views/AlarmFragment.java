@@ -1,7 +1,6 @@
 package com.touchdown.app.smartassistant.views;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,13 +13,13 @@ import com.touchdown.app.smartassistant.newdb.ActionReminder;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link NotificationReminderFragment.OnFragmentInteractionListener} interface
+ * {@link AlarmFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link NotificationReminderFragment#newInstance} factory method to
+ * Use the {@link AlarmFragment#newInstance} factory method to
  * create an instance of this fragment.
  *
  */
-public class NotificationReminderFragment extends Fragment {
+public class AlarmFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -41,15 +40,15 @@ public class NotificationReminderFragment extends Fragment {
      * @return A new instance of fragment NotificationReminderFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static NotificationReminderFragment newInstance(String param1, String param2) {
-        NotificationReminderFragment fragment = new NotificationReminderFragment();
+    public static AlarmFragment newInstance(String param1, String param2) {
+        AlarmFragment fragment = new AlarmFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
-    public NotificationReminderFragment() {
+    public AlarmFragment() {
         // Required empty public constructor
     }
 
@@ -66,7 +65,7 @@ public class NotificationReminderFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notification_reminder, container, false);
+        return inflater.inflate(R.layout.fragment_alarm, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

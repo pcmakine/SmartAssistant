@@ -3,9 +3,7 @@
     android:layout_width="wrap_content" android:layout_height="wrap_content" >
 
     <CheckBox
-        android:id="@+id/enabled"
+        android:id="@+id/myswitch"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/toggle_alarm" />
-
+        android:layout_height="wrap_content" />
 </merge>
