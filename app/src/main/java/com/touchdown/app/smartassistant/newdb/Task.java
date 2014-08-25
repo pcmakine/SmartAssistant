@@ -6,7 +6,9 @@ import com.touchdown.app.smartassistant.data.Data;
 import com.touchdown.app.smartassistant.data.DbContract;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Pete on 19.8.2014.
@@ -17,12 +19,12 @@ public class Task extends Data implements Comparable<Task>{
 
     private String name;
     private Trigger trigger;
-    private List<Action> actions;
+    private Set<Action> actions;
 
     public Task(long id, String name, Trigger trigger, Action action) {
         super(id);
         this.trigger = trigger;
-        this.actions = new ArrayList<Action>();
+        this.actions = new HashSet<Action>();
         actions.add(action);
         this.name = name;
         setTableName(TABLE_NAME);
@@ -34,7 +36,7 @@ public class Task extends Data implements Comparable<Task>{
     }
 
     public void removeAction(Action action){
-        actions.remove(action); //todo probably requires overriding equals in action class
+        actions.remove(action);
     }
 
     public String getName() {
@@ -46,7 +48,9 @@ public class Task extends Data implements Comparable<Task>{
     }
 
     public List<Action> getActions(){
-        return actions;
+        List<Action> actionList = new ArrayList<Action>();
+        actionList.addAll(actions);
+        return actionList;
     }
 
     public Trigger getTrigger(){
@@ -76,6 +80,36 @@ public class Task extends Data implements Comparable<Task>{
         return false;
     }
 
+    public void turnAllActionsOff(){
+        if(actions!= null && !actions.isEmpty()){
+            for(Action action: actions){
+                action.turnOff();
+            }
+        }
+    }
+
+    public void executeActions() {
+        if(actions != null){
+            for(Action action: actions){
+                action.execute();
+            }
+        }
+    }
+
+    public NotificationReminder getAlarm(){
+        for(Action action: actions){
+            if(action.getType() == 0){
+                return (NotificationReminder) action;
+            }
+        }
+
+        return null;
+    }
+
+    public TriggerLocation getLocation(){
+        return (TriggerLocation) trigger;
+    }
+
     //todo check somewhere that this is a good way to implement equals
     @Override
     public boolean equals(Object obj){
@@ -103,8 +137,6 @@ public class Task extends Data implements Comparable<Task>{
         }
         return 0;
     }
-
-
 
     @Override
     public ContentValues getContentValues() {

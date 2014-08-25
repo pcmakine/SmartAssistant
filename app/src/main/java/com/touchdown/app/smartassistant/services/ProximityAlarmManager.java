@@ -7,6 +7,7 @@ import android.location.LocationManager;
 
 import com.touchdown.app.smartassistant.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.models.Reminder;
+import com.touchdown.app.smartassistant.newdb.Task;
 
 /**
  * Created by Pete on 11.8.2014.
@@ -16,17 +17,17 @@ public class ProximityAlarmManager {
     private static final String PROX_ALERT_INTENT = "com.touchdown.app.smartassistant.services.ProximityIntentReceiver";
 
 
-    public static void updateAlert(Reminder reminder){
-        saveAlert(reminder);
+    public static void updateAlert(Task task){
+        saveAlert(task);
     }
 
-    public static void saveAlert(Reminder reminder){
-        if(reminder.getReminderLocation() != null){
+    public static void saveAlert(Task task){
+        if(task.getLocation() != null){
             LocationManager locationManager = (LocationManager) ApplicationContextProvider.getAppContext().getSystemService(Context.LOCATION_SERVICE);
-            PendingIntent proximityIntent = constructPendingIntent(reminder.getId());
-            locationManager.addProximityAlert(reminder.getReminderLocation().getLatLng().latitude,
-                    reminder.getReminderLocation().getLatLng().longitude,
-                    reminder.getReminderLocation().getRadius(),
+            PendingIntent proximityIntent = constructPendingIntent(task.getId());
+            locationManager.addProximityAlert(task.getLocation().getLatLng().latitude,
+                    task.getLocation().getLatLng().longitude,
+                    task.getLocation().getRadius(),
                     PROX_ALERT_EXPIRATION,
                     proximityIntent);
         }

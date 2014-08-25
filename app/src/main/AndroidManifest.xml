@@ -45,7 +45,7 @@
             android:name=".views.DetailsActivity"
             android:label="@string/title_activity_details"
             android:parentActivityName=".MapActivity"
-            android:windowSoftInputMode="adjustResize" >
+            android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.touchdown.app.smartassistant.MapActivity" />

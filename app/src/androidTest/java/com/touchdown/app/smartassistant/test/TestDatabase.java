@@ -1,9 +1,7 @@
 package com.touchdown.app.smartassistant.test;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.location.Location;
 import android.test.AndroidTestCase;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -13,7 +11,7 @@ import com.touchdown.app.smartassistant.data.DbContract.TaskEntry;
 import com.touchdown.app.smartassistant.data.DbContract.ReminderEntry;
 
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.newdb.ActionReminder;
+import com.touchdown.app.smartassistant.newdb.NotificationReminder;
 import com.touchdown.app.smartassistant.newdb.ActionReminderDao;
 import com.touchdown.app.smartassistant.newdb.LocDao;
 import com.touchdown.app.smartassistant.newdb.Task;
@@ -54,7 +52,7 @@ public class TestDatabase extends AndroidTestCase {
     }
 
     public void testInsertActionDirectlyInTheDatabase(){
-        ActionReminder reminder = getDefaultTestReminder();
+        NotificationReminder reminder = getDefaultTestReminder();
         TriggerLocation testLocation = getDefaultTestLocation();
 
         Task task = new Task(-1, "testTask", testLocation, reminder);
@@ -202,7 +200,7 @@ public class TestDatabase extends AndroidTestCase {
         TriggerLocation location = (TriggerLocation) task.getTrigger();
         LatLng testLoc = new LatLng(90, 90);
 
-        ActionReminder reminder = (ActionReminder) task.getActions().get(0);
+        NotificationReminder reminder = (NotificationReminder) task.getActions().get(0);
         reminder.setContent("modified content");
 
         location.setLatLng(testLoc);
@@ -216,7 +214,7 @@ public class TestDatabase extends AndroidTestCase {
         LatLng taskLoc = ((TriggerLocation) task.getTrigger()).getLatLng();
         assertEquals(taskLoc, testLoc);
 
-        ActionReminder modReminder = (ActionReminder) task.getActions().get(0);
+        NotificationReminder modReminder = (NotificationReminder) task.getActions().get(0);
 
         assertEquals("modified content", modReminder.getContent());
     }
@@ -259,8 +257,8 @@ public class TestDatabase extends AndroidTestCase {
         assertEquals(2, taskManager.getActiveTaskCount());
     }
 
-    private ActionReminder getDefaultTestReminder(){
-        return new ActionReminder(-1, 0, "test reminder content", true, -1);
+    private NotificationReminder getDefaultTestReminder(){
+        return new NotificationReminder(-1, 0, "test reminder content", true, -1);
     }
 
     private TriggerLocation getDefaultTestLocation(){

@@ -4,6 +4,8 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import com.touchdown.app.smartassistant.models.Reminder;
+import com.touchdown.app.smartassistant.newdb.Task;
+import com.touchdown.app.smartassistant.newdb.TaskManager;
 import com.touchdown.app.smartassistant.views.AlarmNotification;
 
 /**
@@ -23,11 +25,11 @@ public class HandleAlarmService extends IntentService {
             long id = intent.getLongExtra("reminderID", -1);
 
             if(id != -1){
-                ReminderManager reminderManager = ReminderManager.getInstance(this);
-                Reminder reminder = reminderManager.getOne(id);
-                reminder.turnOff();
-                reminderManager.update(reminder);
-                new AlarmNotification(this, reminder).buildNotification();
+                TaskManager taskManager = TaskManager.getInstance(this);
+                Task task = taskManager.findTaskById(id);
+                task.executeActions();
+                task.turnAllActionsOff();
+                taskManager.update(task);
             }
             ProximityIntentReceiver.completeWakefulIntent(intent);
         }

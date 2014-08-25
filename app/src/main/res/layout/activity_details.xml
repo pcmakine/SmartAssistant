@@ -102,21 +102,19 @@
                     android:layout_height="wrap_content">
 
                     <CheckBox
-                        android:layout_height="wrap_content"
-                        android:layout_width = "wrap_content"
+                        style = "@style/checkBox"
+                        android:text = "@string/exiting"
+                        android:layout_toLeftOf="@+id/enteringCheckBox"
+                        android:layout_alignParentLeft="true">
+                    </CheckBox>
+
+                    <CheckBox
+                        android:id = "@+id/enteringCheckBox"
+                        style = "@style/checkBox"
                         android:text = "@string/entering"
                         android:layout_alignParentRight="true">
 
                     </CheckBox>
-
-                    <CheckBox
-                        android:layout_height="wrap_content"
-                        android:layout_width = "wrap_content"
-                        android:text = "@string/exiting"
-                        android:layout_alignParentLeft="true">
-
-                    </CheckBox>
-
 
                 </RelativeLayout>
             </LinearLayout>
@@ -128,27 +126,27 @@
                 >
             </LinearLayout>
 
-<!--            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity = "center_horizontal"
-                android:layout_marginTop="@dimen/margin_between_items">
+            <!--            <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_gravity = "center_horizontal"
+                            android:layout_marginTop="@dimen/margin_between_items">
 
-                <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick = "addFragment"
-                    android:text = "@string/add_action_btn"/>
+                            <Button
+                                style="?android:attr/buttonStyleSmall"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick = "addFragment"
+                                android:text = "@string/add_action_btn"/>
 
-                <Spinner
-                    android:id = "@+id/action_picker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text = "@string/add_action_btn"/>
+                            <Spinner
+                                android:id = "@+id/action_picker"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text = "@string/add_action_btn"/>
 
-            </LinearLayout>-->
+                        </LinearLayout>-->
         </LinearLayout>
 
     </ScrollView>

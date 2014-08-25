@@ -6,21 +6,22 @@ import android.support.v4.app.NotificationCompat;
 
 import com.touchdown.app.smartassistant.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.models.Reminder;
+import com.touchdown.app.smartassistant.newdb.NotificationReminder;
+import com.touchdown.app.smartassistant.newdb.TaskManager;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 
 /**
  * Created by Pete on 16.8.2014.
  */
-public class OnGoingNotification extends ReminderNotification {
+public class OnGoingNotification extends AbstractNotif {
 
     private int reminderCount;
 
-    public OnGoingNotification(Context context, Reminder reminder) {
+    public OnGoingNotification(Context context, NotificationReminder reminder) {
         super(context, reminder);
     }
 
-    public OnGoingNotification(Context context, Reminder reminder, int reminderCount){
+    public OnGoingNotification(Context context, NotificationReminder reminder, int reminderCount){
         super(context, reminder);
         this.reminderCount = reminderCount;
     }
@@ -38,8 +39,8 @@ public class OnGoingNotification extends ReminderNotification {
     }
 
     public static void updateNotification(){
-        ReminderManager rManager = ReminderManager.getInstance(ApplicationContextProvider.getAppContext());
-        int activeReminders = rManager.getActiveReminderCount();
+        TaskManager taskManager = TaskManager.getInstance(ApplicationContextProvider.getAppContext());
+        int activeReminders = taskManager.getActiveTaskCount();
         OnGoingNotification notif = new OnGoingNotification(ApplicationContextProvider.getAppContext(), null, activeReminders);
         if(activeReminders > 0){
             notif.buildNotification();

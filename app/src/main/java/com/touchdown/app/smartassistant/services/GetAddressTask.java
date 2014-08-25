@@ -131,7 +131,7 @@ public class GetAddressTask extends AsyncTask <LatLng, Void, String> {
         DetailsActivity currentActivity = weakActivityReference.get();
         Log.d(LOG_TAG, Calendar.getInstance().getTime() + "");
         if(currentActivity != null){
-            currentActivity.deliverAddress(address);
+           // currentActivity.deliverAddress(address);
         }
     }
 

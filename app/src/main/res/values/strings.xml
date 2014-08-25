@@ -51,7 +51,7 @@
 
     <string name="notification_reminder_action_title">Notification</string>
 
-    <string name="location_trigger_title"><u>Location trigger</u></string>
+    <string name="location_trigger_title">Location trigger</string>
     <string name="entering">Entering</string>
     <string name="exiting">Leaving</string>
     <string name="alarm_action_title">Action: alarm</string>

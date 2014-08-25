@@ -9,16 +9,17 @@ import android.support.v4.app.TaskStackBuilder;
 
 import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.models.Reminder;
+import com.touchdown.app.smartassistant.newdb.NotificationReminder;
 
 /**
  * Created by Pete on 16.8.2014.
  */
-public abstract class ReminderNotification {
+public abstract class AbstractNotif {
     private static final long NOTIFICATION_ID = 100;
-    protected Reminder mReminder;
+    protected NotificationReminder mReminder;
     protected Context mContext;
 
-    public ReminderNotification(Context context, Reminder reminder){
+    public AbstractNotif(Context context, NotificationReminder reminder){
         this.mReminder = reminder;
         this.mContext = context.getApplicationContext();
     }

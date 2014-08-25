@@ -153,10 +153,13 @@ public class MarkerManager {
     }
 
     public boolean removeSelectedIfEmpty(){
-        if(markerDataMap.get(selectedMarker).getTask() == null){
-            selectedMarker.remove();
-            markerDataMap.remove(selectedMarker);
-            return true;
+        if(selectedMarker != null){
+            MarkerData data = markerDataMap.get(selectedMarker);
+            if(data != null && data.getTask() == null){
+                selectedMarker.remove();
+                markerDataMap.remove(selectedMarker);
+                return true;
+            }
         }
         return false;
     }

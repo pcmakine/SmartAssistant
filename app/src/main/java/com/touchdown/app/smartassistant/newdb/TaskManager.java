@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
+import com.touchdown.app.smartassistant.services.ProximityAlarmManager;
+import com.touchdown.app.smartassistant.views.OnGoingNotification;
 
 import java.util.List;
 import java.util.Observable;
@@ -40,16 +42,11 @@ public class TaskManager extends Observable{
         long id = wDao.insert(task);
         insertActionsAndTriggers(task, id);
 
-/*        long id = reminderDao.insert(reminder); //insertReminderInDatabase(reminder);
-        reminder.setId(id);
-        insertRemindersLocationInDatabase(reminder);
-
-
-        if(reminder.isOn() && reminder.getReminderLocation() != null){
-            ProximityAlarmManager.saveAlert(reminder);
+        if(task.isActive() && task.getLocation() != null){
+            ProximityAlarmManager.saveAlert(task);
         }
 
-        OnGoingNotification.updateNotification();*/
+        OnGoingNotification.updateNotification();
 
         notifyDataObservers();
 
@@ -80,6 +77,10 @@ public class TaskManager extends Observable{
 
         notifyDataObservers();
 
+        updateProximityAlarm(task);
+
+        OnGoingNotification.updateNotification();
+
         return rowsAffected > 0;
     }
 
@@ -88,6 +89,14 @@ public class TaskManager extends Observable{
 
         for(Action action: actions){
             wDao.update(action);
+        }
+    }
+
+    private void updateProximityAlarm(Task task){
+        if(task.isActive() && task.getLocation() != null){
+            ProximityAlarmManager.updateAlert(task);
+        }else{
+            ProximityAlarmManager.removeAlert(task.getId());
         }
     }
 
@@ -110,6 +119,12 @@ public class TaskManager extends Observable{
 
     public int removeTask(long id){
         int rowsAffected = wDao.remove(id, DbContract.TaskEntry.TABLE_NAME, DbContract.TaskEntry._ID);
+
+        notifyDataObservers();
+
+        ProximityAlarmManager.removeAlert(id);
+
+        OnGoingNotification.updateNotification();
         return rowsAffected;
     }
 

@@ -209,12 +209,11 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     @Override
     protected void onResume() {
+        taskManager.addObserver(this);
         if(!onCreateRan){
             markerManager.updateMarkerData();
             markerManager.unSelectMarker();
         }
-        taskManager.addObserver(this);
-
         super.onResume();
     }
 

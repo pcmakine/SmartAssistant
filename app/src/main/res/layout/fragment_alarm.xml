@@ -38,23 +38,21 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_between_items">
 
         <CheckBox
             android:id = "@+id/notification"
-            android:layout_height="wrap_content"
-            android:layout_width = "wrap_content"
-            android:textSize = "@dimen/text_small"
+            style = "@style/checkBox"
             android:text = "@string/notification_reminder_action_title"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/fullscreenAlarm">
-
+            android:layout_toLeftOf="@+id/fullscreenAlarm"
+            >
         </CheckBox>
 
         <CheckBox
             android:id = "@+id/fullscreenAlarm"
-            android:layout_height="wrap_content"
-            android:layout_width = "wrap_content"
+            style = "@style/checkBox"
             android:text = "@string/fullscreen_alarm_title"
             android:textSize = "@dimen/text_small"
             android:layout_alignParentRight="true"

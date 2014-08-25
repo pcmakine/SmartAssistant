@@ -6,14 +6,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbContract;
-import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.models.ReminderLocation;
-import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.newdb.ActionReminder;
+import com.touchdown.app.smartassistant.newdb.NotificationReminder;
 import com.touchdown.app.smartassistant.newdb.Task;
 import com.touchdown.app.smartassistant.newdb.TaskManager;
 import com.touchdown.app.smartassistant.newdb.TriggerLocation;
-import com.touchdown.app.smartassistant.services.ReminderManager;
 
 /**
  * Created by Pete on 4.8.2014.
@@ -53,8 +49,8 @@ public class Util {
     }
 
 
-    public static ActionReminder getDefaultTestReminder(){
-        return new ActionReminder(-1, 0, "test reminder content", true, -1);
+    public static NotificationReminder getDefaultTestReminder(){
+        return new NotificationReminder(-1, 0, "test reminder content", true, -1);
     }
 
     public static TriggerLocation getDefaultTestLocation(){

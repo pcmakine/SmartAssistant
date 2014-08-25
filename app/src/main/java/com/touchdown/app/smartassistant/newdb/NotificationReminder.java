@@ -2,22 +2,25 @@ package com.touchdown.app.smartassistant.newdb;
 
 import android.content.ContentValues;
 
+import com.touchdown.app.smartassistant.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
+import com.touchdown.app.smartassistant.views.AlarmNotification;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Pete on 19.8.2014.
  */
-public class ActionReminder extends Action {
+public class NotificationReminder extends Action implements Serializable {
     private static final String TABLE_NAME = DbContract.ReminderEntry.TABLE_NAME;
     private static final String ID_COLUMN = DbContract.ReminderEntry._ID;
 
     private String content;
 
-    public ActionReminder(long id, int type, String content, boolean isOn, long actionCollectionId) {
+    public NotificationReminder(long id, int type, String content, boolean isOn, long actionCollectionId) {
         super(id, type, isOn, actionCollectionId);
         this.content = content;
         setTableName(TABLE_NAME);
@@ -30,6 +33,10 @@ public class ActionReminder extends Action {
 
     public void setContent(String content){
         this.content = content;
+    }
+
+    public void execute(){
+        new AlarmNotification(ApplicationContextProvider.getAppContext(), this).buildNotification();
     }
 
     @Override

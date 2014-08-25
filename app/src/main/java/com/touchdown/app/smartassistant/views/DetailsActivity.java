@@ -3,7 +3,6 @@ package com.touchdown.app.smartassistant.views;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
@@ -12,23 +11,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.newdb.ActionReminder;
+import com.touchdown.app.smartassistant.newdb.NotificationReminder;
 import com.touchdown.app.smartassistant.newdb.Task;
 import com.touchdown.app.smartassistant.newdb.TaskManager;
 import com.touchdown.app.smartassistant.newdb.TriggerLocation;
-import com.touchdown.app.smartassistant.services.GetAddressTask;
-
-import java.util.Calendar;
 
 
 public class DetailsActivity extends ActionBarActivity implements AlarmFragment.OnFragmentInteractionListener {
@@ -57,8 +51,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     private boolean editMode;
 
     private TaskManager taskManager;
-    private ArrayAdapter<CharSequence> spinnerAdapter;
-    private Spinner actionPicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +65,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         nameTw = (TextView) findViewById(R.id.contentToSave);
         radiusTW = (TextView) findViewById(R.id.radius);
 
-        // setUpCompoundButton();
-
         Intent intent = getIntent();
         if(noReminderIdInExtras(intent)){
             makeNewReminder();
@@ -85,7 +75,10 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         }
         //      fetchAddress();
         setUpSeekBar();
-        addAlarmFragment();
+        if(savedInstanceState == null){
+            addAlarmFragment();
+        }
+
         // setUpSpinner();
     }
 
@@ -106,9 +99,9 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     private void makeNewReminder(){
         this.location = getIntent().getParcelableExtra("location");
         if(location != null){
-            this.task = new Task(-1, "", new TriggerLocation(-1, location, radius, -1), null);
+            this.task = new Task(-1, "", new TriggerLocation(-1, location, radius, -1), new NotificationReminder(-1, 0, "", true, -1));
         }else{
-            this.task = new Task(-1, "", null, null);
+          //  this.task = new Task(-1, "", null, null);
         }
         //   task.setOn(true);
         //  onSwitch.setChecked(true);
@@ -123,30 +116,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         editMode = true;
     }
 
-    private void fetchAddress(){
-        if(Geocoder.isPresent() && location != null){
-            this.addressTask = new GetAddressTask(DetailsActivity.this);
-            this.addressTask.execute(location);
-            this.activityIndicator.setVisibility(View.VISIBLE);
-            startAddressTaskExpirationTimer();
-        }
-    }
-
-    private void startAddressTaskExpirationTimer(){
-        timer = new CountDownTimer(GetAddressTask.TASK_EXPIRATION_SECS * 1000, GetAddressTask.TASK_EXPIRATION_SECS * 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-            }
-
-            @Override
-            public void onFinish() {
-                finishFetchingAddress();
-                locationText.setText(getResources().getString(R.string.error_address_could_not_be_found));
-                Log.d(LOG_TAG, Calendar.getInstance().getTime() + "");
-            }
-        }.start();
-    }
-
     private int metersToProgress(int meters){
         if(meters <= SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD){
             return meters/SEEKBAR_MULTIPLIER_BELOW_KILOMETER - MIN_RADIUS_METERS/SEEKBAR_MULTIPLIER_BELOW_KILOMETER;
@@ -155,7 +124,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
                 (meters - SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD) / SEEKBAR_MULTIPLIER_OVER_KILOMETER;
 
     }
-
 
     private void setUpSeekBar(){
         radiusBar = (SeekBar)findViewById(R.id.seekBar);
@@ -206,21 +174,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         radiusBar.setMax(maxValue);
     }
 
-    private void setUpCompoundButton(){
-        onSwitch = (CompoundButton) findViewById(R.id.myswitch);
-        onSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    //reminder.setOn(true);
-                }else{
-                    // reminder.setOn(false);
-                }
-            }
-        });
-    }
-
     public void addOrUpdate(View view){
         nameInput = nameTw.getText().toString();
         task.setName(nameInput);
@@ -251,11 +204,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
     private void updateTask(){
         if(taskManager.update(task)){
-/*            if(onSwitch.isChecked()){
-                ProximityAlarmManager.updateAlert(reminder);
-            }else{
-                 ProximityAlarmManager.removeAlert(reminder.getId());
-            }*/
             Toast toast = Toast.makeText(this, R.string.successfully_edited, Toast.LENGTH_LONG);
             toast.show();
             onBackPressed();
@@ -267,7 +215,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
     private void addTask(){
         if(taskManager.insert(task) != -1){
-            //ProximityAlarmManager.saveAlert(reminder);
             Toast toast = Toast.makeText(this, R.string.successfully_added, Toast.LENGTH_LONG);
             toast.show();
             onBackPressed();
@@ -281,15 +228,11 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        AlarmFragment notificationReminderFragment = new AlarmFragment();
-        fragmentTransaction.add(R.id.fragment_container, notificationReminderFragment, "HELLO");
-        fragmentTransaction.commit();
-    }
+        AlarmFragment alarmFragment = AlarmFragment.createFragment(task.getAlarm());
 
-    public void deliverAddress(String address){
-        this.locationText.setText(address);
-        this.activityIndicator.setVisibility(View.GONE);
-        this.timer.cancel();
+        //alarmFragment.setArguments(new Bundle());
+        fragmentTransaction.add(R.id.fragment_container, alarmFragment, "HELLO");
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -312,12 +255,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
             fetchAddress();
         }*/
     }
-
-    private void finishFetchingAddress(){
-        this.addressTask.cancel(true);
-        this.activityIndicator.setVisibility(View.GONE);
-    }
-
 
     @Override
     public void onPause(){
@@ -347,7 +284,48 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     }
 
     @Override
-    public void onFragmentInteraction(ActionReminder reminder) {
-
+    public void onFragmentInteraction(NotificationReminder alarm) {
+        task.addAction(alarm);
     }
 }
+
+
+/*
+
+    private void finishFetchingAddress(){
+        this.addressTask.cancel(true);
+        this.activityIndicator.setVisibility(View.GONE);
+    }
+*/
+
+/*    public void deliverAddress(String address){
+        this.locationText.setText(address);
+        this.activityIndicator.setVisibility(View.GONE);
+        this.timer.cancel();
+    }*/
+/*
+    private void fetchAddress(){
+        if(Geocoder.isPresent() && location != null){
+            this.addressTask = new GetAddressTask(DetailsActivity.this);
+            this.addressTask.execute(location);
+            this.activityIndicator.setVisibility(View.VISIBLE);
+            startAddressTaskExpirationTimer();
+        }
+    }
+
+    private void startAddressTaskExpirationTimer(){
+        timer = new CountDownTimer(GetAddressTask.TASK_EXPIRATION_SECS * 1000, GetAddressTask.TASK_EXPIRATION_SECS * 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                finishFetchingAddress();
+                locationText.setText(getResources().getString(R.string.error_address_could_not_be_found));
+                Log.d(LOG_TAG, Calendar.getInstance().getTime() + "");
+            }
+        }.start();
+    }
+*/
+

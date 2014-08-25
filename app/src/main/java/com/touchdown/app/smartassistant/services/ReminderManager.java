@@ -86,7 +86,7 @@ public class ReminderManager extends Observable{
 
     private void updateProximityAlarm(Reminder reminder){
         if(reminder.isOn() && reminder.getReminderLocation() != null){
-            ProximityAlarmManager.updateAlert(reminder);
+     //       ProximityAlarmManager.updateAlert(reminder);
         }else{
             ProximityAlarmManager.removeAlert(reminder.getId());
         }

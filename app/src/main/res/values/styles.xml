@@ -6,7 +6,7 @@
 
     </style>-->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!--<item name="android:checkboxStyle">@style/checkBox</item>-->
     </style>
-
 
 </resources>

@@ -1,25 +1,20 @@
 package com.touchdown.app.smartassistant.views;
 
 import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 
-import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.models.Reminder;
+import com.touchdown.app.smartassistant.newdb.NotificationReminder;
 
 /**
  * Created by Pete on 11.8.2014.
  */
-public class AlarmNotification extends ReminderNotification {
+public class AlarmNotification extends AbstractNotif {
 
-    public AlarmNotification(Context context, Reminder reminder){
+    public AlarmNotification(Context context, NotificationReminder reminder){
         super(context, reminder);
     }
 
