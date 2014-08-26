@@ -35,6 +35,8 @@ public class DbContract {
         public static final String COLUMN_NAME_LAT = "lat";
         public static final String COLUMN_NAME_LONG = "lng";
         public static final String COLUMN_NAME_RADIUS = "radius";
+        public static final String COLUMN_NAME_TRIGGER_ON_ARRIVAL = "triggerOnArrival";
+        public static final String COLUMN_NAME_TRIGGER_ON_DEPARTURE = "triggerOnDeparture";
         public static final String COLUMN_NAME_TRIGGER_TYPE = "triggerType";
         public static final String COLUMN_NAME_TASK_ID = "taskId";
     }

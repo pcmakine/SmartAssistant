@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -38,6 +39,9 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     private String nameInput;
     private SeekBar radiusBar;
     private int radius;
+
+    private CheckBox entering;
+    private CheckBox leaving;
 
     private AsyncTask<LatLng, Void, String> addressTask;
     private ProgressBar activityIndicator;
@@ -78,8 +82,49 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         if(savedInstanceState == null){
             addAlarmFragment();
         }
-
+        setUpCheckBoxes();
         // setUpSpinner();
+    }
+
+    private void setUpCheckBoxes(){
+        TriggerLocation loc = task.getLocation();
+        entering = (CheckBox) findViewById(R.id.enteringCheckBox);
+        entering.setChecked(loc.isArrivalTriggerOn());
+        setListenerForEnteringCheckBox();
+
+        leaving = (CheckBox) findViewById(R.id.leavingCheckBox);
+        leaving.setChecked(loc.isDepartureTriggerOn());
+        setListenerForLeavingCheckBox();
+    }
+
+    private void setListenerForEnteringCheckBox(){
+        entering.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(LOG_TAG, "entering checkbox checked value: " + isChecked);
+                TriggerLocation loc = task.getLocation();
+                if(isChecked){
+                    loc.turnOnArrivalTrigger();
+                }else{
+                    loc.turnOffArrivalTrigger();
+                }
+            }
+        });
+    }
+
+    private void setListenerForLeavingCheckBox(){
+        leaving.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(LOG_TAG, "leaving checkbox checked value: " + isChecked);
+                TriggerLocation loc = task.getLocation();
+                if(isChecked){
+                    loc.turnOnDepartureTrigger();
+                }else{
+                    loc.turnOffDepartureTrigger();
+                }
+            }
+        });
     }
 
     private void setUpSpinner(){

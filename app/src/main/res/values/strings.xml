@@ -57,4 +57,7 @@
     <string name="alarm_action_title">Action: alarm</string>
     <string name="fullscreen_alarm_title">Fullscreen alarm</string>
 
+  <!--  PROGRESS INDICATOR-->
+    <string name="fetching_data">Fetching data...</string>
+
 </resources>

@@ -34,6 +34,13 @@
             android:layout_alignParentLeft="true"
             android:text="@string/alarm_action_title"
             android:textSize = "@dimen/text_medium"/>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_alignParentBottom="true">
+        </View>
     </RelativeLayout>
 
     <RelativeLayout

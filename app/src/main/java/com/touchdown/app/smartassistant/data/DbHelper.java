@@ -12,7 +12,7 @@ import com.touchdown.app.smartassistant.data.DbContract.*;
  */
 public class DbHelper extends SQLiteOpenHelper{
     public static final String LOG_TAG = DbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "smartassist.db";
 
     public DbHelper (Context context){
@@ -39,6 +39,8 @@ public class DbHelper extends SQLiteOpenHelper{
                 LocationEntry.COLUMN_NAME_LONG + " REAL NOT NULL, " +
                 LocationEntry.COLUMN_NAME_RADIUS + " INTEGER NOT NULL, " +
                 LocationEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL, " +
+                LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL + " INTEGER NOT NULL, " +
+                LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE + " INTEGER NOT NULL, " +
                 " FOREIGN KEY (" + LocationEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
                 TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ") " +
                 " ON DELETE CASCADE)";
@@ -97,9 +99,10 @@ public class DbHelper extends SQLiteOpenHelper{
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS" + DbContract.ReminderEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS" + DbContract.LocationEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS" + DbContract.TimeEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbContract.ReminderEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbContract.LocationEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TaskEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS  " + DbContract.TimeEntry.TABLE_NAME);
         onCreate(db);
     }
 }

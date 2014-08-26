@@ -15,7 +15,7 @@ import com.touchdown.app.smartassistant.newdb.TriggerLocation;
  * Created by Pete on 4.8.2014.
  */
 public class Util {
-    public static final int TEST_REMINDER_DEFAULT_COUNT = 5;
+    public static final int TEST_REMINDER_DEFAULT_COUNT = 7;
 
     private static final double TEST_LAT = 60;
     private static final double TEST_LONG = 25;

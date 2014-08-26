@@ -3,6 +3,7 @@ package com.touchdown.app.smartassistant.newdb;
 import android.content.ContentValues;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
 
 /**
@@ -17,6 +18,8 @@ public class TriggerLocation extends Trigger {
 
     private LatLng latLng;
     private int radius;     //meters
+    private boolean triggerWhenEntering;
+    private boolean triggerWhenLeaving;
 
     public TriggerLocation(long id, LatLng loc, int radius, long actionId) {
         super(id, 0, actionId);
@@ -27,9 +30,9 @@ public class TriggerLocation extends Trigger {
         }else{
             this.radius = radius;
         }
-
         setTableName(TABLE_NAME);
         setIdColumn(ID_COLUMN);
+        this.triggerWhenEntering = true;
     }
 
     public int getRadius() {
@@ -48,6 +51,38 @@ public class TriggerLocation extends Trigger {
         this.latLng = latLng;
     }
 
+    public void turnOnArrivalTrigger(){
+        this.triggerWhenEntering = true;
+    }
+
+    public void turnOffArrivalTrigger(){
+        this.triggerWhenEntering = false;
+    }
+
+    public void turnOnDepartureTrigger(){
+        this.triggerWhenLeaving = true;
+    }
+
+    public void turnOffDepartureTrigger(){
+        this.triggerWhenLeaving = false;
+    }
+
+    public boolean isArrivalTriggerOn(){
+        return triggerWhenEntering;
+    }
+
+    public boolean isDepartureTriggerOn(){
+        return triggerWhenLeaving;
+    }
+
+    public void setArrivalTrigger(boolean triggerOn){
+        this.triggerWhenEntering = triggerOn;
+    }
+
+    public void setDepartureTrigger(boolean triggerOn){
+        this.triggerWhenLeaving = triggerOn;
+    }
+
     @Override
     public ContentValues getContentValues() {
         ContentValues vals = new ContentValues();
@@ -56,6 +91,12 @@ public class TriggerLocation extends Trigger {
         vals.put(DbContract.LocationEntry.COLUMN_NAME_RADIUS, radius);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_TYPE, this.getType());
         vals.put(DbContract.LocationEntry.COLUMN_NAME_TASK_ID, this.getActionId());
+
+        int arrivalTriggerInt = Util.booleanAsInt(triggerWhenEntering);
+        int departureTriggerInt = Util.booleanAsInt(triggerWhenLeaving);
+
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL, arrivalTriggerInt);
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE, departureTriggerInt);
         return vals;
     }
 }

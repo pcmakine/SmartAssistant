@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.Dao;
 import com.touchdown.app.smartassistant.data.DbContract;
 
@@ -40,7 +41,15 @@ public class LocDao extends newDao<TriggerLocation> {
 
         long parentId = cursor.getLong(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TASK_ID));
 
-        return new TriggerLocation(id, new LatLng(lat, longitude), radius, parentId);
+        TriggerLocation loc = new TriggerLocation(id, new LatLng(lat, longitude), radius, parentId);
+
+        boolean arrivalTriggerOn = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL)));
+        boolean departureTriggerOn = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE)));
+
+        loc.setArrivalTrigger(arrivalTriggerOn);
+        loc.setDepartureTrigger(departureTriggerOn);
+
+        return loc;
     }
 
     public TriggerLocation findByTaskId(long taskId){

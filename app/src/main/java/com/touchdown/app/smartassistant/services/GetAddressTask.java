@@ -33,9 +33,7 @@ public class GetAddressTask extends AsyncTask <LatLng, Void, String> {
 
     public GetAddressTask(DetailsActivity activity) {
         super();
-        Log.d(LOG_TAG, "hereeeee constructor");
         this.weakActivityReference = new WeakReference<DetailsActivity>(activity);
-
     }
 
     /**

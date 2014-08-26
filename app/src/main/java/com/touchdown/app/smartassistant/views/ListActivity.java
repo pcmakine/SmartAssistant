@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
@@ -25,11 +26,12 @@ import com.touchdown.app.smartassistant.newdb.TaskManager;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 
 
-public class ListActivity extends ActionBarActivity {
+public class ListActivity extends ActionBarActivity implements FetchAllDataListener{
     public static final String LOG_TAG = ListActivity.class.getSimpleName();
     private SimpleCursorAdapter adapter;
     private ListView listView;
     private TaskManager taskManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +39,15 @@ public class ListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_list);
         listView = (ListView) findViewById(R.id.list);
 
+        Util.clearAndInsertTestData(this, new DbHelper(this));
+
+       // Util.clearAndInsertTestData(this, new DbHelper(this));
   /*      int version = dbHelper.getReadableDatabase().getVersion();
 
         Toast.makeText(this, "Current db version: " + version, Toast.LENGTH_LONG).show();*/
 
        // Util.clearDb(new DbHelper(this), this);
-        Util.clearAndInsertTestData(this, new DbHelper(this));
+/*        Util.clearAndInsertTestData(this, new DbHelper(this));
 
         taskManager = TaskManager.getInstance(this);
 
@@ -53,7 +58,7 @@ public class ListActivity extends ActionBarActivity {
                 SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
         // Assign adapter to ListView
-        listView.setAdapter(adapter);
+        listView.setAdapter(adapter);*/
 
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -80,6 +85,29 @@ public class ListActivity extends ActionBarActivity {
             }
 
         });
+    //    getAllTasks();
+    }
+
+    private void getAllTasks(boolean showIndicator){
+        new FetchAllDataTask(this, showIndicator).execute(this);
+    }
+
+    //Callback that is called from the database tasks
+    @Override
+    public void updateData(Cursor cursor) {
+        if(adapter == null){
+            adapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,
+                    new String[] {DbContract.TaskEntry.COLUMN_NAME_TASK_NAME}, new int[] {R.id.itemText},
+                    SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+            listView.setAdapter(adapter);
+        }else{
+            adapter.swapCursor(cursor);
+        }
+    }
+
+    @Override
+    public LinearLayout getOnProgressIndicator() {
+        return (LinearLayout) findViewById(R.id.onProgressIndicator);
     }
 
     private void toggleCheckBox(int position){
@@ -112,10 +140,12 @@ public class ListActivity extends ActionBarActivity {
     }
 
 
+
     @Override
     public void onResume(){
-        updateList();
+        //updateList();
         super.onResume();
+        getAllTasks(true);
     }
 
 
@@ -145,13 +175,14 @@ public class ListActivity extends ActionBarActivity {
                         int idIndex = cursor.getColumnIndex(DbContract.TaskEntry._ID);
                         long taskId = cursor.getLong(idIndex);
 
-                        taskManager.removeTask(taskId);
+                        TaskManager.getInstance(this).removeTask(taskId);
 
                         listView.setItemChecked(i, false);
                         toggleCheckBox(i);
                     }
                 }
-                updateList();
+                //updateList();
+                getAllTasks(false);
                 return true;
 
             case R.id.action_select_all:
