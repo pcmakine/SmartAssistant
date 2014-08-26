@@ -15,8 +15,17 @@ public class DbHelper extends SQLiteOpenHelper{
     private static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "smartassist.db";
 
+    public static DbHelper sInstance;
+
     public DbHelper (Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public synchronized  static SQLiteOpenHelper getInstance(Context context){
+        if(sInstance == null){
+            sInstance = new DbHelper(context.getApplicationContext());
+        }
+        return sInstance;
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -38,9 +47,9 @@ public class DbHelper extends SQLiteOpenHelper{
                 LocationEntry.COLUMN_NAME_LAT + " REAL NOT NULL, " +
                 LocationEntry.COLUMN_NAME_LONG + " REAL NOT NULL, " +
                 LocationEntry.COLUMN_NAME_RADIUS + " INTEGER NOT NULL, " +
-                LocationEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL, " +
                 LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL + " INTEGER NOT NULL, " +
                 LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE + " INTEGER NOT NULL, " +
+                LocationEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL, " +
                 " FOREIGN KEY (" + LocationEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
                 TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ") " +
                 " ON DELETE CASCADE)";

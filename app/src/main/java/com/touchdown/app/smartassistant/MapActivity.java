@@ -27,13 +27,17 @@ import com.touchdown.app.smartassistant.services.MyLocationProvider;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
 import com.touchdown.app.smartassistant.services.Markers.MarkerManager;
 import com.touchdown.app.smartassistant.views.DetailsActivity;
+import com.touchdown.app.smartassistant.views.RemoveTasksListener;
+import com.touchdown.app.smartassistant.views.RemoveTasksTask;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLongClickListener,
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMarkerDragListener, Observer{
+        GoogleMap.OnMarkerDragListener, Observer, RemoveTasksListener{
 
     public static final String LOG_TAG = MapActivity.class.getSimpleName();
 
@@ -66,7 +70,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             }
         });
         initializeMap();
-        markerManager = new MarkerManager(googleMap, taskManager);
+        markerManager = new MarkerManager(googleMap);
         onCreateRan = true;
 
         addressField = (EditText) findViewById(R.id.locationInput);
@@ -189,13 +193,20 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                         dialog.dismiss();
                         long id = markerManager.getTask(markerManager.getSelectedMarker()).getId();
                         markerManager.removeSelectedMarker();
-                        taskManager.removeTask(id);
 
+                       // taskManager.removeTask(id);
+                        removeTask(id);
                         supportInvalidateOptionsMenu();
                     }
                 })
                 .setNegativeButton("No", null)
                 .show();
+    }
+
+    public void removeTask(long id){
+        List idList = new ArrayList();
+        idList.add(id);
+        new RemoveTasksTask(this).execute(idList);
     }
 
     @Override
@@ -279,5 +290,10 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                 markerManager.updateMarkerData();
             }
         });
+    }
+
+    @Override
+    public void removeSuccessful(boolean success) {
+        //todo do something
     }
 }

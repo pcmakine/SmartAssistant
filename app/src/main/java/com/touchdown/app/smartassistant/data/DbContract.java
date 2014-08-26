@@ -13,8 +13,8 @@ public class DbContract {
         public static final String TABLE_NAME = "reminder";
         public static final String COLUMN_NAME_CONTENT = "content";
         public static final String COLUMN_NAME_ON = "alarm_on";
-        public static final String COLUMN_NAME_TASK_ID = "taskId";
-        public static final String COLUMN_NAME_TYPE = "type";
+        public static final String COLUMN_NAME_TASK_ID = "reminderTaskId";
+        public static final String COLUMN_NAME_TYPE = "actionType";
     }
 
     public static final class TaskEntry implements BaseColumns {
@@ -38,7 +38,7 @@ public class DbContract {
         public static final String COLUMN_NAME_TRIGGER_ON_ARRIVAL = "triggerOnArrival";
         public static final String COLUMN_NAME_TRIGGER_ON_DEPARTURE = "triggerOnDeparture";
         public static final String COLUMN_NAME_TRIGGER_TYPE = "triggerType";
-        public static final String COLUMN_NAME_TASK_ID = "taskId";
+        public static final String COLUMN_NAME_TASK_ID = "locationTaskId";
     }
 
     public static final class TimeEntry implements BaseColumns {

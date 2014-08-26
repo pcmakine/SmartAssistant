@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbContract;
+import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.newdb.NotificationReminder;
 import com.touchdown.app.smartassistant.newdb.Task;
 import com.touchdown.app.smartassistant.newdb.TaskManager;
@@ -27,8 +28,10 @@ public class Util {
 
     public static void clearDb(Context context, SQLiteOpenHelper dbHelper){
 
+        context.deleteDatabase(DbHelper.DATABASE_NAME);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(DbContract.TaskEntry.TABLE_NAME, null, null);
+        db.close();
+    //    db.delete(DbContract.TaskEntry.TABLE_NAME, null, null);
         //context.openOrCreateDatabase(DbHelper.DATABASE_NAME, Context.MODE_PRIVATE, null);
     }
 

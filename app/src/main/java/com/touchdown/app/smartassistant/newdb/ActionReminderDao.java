@@ -18,8 +18,11 @@ public class ActionReminderDao extends newDao<NotificationReminder> {
 
     @Override
     protected NotificationReminder buildObject(Cursor cursor) {
-
         long id = cursor.getLong(cursor.getColumnIndex(DbContract.ReminderEntry._ID));
+        return buildObject(cursor, id);
+    }
+
+    protected NotificationReminder buildObject(Cursor cursor, long id) {
         long actionCollectionId = cursor.getLong(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_TASK_ID));
         String content = cursor.getString(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_CONTENT));
         int type = cursor.getInt(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_TYPE));

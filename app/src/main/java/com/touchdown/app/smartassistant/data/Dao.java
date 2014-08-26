@@ -54,7 +54,9 @@ public abstract class Dao<T> {
         }else{
             return null;
         }
-        return buildObject(cursor);
+        T object = buildObject(cursor);
+        db.close();
+        return object;
     }
 
     public Cursor getAll(){
@@ -83,6 +85,8 @@ public abstract class Dao<T> {
                 cursor.moveToNext();
             }
         }
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        db.close();
         return list;
     }
 

@@ -1,11 +1,14 @@
 package com.touchdown.app.smartassistant.test;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.Util;
+import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbContract.LocationEntry;
 import com.touchdown.app.smartassistant.data.DbContract.TaskEntry;
 import com.touchdown.app.smartassistant.data.DbContract.ReminderEntry;
@@ -28,6 +31,7 @@ import java.util.List;
  */
 public class TestDatabase extends AndroidTestCase {
 
+    public static final String LOG_TAG = TestDatabase.class.getSimpleName();
     private static final double TEST_LAT = 60;
     private static final double TEST_LONG = 20;
 
@@ -41,14 +45,15 @@ public class TestDatabase extends AndroidTestCase {
 
     @Override
     public void setUp(){
-        this.dbHelper = new DbHelper(mContext);
+        taskManager = TaskManager.getInstance(mContext);
+        this.dbHelper = DbHelper.getInstance(mContext);
         Util.clearDb(mContext, dbHelper);
 
         reminderDao = new ActionReminderDao(dbHelper);
         locationDao = new LocDao(dbHelper);
         taskDao = new TaskDao(dbHelper);
         wDao = new WriterDao(dbHelper);
-        taskManager = TaskManager.getInstance(mContext);
+
     }
 
     public void testInsertActionDirectlyInTheDatabase(){
@@ -125,32 +130,6 @@ public class TestDatabase extends AndroidTestCase {
         assertEquals(longitude, TEST_LONG);
     }
 
-    public void testGetAllDataDirectlyFromDb(){
-        insertTwoTasks("1st task", "2nd task");
-
-        Cursor cursor = taskDao.getAll(TaskEntry.TABLE_NAME, TaskEntry._ID);
-        int count = cursor.getCount();
-
-        assertTrue(count == 2);
-    }
-
-    public void testGetAllTaskDataUsingTaskManager(){
-
-        insertTwoTasks("3rd task", "4th task");
-
-        Cursor cursor = taskManager.getAllTaskData();
-        int count = cursor.getCount();
-        cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
-
-            String name = cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_TASK_NAME));
-            int s = 5;
-            cursor.moveToNext();
-        }
-
-        assertTrue(count == 2);
-    }
-
     public void testGetAllTasks(){
         insertTwoTasks("first test task", "second test task");
         List<Task> tasks = taskManager.getAllTasks();
@@ -197,7 +176,7 @@ public class TestDatabase extends AndroidTestCase {
 
         task.setName("modified name");
 
-        TriggerLocation location = (TriggerLocation) task.getTrigger();
+        TriggerLocation location = (TriggerLocation) task.getLocation();
         LatLng testLoc = new LatLng(90, 90);
 
         NotificationReminder reminder = (NotificationReminder) task.getActions().get(0);
@@ -247,6 +226,8 @@ public class TestDatabase extends AndroidTestCase {
         numberOfLocationsInDb = locationDao.getAll(LocationEntry.TABLE_NAME,
                 LocationEntry._ID).getCount();
 
+        DbHelper.getInstance(mContext).close();
+
         assertTrue(numberOfRemindersInDb == 0);
         assertTrue(numberOfLocationsInDb == 0);
     }
@@ -255,6 +236,101 @@ public class TestDatabase extends AndroidTestCase {
         insertTwoTasks("first", "second");
 
         assertEquals(2, taskManager.getActiveTaskCount());
+    }
+
+    public void testGetAllDataDirectlyFromDb(){
+        insertTwoTasks("1st task", "2nd task");
+
+        Cursor cursor = taskDao.getAll(TaskEntry.TABLE_NAME, TaskEntry._ID);
+        int count = cursor.getCount();
+
+        DbHelper.getInstance(mContext).close();
+        assertTrue(count == 2);
+    }
+
+    public void testGetAllTaskDataUsingTaskManager(){
+
+        insertTwoTasks("3rd task", "4th task");
+
+        Cursor cursor = taskManager.getAllTaskData();
+        int count = cursor.getCount();
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()){
+
+            String name = cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_TASK_NAME));
+            int s = 5;
+            cursor.moveToNext();
+        }
+
+        DbHelper.getInstance(mContext).close();
+
+        assertTrue(count == 2);
+    }
+
+    public void testGetAllTasksWithLocationTrigger(){
+        Util.insertTestData(mContext, 2);
+        String locationIdAlias = "location";
+        String reminderIdAlias = "reminder";
+
+        String query = "SELECT * FROM " + TaskEntry.TABLE_NAME + " JOIN " +
+                LocationEntry.TABLE_NAME + " ON " +
+                TaskEntry.TABLE_NAME + "." + TaskEntry._ID + " = " +
+                LocationEntry.TABLE_NAME + "." + LocationEntry._ID +
+                " JOIN " + ReminderEntry.TABLE_NAME + " ON " +
+                LocationEntry.TABLE_NAME + "." + LocationEntry.COLUMN_NAME_TASK_ID + " = " +
+                ReminderEntry.TABLE_NAME + "." + ReminderEntry.COLUMN_NAME_TASK_ID;
+
+
+        SQLiteDatabase db = DbHelper.getInstance(mContext).getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        cursor.moveToFirst();
+
+        int resultSetColumnCount = cursor.getColumnCount();
+
+        while(!cursor.isAfterLast()){
+
+            String[] columns = cursor.getColumnNames();
+
+            for (int i = 0; i < columns.length; i++){
+                Log.d(LOG_TAG, columns[i]);
+            }
+            cursor.moveToNext();
+        }
+
+        int trueColumnCount = getTableColumnCount(TaskEntry.TABLE_NAME) +
+                getTableColumnCount(LocationEntry.TABLE_NAME) +
+                getTableColumnCount(ReminderEntry.TABLE_NAME);
+
+        Log.d(LOG_TAG, "result set column count: " + resultSetColumnCount);
+        Log.d(LOG_TAG, "true column count: " + trueColumnCount);
+
+        db.close();
+
+        assertTrue(resultSetColumnCount == trueColumnCount);
+
+    }
+
+    public void testGetAllTasksWithLocationTriggerWithTaskManager(){
+        Util.insertTestData(mContext, 3);
+        List<Task> tasks = taskManager.getAllTasksWithLocationTrigger();
+
+        assertEquals(3, tasks.size());
+    }
+
+    private int getTableColumnCount(String tableName){
+        SQLiteDatabase database = DbHelper.getInstance(mContext).getReadableDatabase();
+        Cursor cursor = database.query(
+                tableName,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        return cursor.getColumnCount();
     }
 
     private NotificationReminder getDefaultTestReminder(){

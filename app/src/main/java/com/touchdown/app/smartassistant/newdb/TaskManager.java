@@ -24,7 +24,7 @@ public class TaskManager extends Observable{
     private SQLiteOpenHelper dbHelper;
 
     private TaskManager(Context context){
-        this.dbHelper = new DbHelper(context.getApplicationContext());
+        this.dbHelper = DbHelper.getInstance(context);
         this.taskDao = new TaskDao(dbHelper);
         this.reminderDao = new ActionReminderDao(dbHelper);
         this.locationDao = new LocDao(dbHelper);
@@ -114,7 +114,7 @@ public class TaskManager extends Observable{
     }
 
     public List<Task> getAllTasksWithLocationTrigger(){
-        return getAllTasks();           //todo return only the tasks that really have a location trigger
+        return taskDao.getAllTasksWithLocation();
     }
 
     public int removeTask(long id){

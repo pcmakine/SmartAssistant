@@ -2,12 +2,16 @@ package com.touchdown.app.smartassistant.newdb;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 
 import com.touchdown.app.smartassistant.data.Dao;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbContract.TaskEntry;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Pete on 19.8.2014.
@@ -32,4 +36,73 @@ public class TaskDao extends newDao<Task> {
 
         return new Task(id, name, location, action);
     }
+
+    public List<Task> getAllTasksWithLocation(){
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT * FROM " + TaskEntry.TABLE_NAME + " JOIN " +
+                DbContract.LocationEntry.TABLE_NAME + " ON " +
+                TaskEntry.TABLE_NAME + "." + TaskEntry._ID + " = " +
+                DbContract.LocationEntry.TABLE_NAME + "." + DbContract.LocationEntry._ID +
+                " JOIN " + DbContract.ReminderEntry.TABLE_NAME + " ON " +
+                DbContract.LocationEntry.TABLE_NAME + "." + DbContract.LocationEntry.COLUMN_NAME_TASK_ID + " = " +
+                DbContract.ReminderEntry.TABLE_NAME + "." + DbContract.ReminderEntry.COLUMN_NAME_TASK_ID;
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        List<Task> list = new ArrayList<Task>();
+
+        while(cursor.moveToNext()){
+            list.add(buildLocationTask(cursor));
+        }
+
+        return list;
+    }
+
+    private Task buildLocationTask(Cursor cursor){
+        long taskId = cursor.getLong(cursor.getColumnIndex(TaskEntry._ID));
+        int locationIdIndex = cursor.getColumnIndex(TaskEntry.COLUMN_NAME_TASK_NAME) + 1;
+
+        long locationId = cursor.getLong(locationIdIndex);
+
+        int reminderIndex = cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TASK_ID) + 1;
+        long reminderId = cursor.getLong(reminderIndex);
+
+        String name = cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_TASK_NAME));
+
+        TriggerLocation location = new LocDao(dbHelper).buildObject(cursor, locationId);
+        NotificationReminder reminder = new ActionReminderDao(dbHelper).buildObject(cursor, reminderId);
+
+        Task task = new Task(taskId, name, location, reminder);
+
+        return task;
+
+    }
 }
+
+
+
+/*      String locationIdAlias = "location";
+        String reminderIdAlias = "reminder";
+
+        String query = "SELECT " + TaskEntry.TABLE_NAME + "." + TaskEntry._ID  + ", " +
+                TaskEntry.COLUMN_NAME_TASK_NAME + ", " +
+                DbContract.LocationEntry.TABLE_NAME + "." + DbContract.LocationEntry._ID + " AS " + locationIdAlias + ", " +
+                DbContract.LocationEntry.COLUMN_NAME_TASK_ID + ", " +
+                DbContract.LocationEntry.COLUMN_NAME_RADIUS + ", " +
+                DbContract.LocationEntry.COLUMN_NAME_LAT + ", " +
+                DbContract.LocationEntry.COLUMN_NAME_LONG + ", " +
+                DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL + ", " +
+                DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE + ", " +
+                DbContract.LocationEntry.COLUMN_NAME_TRIGGER_TYPE + ", " +
+                DbContract.ReminderEntry.TABLE_NAME + "." + DbContract.ReminderEntry._ID + " AS " + reminderIdAlias + ", " +
+                DbContract.ReminderEntry.COLUMN_NAME_TASK_ID + ", " +
+                DbContract.ReminderEntry.COLUMN_NAME_ON + ", " +
+                DbContract.ReminderEntry.COLUMN_NAME_TYPE + ", " +
+                DbContract.ReminderEntry.COLUMN_NAME_CONTENT +
+
+                " FROM " + TaskEntry.TABLE_NAME + " JOIN " +
+                DbContract.LocationEntry.TABLE_NAME + " ON " + TaskEntry.TABLE_NAME + "."
+                + TaskEntry._ID + " = " + DbContract.LocationEntry.TABLE_NAME + "." + DbContract.LocationEntry.COLUMN_NAME_TASK_ID +
+                " JOIN " + DbContract.ReminderEntry.TABLE_NAME + " ON " + DbContract.LocationEntry.TABLE_NAME + "."
+                + DbContract.LocationEntry.COLUMN_NAME_TASK_ID + " = " + DbContract.ReminderEntry.TABLE_NAME + "." + DbContract.ReminderEntry.COLUMN_NAME_TASK_ID;*/

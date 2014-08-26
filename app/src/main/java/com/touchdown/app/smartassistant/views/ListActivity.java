@@ -25,12 +25,14 @@ import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.newdb.TaskManager;
 import com.touchdown.app.smartassistant.services.ReminderManager;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class ListActivity extends ActionBarActivity implements FetchAllDataListener{
+
+public class ListActivity extends ActionBarActivity implements FetchAllDataListener, RemoveTasksListener{
     public static final String LOG_TAG = ListActivity.class.getSimpleName();
     private SimpleCursorAdapter adapter;
     private ListView listView;
-    private TaskManager taskManager;
 
 
     @Override
@@ -41,25 +43,6 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
 
         Util.clearAndInsertTestData(this, new DbHelper(this));
 
-       // Util.clearAndInsertTestData(this, new DbHelper(this));
-  /*      int version = dbHelper.getReadableDatabase().getVersion();
-
-        Toast.makeText(this, "Current db version: " + version, Toast.LENGTH_LONG).show();*/
-
-       // Util.clearDb(new DbHelper(this), this);
-/*        Util.clearAndInsertTestData(this, new DbHelper(this));
-
-        taskManager = TaskManager.getInstance(this);
-
-        Cursor cursor =  taskManager.getAllTaskData();
-
-        adapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,
-                new String[] {DbContract.TaskEntry.COLUMN_NAME_TASK_NAME}, new int[] {R.id.itemText},
-                SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-
-        // Assign adapter to ListView
-        listView.setAdapter(adapter);*/
-
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -67,25 +50,22 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 // ListView Clicked item index
-                int itemPosition     = position;
+                int itemPosition = position;
 
                 // ListView Clicked item value
-                Cursor  c    = (Cursor) listView.getItemAtPosition(position);
+                Cursor c = (Cursor) listView.getItemAtPosition(position);
                 c.moveToPosition(position);
                 String name = c.getString(c.getColumnIndex(DbContract.TaskEntry.COLUMN_NAME_TASK_NAME));
 
                 toggleCheckBox(position);
 
-                // adapter.notifyDataSetChanged();
-
                 // Show Alert
                 Toast.makeText(getApplicationContext(),
-                        "Position :"+itemPosition+"  ListItem : " + name , Toast.LENGTH_LONG)
+                        "Position :" + itemPosition + "  ListItem : " + name, Toast.LENGTH_LONG)
                         .show();
             }
 
         });
-    //    getAllTasks();
     }
 
     private void getAllTasks(boolean showIndicator){
@@ -127,19 +107,11 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
         startActivity(intent);
     }
 
-    public void updateList(){
-        Cursor newCursor = taskManager.getAllTaskData();
-
-        adapter.swapCursor(newCursor);
-    }
-
     public void startEdit(long reminderId){
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra("reminderID", reminderId);
         startActivity(intent);
     }
-
-
 
     @Override
     public void onResume(){
@@ -169,20 +141,23 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
             case R.id.action_delete:
                 SparseBooleanArray checked = listView.getCheckedItemPositions();
                 Cursor cursor;
+                List<Long> idList = new ArrayList<Long>();
                 for (int i = 0; i < listView.getAdapter().getCount(); i++) {
                     if (checked.get(i)) {
                         cursor = (Cursor) adapter.getItem(i);
                         int idIndex = cursor.getColumnIndex(DbContract.TaskEntry._ID);
                         long taskId = cursor.getLong(idIndex);
+                        idList.add(taskId);
 
-                        TaskManager.getInstance(this).removeTask(taskId);
+                       //TaskManager.getInstance(this).removeTask(taskId);
 
                         listView.setItemChecked(i, false);
                         toggleCheckBox(i);
                     }
                 }
-                //updateList();
-                getAllTasks(false);
+
+                new RemoveTasksTask(this).execute(idList);
+               // getAllTasks(false);
                 return true;
 
             case R.id.action_select_all:
@@ -223,5 +198,11 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
         }
         return false;
         //return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void removeSuccessful(boolean success) {
+        Toast.makeText(this, "Task(s) deleted successfully", Toast.LENGTH_SHORT).show();
+        getAllTasks(false);
     }
 }

@@ -6,9 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.touchdown.app.smartassistant.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.Dao;
 import com.touchdown.app.smartassistant.data.DbContract;
+import com.touchdown.app.smartassistant.data.DbHelper;
 
 import java.util.List;
 
@@ -21,19 +23,14 @@ public class LocDao extends newDao<TriggerLocation> {
         super(dbHelper);
     }
 
-/*    @Override
-    public long insert(TriggerLocation location){
-        TriggerDao triggerDao = new TriggerDao(dbHelper, DbContract.TriggerEntry.TABLE_NAME, DbContract.TriggerEntry._ID);
-        Trigger trigger = new Trigger(-1, TriggerLocation.TRIGGER_TYPE, );
-        long parentId = triggerDao.insert(trigger);
-        location.setParentId(parentId);
-        return super.insert(location);
-    }*/
-
 
     @Override
     protected TriggerLocation buildObject(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndex(DbContract.LocationEntry._ID));
+        return buildObject(cursor, id);
+    }
+
+    public TriggerLocation buildObject(Cursor cursor, long id){
         double lat = cursor.getDouble(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LAT));
         double longitude = cursor.getDouble(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_LONG));
 
@@ -62,6 +59,9 @@ public class LocDao extends newDao<TriggerLocation> {
         }else{
             return null;
         }
+
+        TriggerLocation location = buildObject(cursor);
+        DbHelper.getInstance(ApplicationContextProvider.getAppContext()).getReadableDatabase().close();
         return buildObject(cursor);
     }
 

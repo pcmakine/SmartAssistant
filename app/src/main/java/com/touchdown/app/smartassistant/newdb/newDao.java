@@ -27,8 +27,9 @@ public abstract class newDao<T> {
         }else{
             return null;
         }
-        //db.close();
-        return buildObject(cursor);
+        T object = buildObject(cursor);
+        db.close();
+        return object;
     }
 
 
@@ -64,7 +65,8 @@ public abstract class newDao<T> {
 
     public List<T> getAllAsList(String tableName, String idColumn){
         Cursor cursor = getAll(tableName, idColumn);
-        return getListFromCursor(cursor);
+        List<T> list = getListFromCursor(cursor);
+        return list;
     }
 
     private List<T> getListFromCursor(Cursor cursor){
@@ -76,6 +78,7 @@ public abstract class newDao<T> {
                 cursor.moveToNext();
             }
         }
+        dbHelper.getWritableDatabase().close();
         return list;
     }
 

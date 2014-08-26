@@ -1,6 +1,7 @@
 package com.touchdown.app.smartassistant.services.Markers;
 
 import android.graphics.Color;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -9,11 +10,10 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.touchdown.app.smartassistant.models.ReminderLocation;
-import com.touchdown.app.smartassistant.models.Reminder;
 import com.touchdown.app.smartassistant.newdb.Task;
-import com.touchdown.app.smartassistant.newdb.TaskManager;
 import com.touchdown.app.smartassistant.newdb.TriggerLocation;
+import com.touchdown.app.smartassistant.views.FetchAllLocationTasksTask;
+import com.touchdown.app.smartassistant.views.FetchTaskListListener;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Created by Pete on 6.8.2014.
  */
-public class MarkerManager {
+public class MarkerManager implements FetchTaskListListener {
     private static final float SELECTED_COLOR = BitmapDescriptorFactory.HUE_AZURE;
     private static final float NON_EMPTY_MARKER_ON = BitmapDescriptorFactory.HUE_ORANGE;
     private static final float NON_EMPTY_MARKER_OFF = BitmapDescriptorFactory.HUE_VIOLET;
@@ -36,24 +36,15 @@ public class MarkerManager {
 
     private Map<Marker, MarkerData> markerDataMap;
 
-    private TaskManager taskManager;
-
-    public MarkerManager(GoogleMap map, TaskManager taskManager){
+    public MarkerManager(GoogleMap map) {
         this.map = map;
-        this.taskManager = taskManager;
         this.markerDataMap = new HashMap<Marker, MarkerData>();
-        populateMapWithMarkers();
+        updateMarkerData();
         this.selectedMarker = null;
     }
 
     public void updateMarkerData(){
-        List<Task> taskList = taskManager.getAllTasksWithLocationTrigger();
-
-        map.clear();
-
-        markerDataMap.clear();
-
-        putTaskMarkersOnMap(taskList);
+        new FetchAllLocationTasksTask(this, false).execute();//taskManager.getAllTasksWithLocationTrigger();
     }
 
     private void putTaskMarkersOnMap(List<Task> taskList){
@@ -62,11 +53,6 @@ public class MarkerManager {
             saveMarker(generateMarker(task.getName(), location.getLatLng(), NON_EMPTY_MARKER_ON), task);
         }
         updateMarkerColors();
-    }
-
-    public void populateMapWithMarkers(){
-        List<Task> taskList = taskManager.getAllTasksWithLocationTrigger();
-        putTaskMarkersOnMap(taskList);
     }
 
     public Marker generateMarker(String text, LatLng loc, float color){
@@ -216,4 +202,17 @@ public class MarkerManager {
         return SELECTED_COLOR;
     }
 
+    @Override
+    public void updateTasks(List<Task> taskList) {
+        map.clear();
+
+        markerDataMap.clear();
+
+        putTaskMarkersOnMap(taskList);
+    }
+
+    @Override
+    public LinearLayout getOnProgressIndicator() {
+        return null;
+    }
 }

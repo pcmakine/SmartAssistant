@@ -11,7 +11,6 @@ import com.touchdown.app.smartassistant.newdb.TaskManager;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -84,7 +83,6 @@ public class FetchAllDataTask extends AsyncTask<Context, Void, Cursor> {
 
         Log.d(LOG_TAG, "Data fetching ended at " + getCurrentTimeStamp());
         FetchAllDataListener currentActivity = weakActivityReference.get();
-        Log.d(LOG_TAG, Calendar.getInstance().getTime() + "");
         if(currentActivity != null){
             currentActivity.updateData(cursor);
             changeProgressIndicatorVisibility(View.GONE);
