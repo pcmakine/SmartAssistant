@@ -7,8 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.TaskStackBuilder;
 
-import com.touchdown.app.smartassistant.MapActivity;
-
 /**
  * Created by Pete on 16.8.2014.
  */

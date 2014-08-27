@@ -10,11 +10,11 @@ import java.util.List;
 /**
  * Created by Pete on 21.8.2014.
  */
-public abstract class newDao<T> {
+public abstract class Dao<T> {
 
     protected SQLiteOpenHelper dbHelper;
 
-    public newDao(SQLiteOpenHelper dbHelper){
+    public Dao(SQLiteOpenHelper dbHelper){
         this.dbHelper = dbHelper;
     }
 
@@ -28,7 +28,6 @@ public abstract class newDao<T> {
             return null;
         }
         T object = buildObject(cursor);
-        db.close();
         return object;
     }
 
@@ -52,7 +51,8 @@ public abstract class newDao<T> {
 
     public List<T> findByFieldInt(String tableName, String columnName, int value){
         Cursor cursor = getDataByFieldInt(tableName, columnName, value);
-        return getListFromCursor(cursor);
+        List<T> list = getListFromCursor(cursor);
+        return list;
     }
 
     public Cursor getDataByFieldInt(String tableName, String columnName, int value){
@@ -78,7 +78,6 @@ public abstract class newDao<T> {
                 cursor.moveToNext();
             }
         }
-        dbHelper.getWritableDatabase().close();
         return list;
     }
 

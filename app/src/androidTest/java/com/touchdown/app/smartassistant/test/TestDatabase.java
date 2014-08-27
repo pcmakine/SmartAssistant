@@ -7,7 +7,7 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.touchdown.app.smartassistant.Util;
+import com.touchdown.app.smartassistant.services.Util;
 import com.touchdown.app.smartassistant.data.DbContract.LocationEntry;
 import com.touchdown.app.smartassistant.data.DbContract.TaskEntry;
 import com.touchdown.app.smartassistant.data.DbContract.ReminderEntry;

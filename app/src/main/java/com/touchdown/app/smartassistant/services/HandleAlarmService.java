@@ -2,6 +2,7 @@ package com.touchdown.app.smartassistant.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.location.LocationManager;
 
 import com.touchdown.app.smartassistant.models.Task;
 
@@ -19,6 +20,8 @@ public class HandleAlarmService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
+            String key = LocationManager.KEY_PROXIMITY_ENTERING;
+            boolean entering = intent.getBooleanExtra(key, false);
             long id = intent.getLongExtra("reminderID", -1);
 
             if(id != -1){

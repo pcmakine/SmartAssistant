@@ -3,9 +3,8 @@ package com.touchdown.app.smartassistant.models;
 import android.content.ContentValues;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.touchdown.app.smartassistant.Util;
+import com.touchdown.app.smartassistant.services.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
-import com.touchdown.app.smartassistant.models.Trigger;
 
 /**
  * Created by Pete on 18.8.2014.
@@ -21,6 +20,7 @@ public class TriggerLocation extends Trigger {
     private int radius;     //meters
     private boolean triggerWhenEntering;
     private boolean triggerWhenLeaving;
+    private boolean pending;        //wether the task was started inside the location and is waiting to be activated once the user is outside
 
     public TriggerLocation(long id, LatLng loc, int radius, long actionId) {
         super(id, 0, actionId);
@@ -84,6 +84,14 @@ public class TriggerLocation extends Trigger {
         this.triggerWhenLeaving = triggerOn;
     }
 
+    public void setPending(boolean pending){
+        this.pending = pending;
+    }
+
+    public boolean isPending(){
+        return pending;
+    }
+
     @Override
     public ContentValues getContentValues() {
         ContentValues vals = new ContentValues();
@@ -95,9 +103,12 @@ public class TriggerLocation extends Trigger {
 
         int arrivalTriggerInt = Util.booleanAsInt(triggerWhenEntering);
         int departureTriggerInt = Util.booleanAsInt(triggerWhenLeaving);
+        int pendingInt = Util.booleanAsInt(pending);
 
         vals.put(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL, arrivalTriggerInt);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE, departureTriggerInt);
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_PENDING, pendingInt);
+
         return vals;
     }
 }

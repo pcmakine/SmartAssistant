@@ -18,7 +18,6 @@ public class WriterDao {
     public long insert(Data data){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         long id = db.insert(data.getTableName(), null, data.getContentValues());
-        db.close();
         return id;
     }
 
@@ -28,7 +27,6 @@ public class WriterDao {
         int numOfRowsAffected = db.update(data.getTableName(), data.getContentValues(), data.getIdColumn() + " = ?",
                 new String[] {String.valueOf(data.getId())});
 
-        db.close();
         return numOfRowsAffected;
     }
 
@@ -36,7 +34,7 @@ public class WriterDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int rowsAffected = db.delete(tableName, idColumn + " =?",
                 new String[]{String.valueOf(id)});
-        db.close();
+
         return rowsAffected;
     }
 }

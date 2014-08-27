@@ -9,9 +9,6 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.models.ReminderLocation;
-import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.services.ReminderManager;
 
 import java.util.Map;
 import java.util.Set;
@@ -24,8 +21,6 @@ public class TestDb extends AndroidTestCase {
 
     public static final double TESTLAT = 64.772;
     public static final double TESTLONG = -147.335;
-
-    ReminderManager reminderManager;
 
     @Override
     public void setUp(){

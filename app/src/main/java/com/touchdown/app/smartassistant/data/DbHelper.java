@@ -49,7 +49,8 @@ public class DbHelper extends SQLiteOpenHelper{
                 LocationEntry.COLUMN_NAME_RADIUS + " INTEGER NOT NULL, " +
                 LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL + " INTEGER NOT NULL, " +
                 LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE + " INTEGER NOT NULL, " +
-                LocationEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL, " +
+                LocationEntry.COLUMN_NAME_PENDING + " INTEGER NOT NULL, " +
+                LocationEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL, " +             //MUST BE CREATED AS THE LAST COLUMN FOR TASKDAO TO WORK
                 " FOREIGN KEY (" + LocationEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
                 TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ") " +
                 " ON DELETE CASCADE)";
@@ -86,8 +87,8 @@ public class DbHelper extends SQLiteOpenHelper{
                 + ReminderEntry.TABLE_NAME + "(" + ReminderEntry._ID +
                 ") ON DELETE CASCADE)";*/
 
-       // db.execSQL(SQL_CREATE_REMINDER_TABLE);
-       // db.execSQL(SQL_CREATE_LOCATION_TABLE);
+        // db.execSQL(SQL_CREATE_REMINDER_TABLE);
+        // db.execSQL(SQL_CREATE_LOCATION_TABLE);
 
         db.execSQL(SQL_CREATE_TASK_TABLE);
         db.execSQL(SQL_CREATE_LOCATION_TABLE);

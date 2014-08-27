@@ -22,14 +22,6 @@ public class DbContract {
         public static final String COLUMN_NAME_TASK_NAME = "taskName";
     }
 
-/*
-    public static final class ActionTriggerEntry {
-        public static final String TABLE_NAME = "action_trigger";
-        public static final String COLUMN_NAME_TASK_ID = "actionId";
-        public static final String COLUMN_NAME_TRIGGER_ID = "triggerId";
-    }
-*/
-
     public static final class LocationEntry implements BaseColumns {
         public static final String TABLE_NAME = "location";
         public static final String COLUMN_NAME_LAT = "lat";
@@ -38,6 +30,7 @@ public class DbContract {
         public static final String COLUMN_NAME_TRIGGER_ON_ARRIVAL = "triggerOnArrival";
         public static final String COLUMN_NAME_TRIGGER_ON_DEPARTURE = "triggerOnDeparture";
         public static final String COLUMN_NAME_TRIGGER_TYPE = "triggerType";
+        public static final String COLUMN_NAME_PENDING = "pending";
         public static final String COLUMN_NAME_TASK_ID = "locationTaskId";
     }
 

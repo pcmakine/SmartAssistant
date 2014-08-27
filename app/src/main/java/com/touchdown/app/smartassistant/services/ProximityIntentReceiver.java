@@ -1,19 +1,11 @@
 package com.touchdown.app.smartassistant.services;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.touchdown.app.smartassistant.MapActivity;
-import com.touchdown.app.smartassistant.R;
 
 /**
  * Created by Pete on 7.8.2014.
@@ -34,7 +26,8 @@ public class ProximityIntentReceiver extends WakefulBroadcastReceiver {
 
 
         Intent alarmServiceIntent = new Intent(context, HandleAlarmService.class);
-        alarmServiceIntent.putExtra("reminderID", intent.getLongExtra("reminderID", -1));
+        alarmServiceIntent.putExtras(intent.getExtras());
+      //  alarmServiceIntent.putExtra("reminderID", intent.getLongExtra("reminderID", -1));
         startWakefulService(context, alarmServiceIntent);
     }
 }

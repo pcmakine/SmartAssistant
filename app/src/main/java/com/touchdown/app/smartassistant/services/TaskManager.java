@@ -1,6 +1,7 @@
 package com.touchdown.app.smartassistant.services;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -45,11 +46,10 @@ public class TaskManager extends Observable{
 
     public long insert(Task task){
         long id = wDao.insert(task);
+
         insertActionsAndTriggers(task, id);
 
-        if(task.isActive() && task.getLocation() != null){
-            ProximityAlarmManager.saveAlert(task);
-        }
+        saveProximityAlert(task);
 
         OnGoingNotification.updateNotification();
 
@@ -70,6 +70,12 @@ public class TaskManager extends Observable{
         List<Action> actions = task.getActions();
         for(Action action: actions){
             wDao.insert(action);
+        }
+    }
+
+    private void saveProximityAlert(Task task){
+        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending()){
+            ProximityAlarmManager.saveAlert(task);
         }
     }
 
@@ -98,7 +104,7 @@ public class TaskManager extends Observable{
     }
 
     private void updateProximityAlarm(Task task){
-        if(task.isActive() && task.getLocation() != null){
+        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending()){
             ProximityAlarmManager.updateAlert(task);
         }else{
             ProximityAlarmManager.removeAlert(task.getId());

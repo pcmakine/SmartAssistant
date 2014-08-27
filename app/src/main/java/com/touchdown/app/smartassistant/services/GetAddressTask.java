@@ -6,16 +6,12 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.touchdown.app.smartassistant.ApplicationContextProvider;
-import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.views.DetailsActivity;
-import com.touchdown.app.smartassistant.views.ListActivity;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 

@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant;
+package com.touchdown.app.smartassistant.services;
 
 import android.app.Application;
 import android.content.Context;

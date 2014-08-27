@@ -5,14 +5,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.touchdown.app.smartassistant.ApplicationContextProvider;
-import com.touchdown.app.smartassistant.Util;
+import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
+import com.touchdown.app.smartassistant.services.Util;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 
 /**
  * Created by Pete on 18.8.2014.
  */
-public class LocDao extends newDao<TriggerLocation> {
+public class LocDao extends Dao<TriggerLocation> {
 
     public LocDao(SQLiteOpenHelper dbHelper) {
         super(dbHelper);
@@ -37,9 +37,11 @@ public class LocDao extends newDao<TriggerLocation> {
 
         boolean arrivalTriggerOn = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL)));
         boolean departureTriggerOn = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE)));
+        boolean pending = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_PENDING)));
 
         loc.setArrivalTrigger(arrivalTriggerOn);
         loc.setDepartureTrigger(departureTriggerOn);
+        loc.setPending(pending);
 
         return loc;
     }
@@ -56,8 +58,7 @@ public class LocDao extends newDao<TriggerLocation> {
         }
 
         TriggerLocation location = buildObject(cursor);
-        DbHelper.getInstance(ApplicationContextProvider.getAppContext()).getReadableDatabase().close();
-        return buildObject(cursor);
+        return location;
     }
 
 }

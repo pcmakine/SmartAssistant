@@ -4,13 +4,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.touchdown.app.smartassistant.Util;
+import com.touchdown.app.smartassistant.services.Util;
 import com.touchdown.app.smartassistant.views.NotificationReminder;
 
 /**
  * Created by Pete on 19.8.2014.
  */
-public class ActionReminderDao extends newDao<NotificationReminder> {
+public class ActionReminderDao extends Dao<NotificationReminder> {
 
     public ActionReminderDao(SQLiteOpenHelper dbHelper) {
         super(dbHelper);

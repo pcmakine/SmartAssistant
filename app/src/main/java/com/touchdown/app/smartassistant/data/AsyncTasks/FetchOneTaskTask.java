@@ -2,7 +2,7 @@ package com.touchdown.app.smartassistant.data.AsyncTasks;
 
 import android.os.AsyncTask;
 
-import com.touchdown.app.smartassistant.ApplicationContextProvider;
+import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.services.TaskManager;
 

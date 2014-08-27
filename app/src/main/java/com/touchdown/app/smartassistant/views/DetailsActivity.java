@@ -1,5 +1,6 @@
 package com.touchdown.app.smartassistant.views;
 
+import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -25,11 +26,15 @@ import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskListener;
 import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskTask;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
+import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
+import com.touchdown.app.smartassistant.services.TaskActivator;
+import com.touchdown.app.smartassistant.services.MyLocationProvider;
 
 
 public class DetailsActivity extends ActionBarActivity implements AlarmFragment.OnFragmentInteractionListener,
         UpdateTaskListener, FetchOneTaskListener {
     public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
+    public static TaskActivator locationHelper;
 
     private static final int MIN_RADIUS_METERS = 50;
     private static final int MAX_RADIUS_METERS = 10000;
@@ -210,6 +215,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         nameInput = nameTw.getText().toString();
         task.setName(nameInput);
         if(!displayErrorToastOnEmptyName(nameInput) && !displayErrorToastOnNoActions()){
+            updatePendingStatus();
             if(editMode){
                 updateTask();
             }else{
@@ -234,11 +240,20 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         return false;
     }
 
+    private void updatePendingStatus(){
+        if(TaskActivator.startIfNeeded(task)){
+            task.getLocation().setPending(true);
+        }else{
+            task.getLocation().setPending(false);
+        }
+    }
+
     private void updateTask(){
         new UpdateTaskTask(this, false,false).execute(task);    //second false for updatetask
     }
 
     private void addTask(){
+
         new UpdateTaskTask(this, false, true).execute(task);                  //true for insert task
     }
 

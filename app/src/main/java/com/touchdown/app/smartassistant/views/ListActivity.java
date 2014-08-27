@@ -17,9 +17,10 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.Util;
+import com.touchdown.app.smartassistant.services.TaskActivator;
+import com.touchdown.app.smartassistant.services.TaskActivatorKiller;
+import com.touchdown.app.smartassistant.services.Util;
 import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksListener;
 import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksTask;
 import com.touchdown.app.smartassistant.data.DbContract;
@@ -43,7 +44,7 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
         setContentView(R.layout.activity_list);
         listView = (ListView) findViewById(R.id.list);
 
-        Util.clearAndInsertTestData(this, new DbHelper(this));
+  //      Util.clearAndInsertTestData(this, new DbHelper(this));
 
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -151,8 +152,6 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
                         long taskId = cursor.getLong(idIndex);
                         idList.add(taskId);
 
-                       //TaskManager.getInstance(this).removeTask(taskId);
-
                         listView.setItemChecked(i, false);
                         toggleCheckBox(i);
                     }
@@ -206,5 +205,9 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
     public void removeSuccessful(boolean success) {
         Toast.makeText(this, "Task(s) deleted successfully", Toast.LENGTH_SHORT).show();
         getAllTasks(false);
+    }
+
+    public void stopService(View view) {
+       startService(new Intent(this, TaskActivatorKiller.class));
     }
 }

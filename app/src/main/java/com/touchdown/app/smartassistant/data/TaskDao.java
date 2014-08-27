@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by Pete on 19.8.2014.
  */
-public class TaskDao extends newDao<Task> {
+public class TaskDao extends Dao<Task> {
 
     public TaskDao(SQLiteOpenHelper dbHelper) {
         super(dbHelper);

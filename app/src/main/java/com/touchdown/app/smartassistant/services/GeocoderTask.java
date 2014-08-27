@@ -16,10 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 
-import com.touchdown.app.smartassistant.MapActivity;
-
-import java.io.IOException;
-import java.util.List;
+import com.touchdown.app.smartassistant.views.MapActivity;
 
 /*
  Created by Pete on 15.4.2014.

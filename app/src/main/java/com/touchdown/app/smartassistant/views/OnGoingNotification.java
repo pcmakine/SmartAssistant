@@ -4,7 +4,7 @@ import android.app.Notification;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 
-import com.touchdown.app.smartassistant.ApplicationContextProvider;
+import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.services.TaskManager;
 

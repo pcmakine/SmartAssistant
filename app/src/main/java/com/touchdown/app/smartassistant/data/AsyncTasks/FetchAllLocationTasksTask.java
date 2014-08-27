@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.touchdown.app.smartassistant.ApplicationContextProvider;
+import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.services.TaskManager;
 

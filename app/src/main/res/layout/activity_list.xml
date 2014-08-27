@@ -41,5 +41,12 @@
             android:text = "@string/fetching_data"/>
     </LinearLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "stop the service"
+        android:onClick = "stopService"
+        android:layout_alignParentBottom="true"/>
+
 
 </RelativeLayout>

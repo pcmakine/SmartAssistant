@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant;
+package com.touchdown.app.smartassistant.views;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -21,13 +21,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.services.TaskManager;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 import com.touchdown.app.smartassistant.services.MyLocationProvider;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
 import com.touchdown.app.smartassistant.services.Markers.MarkerManager;
-import com.touchdown.app.smartassistant.views.DetailsActivity;
 import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksListener;
 import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksTask;
 import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskListener;
