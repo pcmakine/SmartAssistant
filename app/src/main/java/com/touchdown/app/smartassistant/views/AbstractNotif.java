@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.support.v4.app.TaskStackBuilder;
 
 import com.touchdown.app.smartassistant.MapActivity;
-import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.newdb.NotificationReminder;
 
 /**
  * Created by Pete on 16.8.2014.

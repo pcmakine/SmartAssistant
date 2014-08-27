@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.newdb;
+package com.touchdown.app.smartassistant.models;
 
 import android.content.ContentValues;
 

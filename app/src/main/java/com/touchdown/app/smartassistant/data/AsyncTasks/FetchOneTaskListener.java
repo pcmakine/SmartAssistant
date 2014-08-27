@@ -1,6 +1,6 @@
-package com.touchdown.app.smartassistant.views;
+package com.touchdown.app.smartassistant.data.AsyncTasks;
 
-import com.touchdown.app.smartassistant.newdb.Task;
+import com.touchdown.app.smartassistant.models.Task;
 
 /**
  * Created by Pete on 27.8.2014.

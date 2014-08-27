@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.views;
+package com.touchdown.app.smartassistant.data.AsyncTasks;
 
 import android.widget.LinearLayout;
 

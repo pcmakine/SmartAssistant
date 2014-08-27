@@ -10,7 +10,6 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.newdb.NotificationReminder;
 
 /**
  * A simple {@link Fragment} subclass.

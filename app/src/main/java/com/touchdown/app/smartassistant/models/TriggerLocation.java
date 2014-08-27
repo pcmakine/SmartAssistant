@@ -1,10 +1,11 @@
-package com.touchdown.app.smartassistant.newdb;
+package com.touchdown.app.smartassistant.models;
 
 import android.content.ContentValues;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
+import com.touchdown.app.smartassistant.models.Trigger;
 
 /**
  * Created by Pete on 18.8.2014.

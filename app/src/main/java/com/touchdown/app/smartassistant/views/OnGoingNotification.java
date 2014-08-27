@@ -6,9 +6,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.touchdown.app.smartassistant.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.newdb.NotificationReminder;
-import com.touchdown.app.smartassistant.newdb.TaskManager;
-import com.touchdown.app.smartassistant.services.ReminderManager;
+import com.touchdown.app.smartassistant.services.TaskManager;
 
 /**
  * Created by Pete on 16.8.2014.

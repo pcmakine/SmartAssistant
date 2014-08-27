@@ -1,6 +1,5 @@
-package com.touchdown.app.smartassistant.newdb;
+package com.touchdown.app.smartassistant.data;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -8,11 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.Util;
-import com.touchdown.app.smartassistant.data.Dao;
-import com.touchdown.app.smartassistant.data.DbContract;
-import com.touchdown.app.smartassistant.data.DbHelper;
-
-import java.util.List;
+import com.touchdown.app.smartassistant.models.TriggerLocation;
 
 /**
  * Created by Pete on 18.8.2014.

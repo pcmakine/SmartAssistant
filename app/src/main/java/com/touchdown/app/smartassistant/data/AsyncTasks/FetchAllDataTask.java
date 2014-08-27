@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.views;
+package com.touchdown.app.smartassistant.data.AsyncTasks;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.touchdown.app.smartassistant.newdb.TaskManager;
+import com.touchdown.app.smartassistant.services.TaskManager;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;

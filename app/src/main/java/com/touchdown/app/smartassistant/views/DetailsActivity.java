@@ -13,21 +13,22 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.newdb.NotificationReminder;
-import com.touchdown.app.smartassistant.newdb.Task;
-import com.touchdown.app.smartassistant.newdb.TaskManager;
-import com.touchdown.app.smartassistant.newdb.TriggerLocation;
+import com.touchdown.app.smartassistant.data.AsyncTasks.FetchOneTaskListener;
+import com.touchdown.app.smartassistant.data.AsyncTasks.FetchOneTaskTask;
+import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskListener;
+import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskTask;
+import com.touchdown.app.smartassistant.models.Task;
+import com.touchdown.app.smartassistant.models.TriggerLocation;
 
 
 public class DetailsActivity extends ActionBarActivity implements AlarmFragment.OnFragmentInteractionListener,
-UpdateTaskListener, FetchOneTaskListener{
+        UpdateTaskListener, FetchOneTaskListener {
     public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
 
     private static final int MIN_RADIUS_METERS = 50;

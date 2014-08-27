@@ -1,11 +1,11 @@
-package com.touchdown.app.smartassistant.newdb;
+package com.touchdown.app.smartassistant.data;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.touchdown.app.smartassistant.Util;
-import com.touchdown.app.smartassistant.data.DbContract;
+import com.touchdown.app.smartassistant.views.NotificationReminder;
 
 /**
  * Created by Pete on 19.8.2014.
@@ -22,7 +22,7 @@ public class ActionReminderDao extends newDao<NotificationReminder> {
         return buildObject(cursor, id);
     }
 
-    protected NotificationReminder buildObject(Cursor cursor, long id) {
+    public NotificationReminder buildObject(Cursor cursor, long id) {
         long actionCollectionId = cursor.getLong(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_TASK_ID));
         String content = cursor.getString(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_CONTENT));
         int type = cursor.getInt(cursor.getColumnIndex(DbContract.ReminderEntry.COLUMN_NAME_TYPE));

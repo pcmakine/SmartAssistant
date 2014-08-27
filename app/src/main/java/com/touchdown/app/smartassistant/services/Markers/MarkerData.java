@@ -1,11 +1,9 @@
 package com.touchdown.app.smartassistant.services.Markers;
 
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.Marker;
-import com.touchdown.app.smartassistant.models.ReminderLocation;
-import com.touchdown.app.smartassistant.newdb.Task;
-import com.touchdown.app.smartassistant.newdb.TriggerLocation;
+import com.touchdown.app.smartassistant.models.Task;
+import com.touchdown.app.smartassistant.models.TriggerLocation;
 
 /**
  * Created by Pete on 8.8.2014.

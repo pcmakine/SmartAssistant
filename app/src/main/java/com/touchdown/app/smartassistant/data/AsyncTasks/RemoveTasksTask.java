@@ -1,15 +1,11 @@
-package com.touchdown.app.smartassistant.views;
+package com.touchdown.app.smartassistant.data.AsyncTasks;
 
-import android.database.Cursor;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.View;
 
 import com.touchdown.app.smartassistant.ApplicationContextProvider;
-import com.touchdown.app.smartassistant.newdb.TaskManager;
+import com.touchdown.app.smartassistant.services.TaskManager;
 
 import java.lang.ref.WeakReference;
-import java.util.Calendar;
 import java.util.List;
 
 /**

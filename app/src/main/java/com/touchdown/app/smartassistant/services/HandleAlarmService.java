@@ -3,10 +3,7 @@ package com.touchdown.app.smartassistant.services;
 import android.app.IntentService;
 import android.content.Intent;
 
-import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.newdb.Task;
-import com.touchdown.app.smartassistant.newdb.TaskManager;
-import com.touchdown.app.smartassistant.views.AlarmNotification;
+import com.touchdown.app.smartassistant.models.Task;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in

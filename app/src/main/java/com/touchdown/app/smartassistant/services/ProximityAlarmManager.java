@@ -6,8 +6,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 
 import com.touchdown.app.smartassistant.ApplicationContextProvider;
-import com.touchdown.app.smartassistant.models.Reminder;
-import com.touchdown.app.smartassistant.newdb.Task;
+import com.touchdown.app.smartassistant.models.Task;
 
 /**
  * Created by Pete on 11.8.2014.

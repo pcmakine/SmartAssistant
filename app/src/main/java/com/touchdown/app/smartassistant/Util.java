@@ -5,12 +5,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.newdb.NotificationReminder;
-import com.touchdown.app.smartassistant.newdb.Task;
-import com.touchdown.app.smartassistant.newdb.TaskManager;
-import com.touchdown.app.smartassistant.newdb.TriggerLocation;
+import com.touchdown.app.smartassistant.views.NotificationReminder;
+import com.touchdown.app.smartassistant.models.Task;
+import com.touchdown.app.smartassistant.services.TaskManager;
+import com.touchdown.app.smartassistant.models.TriggerLocation;
 
 /**
  * Created by Pete on 4.8.2014.

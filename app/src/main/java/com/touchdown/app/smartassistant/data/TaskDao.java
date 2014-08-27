@@ -1,14 +1,15 @@
-package com.touchdown.app.smartassistant.newdb;
+package com.touchdown.app.smartassistant.data;
 
-import android.content.ContentValues;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.location.Location;
 
-import com.touchdown.app.smartassistant.data.Dao;
-import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbContract.TaskEntry;
+import com.touchdown.app.smartassistant.models.Action;
+import com.touchdown.app.smartassistant.views.NotificationReminder;
+import com.touchdown.app.smartassistant.models.Task;
+import com.touchdown.app.smartassistant.models.TriggerLocation;
 
 import java.util.ArrayList;
 import java.util.List;

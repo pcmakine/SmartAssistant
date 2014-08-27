@@ -1,8 +1,8 @@
-package com.touchdown.app.smartassistant.views;
+package com.touchdown.app.smartassistant.data.AsyncTasks;
 
 import android.widget.LinearLayout;
 
-import com.touchdown.app.smartassistant.newdb.Task;
+import com.touchdown.app.smartassistant.models.Task;
 
 import java.util.List;
 

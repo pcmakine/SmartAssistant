@@ -20,16 +20,18 @@ import android.widget.Toast;
 import com.touchdown.app.smartassistant.MapActivity;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.Util;
+import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksListener;
+import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksTask;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.newdb.TaskManager;
-import com.touchdown.app.smartassistant.services.ReminderManager;
+import com.touchdown.app.smartassistant.data.AsyncTasks.FetchAllDataListener;
+import com.touchdown.app.smartassistant.data.AsyncTasks.FetchAllDataTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ListActivity extends ActionBarActivity implements FetchAllDataListener, RemoveTasksListener{
+public class ListActivity extends ActionBarActivity implements FetchAllDataListener, RemoveTasksListener {
     public static final String LOG_TAG = ListActivity.class.getSimpleName();
     private SimpleCursorAdapter adapter;
     private ListView listView;

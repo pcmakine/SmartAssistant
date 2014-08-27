@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.newdb.NotificationReminder;
 
 /**
  * Created by Pete on 11.8.2014.

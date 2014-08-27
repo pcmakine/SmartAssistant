@@ -1,11 +1,6 @@
-package com.touchdown.app.smartassistant.newdb;
-
-import android.content.ContentValues;
+package com.touchdown.app.smartassistant.models;
 
 import com.touchdown.app.smartassistant.data.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Pete on 19.8.2014.

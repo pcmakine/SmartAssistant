@@ -10,10 +10,10 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.touchdown.app.smartassistant.newdb.Task;
-import com.touchdown.app.smartassistant.newdb.TriggerLocation;
-import com.touchdown.app.smartassistant.views.FetchAllLocationTasksTask;
-import com.touchdown.app.smartassistant.views.FetchTaskListListener;
+import com.touchdown.app.smartassistant.models.Task;
+import com.touchdown.app.smartassistant.models.TriggerLocation;
+import com.touchdown.app.smartassistant.data.AsyncTasks.FetchAllLocationTasksTask;
+import com.touchdown.app.smartassistant.data.AsyncTasks.FetchTaskListListener;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.newdb;
+package com.touchdown.app.smartassistant.data;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;

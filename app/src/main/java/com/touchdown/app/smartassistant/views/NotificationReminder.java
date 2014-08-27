@@ -1,15 +1,14 @@
-package com.touchdown.app.smartassistant.newdb;
+package com.touchdown.app.smartassistant.views;
 
 import android.content.ContentValues;
 
 import com.touchdown.app.smartassistant.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
+import com.touchdown.app.smartassistant.models.Action;
 import com.touchdown.app.smartassistant.views.AlarmNotification;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Pete on 19.8.2014.

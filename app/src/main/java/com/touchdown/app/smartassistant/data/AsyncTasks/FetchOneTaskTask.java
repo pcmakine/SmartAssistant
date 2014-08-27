@@ -1,15 +1,12 @@
-package com.touchdown.app.smartassistant.views;
+package com.touchdown.app.smartassistant.data.AsyncTasks;
 
 import android.os.AsyncTask;
-import android.view.View;
-import android.widget.LinearLayout;
 
 import com.touchdown.app.smartassistant.ApplicationContextProvider;
-import com.touchdown.app.smartassistant.newdb.Task;
-import com.touchdown.app.smartassistant.newdb.TaskManager;
+import com.touchdown.app.smartassistant.models.Task;
+import com.touchdown.app.smartassistant.services.TaskManager;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 /**
  * Created by Pete on 27.8.2014.
