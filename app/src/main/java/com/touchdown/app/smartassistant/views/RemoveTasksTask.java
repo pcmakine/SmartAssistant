@@ -30,7 +30,7 @@ public class RemoveTasksTask extends AsyncTask<List<Long>, Void, Boolean> {
     @Override
     protected Boolean doInBackground(List<Long>... params) {
         boolean success = true;
-        for(int i = 0; i < params.length; i++){
+        for(int i = 0; i < params[0].size(); i++){
             if(TaskManager.getInstance(ApplicationContextProvider.getAppContext()).removeTask(params[0].get(i)) != 1){
                 success = false;
             }

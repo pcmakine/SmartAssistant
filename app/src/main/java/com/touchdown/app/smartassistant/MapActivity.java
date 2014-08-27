@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +30,8 @@ import com.touchdown.app.smartassistant.services.Markers.MarkerManager;
 import com.touchdown.app.smartassistant.views.DetailsActivity;
 import com.touchdown.app.smartassistant.views.RemoveTasksListener;
 import com.touchdown.app.smartassistant.views.RemoveTasksTask;
+import com.touchdown.app.smartassistant.views.UpdateTaskListener;
+import com.touchdown.app.smartassistant.views.UpdateTaskTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +40,7 @@ import java.util.Observer;
 
 public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLongClickListener,
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMarkerDragListener, Observer, RemoveTasksListener{
+        GoogleMap.OnMarkerDragListener, Observer, RemoveTasksListener, UpdateTaskListener{
 
     public static final String LOG_TAG = MapActivity.class.getSimpleName();
 
@@ -278,7 +281,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             markerManager.selectMarker(marker);
             markerManager.updateRadiusLocation(marker);
             //markerManager.showRadius(marker);
-            taskManager.update(task);   //todo how to save the selected marker... the update will overwrite it
+            new UpdateTaskTask(this, false, false).execute(task);   //todo how to save the selected marker... the update will overwrite it
         }
     }
 
@@ -294,6 +297,25 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
 
     @Override
     public void removeSuccessful(boolean success) {
-        //todo do something
+        if(success){
+            Toast.makeText(this, R.string.remove_success, Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, R.string.remove_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void updateSuccessful(boolean success) {
+        if(success){
+            Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, R.string.update_error, Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public LinearLayout getOnProgressIndicator() {
+        return null;
     }
 }

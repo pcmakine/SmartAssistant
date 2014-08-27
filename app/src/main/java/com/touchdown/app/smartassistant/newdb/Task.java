@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import com.touchdown.app.smartassistant.data.Data;
 import com.touchdown.app.smartassistant.data.DbContract;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

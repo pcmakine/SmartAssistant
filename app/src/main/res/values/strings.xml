@@ -59,5 +59,9 @@
 
   <!--  PROGRESS INDICATOR-->
     <string name="fetching_data">Fetching data...</string>
+    <string name="update_success">Update successful</string>
+    <string name="update_error">An error occured, task not updated</string>
+    <string name="remove_success">Deleted successfully</string>
+    <string name="remove_error">An error occured, task not deleted</string>
 
 </resources>
