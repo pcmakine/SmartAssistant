@@ -24,16 +24,15 @@ import com.google.android.gms.maps.model.Marker;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.services.PendingTask;
-import com.touchdown.app.smartassistant.services.TaskActivator;
 import com.touchdown.app.smartassistant.services.TaskManager;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 import com.touchdown.app.smartassistant.services.MyLocationProvider;
-import com.touchdown.app.smartassistant.services.GeocoderTask;
-import com.touchdown.app.smartassistant.services.Markers.MarkerManager;
-import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksListener;
-import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksTask;
-import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskListener;
-import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskTask;
+import com.touchdown.app.smartassistant.data.asyncTasks.GeocoderTask;
+import com.touchdown.app.smartassistant.services.markers.MarkerManager;
+import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksListener;
+import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksTask;
+import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskListener;
+import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -313,15 +312,14 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     @Override
     public void updateSuccessful(boolean success) {
         if(success){
-            if(taskBeingUpdated.getLocation().isPending()){     //todo add null check
+/*            if(taskBeingUpdated.getLocation().isPending()){     //todo add null check
                 startService(new Intent(this, TaskActivator.class));
-                taskBeingUpdated = null;
-            }
+            taskBeingUpdated = null;
+        }*/
             Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this, R.string.update_error, Toast.LENGTH_SHORT).show();
         }
-
     }
 
     @Override

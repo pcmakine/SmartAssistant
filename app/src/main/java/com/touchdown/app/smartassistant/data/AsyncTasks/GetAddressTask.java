@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.services;
+package com.touchdown.app.smartassistant.data.asyncTasks;
 
 import android.location.Address;
 import android.location.Geocoder;
@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.R;
+import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.views.DetailsActivity;
 
 import java.io.IOException;

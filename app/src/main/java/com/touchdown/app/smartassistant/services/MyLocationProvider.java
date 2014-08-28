@@ -53,24 +53,22 @@ public class MyLocationProvider {
     }
 
     public boolean isUserInLocation(LatLng latLng, int radiusInMeters){
-        Location userLocation = getLocation();
+        return isLocationInArea(getLocation(), latLng, radiusInMeters);
+    }
 
-        float accuracy = userLocation.getAccuracy();
-
-        double userLat = userLocation.getLatitude();
-        double userLong = userLocation.getLongitude();
+    public boolean isLocationInArea(Location location, LatLng areaCenter, int radiusInMeters){
+        double locationLat = location.getLatitude();
+        double locationLong = location.getLongitude();
+        float accuracy = location.getAccuracy();
 
         float[] distance = new float[1];
-        Location.distanceBetween(userLat, userLong, latLng.latitude, latLng.longitude, distance);
+        Location.distanceBetween(locationLat, locationLong, areaCenter.latitude, areaCenter.longitude, distance);
 
         Log.d(LOG_TAG, "Accuracy: " + accuracy);
 
         Log.d(LOG_TAG, "Distance between user position and the task center: " +
                 distance[0] + ", radius: " + radiusInMeters);
 
-        if(distance[0] < radiusInMeters + accuracy){
-            return true;
-        }
-        return false;
+        return distance[0] < radiusInMeters + accuracy;
     }
 }

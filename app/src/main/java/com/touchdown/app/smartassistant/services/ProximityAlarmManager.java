@@ -32,17 +32,17 @@ public class ProximityAlarmManager {
         }
     }
 
-    public static void removeAlert(long reminderId){
+    public static void removeAlert(long taskId){
         LocationManager locationManager = (LocationManager) ApplicationContextProvider.getAppContext().getSystemService(Context.LOCATION_SERVICE);
-        PendingIntent pIndent = constructPendingIntent(reminderId);
+        PendingIntent pIndent = constructPendingIntent(taskId);
         locationManager.removeProximityAlert(pIndent);
     }
 
-    private static PendingIntent constructPendingIntent(long reminderId){
+    private static PendingIntent constructPendingIntent(long taskId){
         Intent intent = new Intent(PROX_ALERT_INTENT);
-        intent.putExtra("reminderID", reminderId);
+        intent.putExtra("reminderID", taskId);
         //todo handle the case where the reminder id has grown too much to fit into int
-        PendingIntent proximityIntent = PendingIntent.getBroadcast(ApplicationContextProvider.getAppContext(), (int) reminderId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent proximityIntent = PendingIntent.getBroadcast(ApplicationContextProvider.getAppContext(), (int) taskId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return proximityIntent;
     }
 

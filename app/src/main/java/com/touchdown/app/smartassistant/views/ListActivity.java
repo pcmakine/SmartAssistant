@@ -18,15 +18,11 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.services.TaskActivator;
-import com.touchdown.app.smartassistant.services.TaskActivatorKiller;
-import com.touchdown.app.smartassistant.services.Util;
-import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksListener;
-import com.touchdown.app.smartassistant.data.AsyncTasks.RemoveTasksTask;
+import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksListener;
+import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksTask;
 import com.touchdown.app.smartassistant.data.DbContract;
-import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.data.AsyncTasks.FetchAllDataListener;
-import com.touchdown.app.smartassistant.data.AsyncTasks.FetchAllDataTask;
+import com.touchdown.app.smartassistant.data.asyncTasks.FetchAllDataListener;
+import com.touchdown.app.smartassistant.data.asyncTasks.FetchAllDataTask;
 
 import java.util.ArrayList;
 import java.util.List;

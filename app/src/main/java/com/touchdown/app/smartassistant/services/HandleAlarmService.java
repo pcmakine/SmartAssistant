@@ -40,7 +40,15 @@ public class HandleAlarmService extends IntentService {
             task.executeActions();
             task.turnAllActionsOff();
             TaskManager.getInstance(this).update(task);
+        }else if(entering && taskHasLocationWithDepartureTrigger(task)){            //user is entering an area that has an active task with a departure trigger
+            removeProximityAlarmAndStartTrackingWhenUserExits(task);
         }
+    }
+
+    private void removeProximityAlarmAndStartTrackingWhenUserExits(Task task){
+        ProximityAlarmManager.removeAlert(task.getId());
+
+        startService(new Intent(this, DepartureTaskBroadcastAlarm.class));
     }
 
     private boolean taskHasLocationWithArrivalTrigger(Task task){

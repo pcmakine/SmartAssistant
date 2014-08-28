@@ -77,7 +77,12 @@
             android:exported="false" >
         </service>
         <service
-            android:name=".services.TaskActivatorKiller"
+            android:name=".services.LocationListenerManager"
+            android:exported="false" >
+        </service>
+        <service
+            android:name=".services.DepartureTaskBroadcastAlarm"
+            android:enabled="true"
             android:exported="false" >
         </service>
     </application>

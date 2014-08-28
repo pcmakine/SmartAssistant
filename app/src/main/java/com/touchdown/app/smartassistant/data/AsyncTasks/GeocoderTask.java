@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.services;
+package com.touchdown.app.smartassistant.data.asyncTasks;
 
 import android.content.Context;
 import android.location.Address;

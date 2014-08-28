@@ -1,6 +1,5 @@
 package com.touchdown.app.smartassistant.views;
 
-import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -11,31 +10,24 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.data.AsyncTasks.FetchOneTaskListener;
-import com.touchdown.app.smartassistant.data.AsyncTasks.FetchOneTaskTask;
-import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskListener;
-import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskTask;
+import com.touchdown.app.smartassistant.data.asyncTasks.FetchOneTaskListener;
+import com.touchdown.app.smartassistant.data.asyncTasks.FetchOneTaskTask;
+import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskListener;
+import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskTask;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
-import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.services.PendingTask;
-import com.touchdown.app.smartassistant.services.TaskActivator;
-import com.touchdown.app.smartassistant.services.MyLocationProvider;
 
 
 public class DetailsActivity extends ActionBarActivity implements AlarmFragment.OnFragmentInteractionListener,
         UpdateTaskListener, FetchOneTaskListener, LocationFragment.onFragmentInteractionListener {
     public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
-    public static TaskActivator locationHelper;
 
     private LatLng location;
     private String nameInput;
@@ -60,9 +52,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
     private void showUi(){
         setContentView(R.layout.activity_details);
-
         nameTw = (TextView) findViewById(R.id.contentToSave);
-       // radiusTW = (TextView) findViewById(R.id.radius);
     }
 
     private void prepareTaskRelatedUiElements(){
@@ -218,9 +208,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
     @Override
     public void updateSuccessful(boolean success) {
-        if(task.getLocation().isPending()){
-            startService(new Intent(this, TaskActivator.class));
-        }
         if(success){
             showSuccessMessage();
             onBackPressed();

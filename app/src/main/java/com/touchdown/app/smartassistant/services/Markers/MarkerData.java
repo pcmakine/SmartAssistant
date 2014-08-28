@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.services.Markers;
+package com.touchdown.app.smartassistant.services.markers;
 
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.Marker;

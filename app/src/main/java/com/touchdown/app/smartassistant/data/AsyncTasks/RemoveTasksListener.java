@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.data.AsyncTasks;
+package com.touchdown.app.smartassistant.data.asyncTasks;
 
 /**
  * Created by Pete on 26.8.2014.

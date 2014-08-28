@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.services.Markers;
+package com.touchdown.app.smartassistant.services.markers;
 
 import android.graphics.Color;
 import android.widget.LinearLayout;
@@ -12,8 +12,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
-import com.touchdown.app.smartassistant.data.AsyncTasks.FetchAllLocationTasksTask;
-import com.touchdown.app.smartassistant.data.AsyncTasks.FetchTaskListListener;
+import com.touchdown.app.smartassistant.data.asyncTasks.FetchAllLocationTasksTask;
+import com.touchdown.app.smartassistant.data.asyncTasks.FetchTaskListListener;
 
 import org.apache.commons.lang3.StringUtils;
 

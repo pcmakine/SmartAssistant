@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.services.Markers;
+package com.touchdown.app.smartassistant.services.markers;
 
 import java.util.Map;
 import java.util.TreeMap;

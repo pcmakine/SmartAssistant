@@ -24,7 +24,6 @@ public class ProximityIntentReceiver extends WakefulBroadcastReceiver {
             Toast.makeText(context, "Exited!!!", Toast.LENGTH_LONG).show();
         }
 
-
         Intent alarmServiceIntent = new Intent(context, HandleAlarmService.class);
         alarmServiceIntent.putExtras(intent.getExtras());
       //  alarmServiceIntent.putExtra("reminderID", intent.getLongExtra("reminderID", -1));

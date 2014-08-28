@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.data.AsyncTasks;
+package com.touchdown.app.smartassistant.data.asyncTasks;
 
 import android.os.AsyncTask;
 

@@ -13,6 +13,7 @@ import com.touchdown.app.smartassistant.data.TaskDao;
 import com.touchdown.app.smartassistant.data.WriterDao;
 import com.touchdown.app.smartassistant.models.Action;
 import com.touchdown.app.smartassistant.models.Task;
+import com.touchdown.app.smartassistant.services.LocationListenerManager;
 import com.touchdown.app.smartassistant.views.OnGoingNotification;
 
 import java.util.List;
@@ -92,7 +93,7 @@ public class TaskManager extends Observable{
 
         OnGoingNotification.updateNotification();
 
-        stopTaskActivatorIfNoPendingTasksLeft();
+        updateLocationListeners();
 
         return rowsAffected > 0;
     }
@@ -106,7 +107,7 @@ public class TaskManager extends Observable{
     }
 
     private void updateProximityAlarm(Task task){
-        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending() ){
+        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending()){
             ProximityAlarmManager.updateAlert(task);
         }else{
             ProximityAlarmManager.removeAlert(task.getId());
@@ -139,7 +140,7 @@ public class TaskManager extends Observable{
 
         OnGoingNotification.updateNotification();
 
-        stopTaskActivatorIfNoPendingTasksLeft();
+        updateLocationListeners();
         return rowsAffected;
     }
 
@@ -153,9 +154,9 @@ public class TaskManager extends Observable{
         clearChanged();
     }
 
-    private void stopTaskActivatorIfNoPendingTasksLeft() {
+    private void updateLocationListeners() {
         ApplicationContextProvider.getAppContext().startService(
-                new Intent(ApplicationContextProvider.getAppContext(), TaskActivatorKiller.class));
+                new Intent(ApplicationContextProvider.getAppContext(), LocationListenerManager.class));
     }
 
 }
