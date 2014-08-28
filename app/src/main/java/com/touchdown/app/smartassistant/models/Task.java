@@ -111,6 +111,10 @@ public class Task extends Data implements Comparable<Task>{
         return (TriggerLocation) trigger;
     }
 
+    public void setLocation(TriggerLocation location){
+        this.trigger = location;
+    }
+
     //todo check somewhere that this is a good way to implement equals
     @Override
     public boolean equals(Object obj){

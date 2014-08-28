@@ -116,7 +116,7 @@ public class TaskActivator extends Service {
                     MyLocationProvider locationProvider = new MyLocationProvider(TaskActivator.this);
 
                     boolean userStillInLocation = locationProvider.
-                            isUserInLocation(task.getLocation().getLatLng(), task.getLocation().getRadius());
+                            isUserInLocation(task.getLocation().getLatLng(), task.getLocation().getRadius());   //todo use the location provided by the onlocationchanged
                     if(!userStillInLocation){
                         task.getLocation().setPending(false);
                         TaskManager.getInstance(TaskActivator.this).update(task);                   //the updatefunction

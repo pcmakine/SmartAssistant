@@ -10,38 +10,14 @@
     android:orientation="vertical"
     >
 
-    <RelativeLayout
+    <FrameLayout
+        android:id = "@+id/titleFrame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >
-
-        <FrameLayout
-            android:id = "@+id/onSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            >
-            <include layout="@layout/compound_button"
-                />
-        </FrameLayout>
-
-        <TextView
-            android:id = "@+id/alarmTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:text="@string/alarm_action_title"
-            android:textSize = "@dimen/text_medium"/>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"
-            android:layout_alignParentBottom="true">
-        </View>
-    </RelativeLayout>
+        <include layout="@layout/fragments_title"
+            />
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="wrap_content"

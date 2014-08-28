@@ -6,10 +6,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.services.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
 
+import java.io.Serializable;
+
 /**
  * Created by Pete on 18.8.2014.
  */
-public class TriggerLocation extends Trigger {
+public class TriggerLocation extends Trigger implements Serializable {
     private static final String TABLE_NAME = DbContract.LocationEntry.TABLE_NAME;
     private static final String ID_COLUMN = DbContract.LocationEntry._ID;
 

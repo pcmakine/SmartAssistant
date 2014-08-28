@@ -206,8 +206,4 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
         Toast.makeText(this, "Task(s) deleted successfully", Toast.LENGTH_SHORT).show();
         getAllTasks(false);
     }
-
-    public void stopService(View view) {
-       startService(new Intent(this, TaskActivatorKiller.class));
-    }
 }

@@ -27,11 +27,27 @@ public class HandleAlarmService extends IntentService {
             if(id != -1){
                 TaskManager taskManager = TaskManager.getInstance(this);
                 Task task = taskManager.findTaskById(id);
-                task.executeActions();
-                task.turnAllActionsOff();
-                taskManager.update(task);
+
+                executeActions(entering, task);
             }
             ProximityIntentReceiver.completeWakefulIntent(intent);
         }
+    }
+
+    private void executeActions(boolean entering, Task task){
+        if((entering && taskHasLocationWithArrivalTrigger(task))
+                || (!entering && taskHasLocationWithDepartureTrigger(task))){
+            task.executeActions();
+            task.turnAllActionsOff();
+            TaskManager.getInstance(this).update(task);
+        }
+    }
+
+    private boolean taskHasLocationWithArrivalTrigger(Task task){
+        return task.getLocation() != null && task.getLocation().isArrivalTriggerOn();
+    }
+
+    private boolean taskHasLocationWithDepartureTrigger(Task task){
+        return task.getLocation() != null && task.getLocation().isDepartureTriggerOn();
     }
 }

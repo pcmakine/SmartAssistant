@@ -23,6 +23,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.models.Task;
+import com.touchdown.app.smartassistant.services.PendingTask;
+import com.touchdown.app.smartassistant.services.TaskActivator;
 import com.touchdown.app.smartassistant.services.TaskManager;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 import com.touchdown.app.smartassistant.services.MyLocationProvider;
@@ -49,6 +51,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     private boolean onCreateRan;
     private MyLocationProvider locProvider;
     private EditText addressField;
+    private Task taskBeingUpdated;
 
     // Google Map
     private GoogleMap googleMap;
@@ -281,6 +284,9 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
             markerManager.selectMarker(marker);
             markerManager.updateRadiusLocation(marker);
             //markerManager.showRadius(marker);
+
+            PendingTask.updatePendingStatus(task);
+            taskBeingUpdated = task;
             new UpdateTaskTask(this, false, false).execute(task);   //todo how to save the selected marker... the update will overwrite it
         }
     }
@@ -307,6 +313,10 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     @Override
     public void updateSuccessful(boolean success) {
         if(success){
+            if(taskBeingUpdated.getLocation().isPending()){     //todo add null check
+                startService(new Intent(this, TaskActivator.class));
+                taskBeingUpdated = null;
+            }
             Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this, R.string.update_error, Toast.LENGTH_SHORT).show();

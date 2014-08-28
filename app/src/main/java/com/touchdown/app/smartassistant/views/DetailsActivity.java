@@ -27,31 +27,20 @@ import com.touchdown.app.smartassistant.data.AsyncTasks.UpdateTaskTask;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
+import com.touchdown.app.smartassistant.services.PendingTask;
 import com.touchdown.app.smartassistant.services.TaskActivator;
 import com.touchdown.app.smartassistant.services.MyLocationProvider;
 
 
 public class DetailsActivity extends ActionBarActivity implements AlarmFragment.OnFragmentInteractionListener,
-        UpdateTaskListener, FetchOneTaskListener {
+        UpdateTaskListener, FetchOneTaskListener, LocationFragment.onFragmentInteractionListener {
     public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
     public static TaskActivator locationHelper;
 
-    private static final int MIN_RADIUS_METERS = 50;
-    private static final int MAX_RADIUS_METERS = 10000;
-    private static final int SEEKBAR_MULTIPLIER_BELOW_KILOMETER = 10;
-    private static final int SEEKBAR_MULTIPLIER_OVER_KILOMETER = 100;
-    private static final int SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD = 1000;
-
     private LatLng location;
     private String nameInput;
-    private SeekBar radiusBar;
-    private int radius;
-
-    private CheckBox entering;
-    private CheckBox leaving;
-
     private TextView nameTw;
-    private TextView radiusTW;
+
     private Task task;
     private boolean editMode;
 
@@ -69,64 +58,18 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         }
     }
 
-    private void setUpCheckBoxes(){
-        TriggerLocation loc = task.getLocation();
-        entering = (CheckBox) findViewById(R.id.enteringCheckBox);
-        entering.setChecked(loc.isArrivalTriggerOn());
-        setListenerForEnteringCheckBox();
-
-        leaving = (CheckBox) findViewById(R.id.leavingCheckBox);
-        leaving.setChecked(loc.isDepartureTriggerOn());
-        setListenerForLeavingCheckBox();
-    }
-
-    private void setListenerForEnteringCheckBox(){
-        entering.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(LOG_TAG, "entering checkbox checked value: " + isChecked);
-                TriggerLocation loc = task.getLocation();
-                if(isChecked){
-                    loc.turnOnArrivalTrigger();
-                }else{
-                    loc.turnOffArrivalTrigger();
-                }
-            }
-        });
-    }
-
-    private void setListenerForLeavingCheckBox(){
-        leaving.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(LOG_TAG, "leaving checkbox checked value: " + isChecked);
-                TriggerLocation loc = task.getLocation();
-                if(isChecked){
-                    loc.turnOnDepartureTrigger();
-                }else{
-                    loc.turnOffDepartureTrigger();
-                }
-            }
-        });
-    }
-
     private void showUi(){
         setContentView(R.layout.activity_details);
 
         nameTw = (TextView) findViewById(R.id.contentToSave);
-        radiusTW = (TextView) findViewById(R.id.radius);
+       // radiusTW = (TextView) findViewById(R.id.radius);
     }
 
     private void prepareTaskRelatedUiElements(){
-        setUpSeekBar();
-        FragmentManager fManager = getSupportFragmentManager();
-        Fragment alarmFragment = fManager.findFragmentById(R.id.fragment_container);
-        if(alarmFragment != null && alarmFragment.isInLayout()){
-            //dont do anything
-        }else{
-            addAlarmFragment();
-        }
-        setUpCheckBoxes();
+        addLocationFragment();
+        addAlarmFragment();
+     //   setUpSeekBar();
+      //  setUpCheckBoxes();
     }
 
     private boolean noReminderIdInExtras(Intent intent){
@@ -137,7 +80,9 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         showUi();
         this.location = getIntent().getParcelableExtra("location");
         if(location != null){
-            this.task = new Task(-1, "", new TriggerLocation(-1, location, radius, -1), new NotificationReminder(-1, 0, "", true, -1));
+            this.task = new Task(-1, "",
+                    new TriggerLocation(-1, location, TriggerLocation.DEFAULT_RADIUS, -1),
+                    new NotificationReminder(-1, 0, "", true, -1));
         }else{
         }
         editMode = false;
@@ -153,69 +98,11 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         prepareTaskRelatedUiElements();
     }
 
-    private int metersToProgress(int meters){
-        if(meters <= SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD){
-            return meters/SEEKBAR_MULTIPLIER_BELOW_KILOMETER - MIN_RADIUS_METERS/SEEKBAR_MULTIPLIER_BELOW_KILOMETER;
-        }
-        return metersToProgress(SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD) +
-                (meters - SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD) / SEEKBAR_MULTIPLIER_OVER_KILOMETER;
-
-    }
-
-    private void setUpSeekBar(){
-        radiusBar = (SeekBar)findViewById(R.id.seekBar);
-        TriggerLocation location = (TriggerLocation) task.getTrigger();
-        if(location != null){
-            int rad = location.getRadius();
-            radiusBar.setProgress(metersToProgress(rad));
-        }
-
-        radiusBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int progressMultiplierTreshold = metersToProgress(SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD); //SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD/SEEKBAR_MULTIPLIER_BELOW_KILOMETER - MIN_RADIUS_METERS;
-
-                if(progress < progressMultiplierTreshold){
-                    radius = progress * SEEKBAR_MULTIPLIER_BELOW_KILOMETER + MIN_RADIUS_METERS;
-                }else{
-                    radius = SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD + (progress - progressMultiplierTreshold) * SEEKBAR_MULTIPLIER_OVER_KILOMETER;
-                }
-                radiusTW.setText(getRadiusText());
-                TriggerLocation location = (TriggerLocation) task.getTrigger();
-                if(location != null){
-                    location.setRadius(radius);
-                }
-            }
-
-            private String getRadiusText(){
-                if(radius < 1000){
-                    return getResources().getString(R.string.radius) + " " + radius + " "  +
-                            getResources().getString(R.string.meters);
-                }else{
-                    return  getResources().getString(R.string.radius) + " " + 1.0*radius/1000*1.0 + " " +
-                            getResources().getString(R.string.kilometers);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        int progressUntilTreshold = SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD / SEEKBAR_MULTIPLIER_BELOW_KILOMETER;
-        int progressFromTresholdToMaxRadius = (MAX_RADIUS_METERS - SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD) / SEEKBAR_MULTIPLIER_OVER_KILOMETER;
-        int maxValue = progressUntilTreshold + progressFromTresholdToMaxRadius - MIN_RADIUS_METERS / SEEKBAR_MULTIPLIER_BELOW_KILOMETER;
-        radiusBar.setMax(maxValue);
-    }
-
     public void addOrUpdate(View view){
         nameInput = nameTw.getText().toString();
         task.setName(nameInput);
         if(!displayErrorToastOnEmptyName(nameInput) && !displayErrorToastOnNoActions()){
-            updatePendingStatus();
+            task = PendingTask.updatePendingStatus(task);
             if(editMode){
                 updateTask();
             }else{
@@ -240,14 +127,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         return false;
     }
 
-    private void updatePendingStatus(){
-        if(TaskActivator.startIfNeeded(task)){
-            task.getLocation().setPending(true);
-        }else{
-            task.getLocation().setPending(false);
-        }
-    }
-
     private void updateTask(){
         new UpdateTaskTask(this, false,false).execute(task);    //second false for updatetask
     }
@@ -257,17 +136,44 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         new UpdateTaskTask(this, false, true).execute(task);                  //true for insert task
     }
 
+    public void addLocationFragment(){
+        FragmentManager fManager = getSupportFragmentManager();
+        Fragment locationFragment = fManager.findFragmentById(R.id.locationFragmentContainer);
+
+        if(locationFragment != null && locationFragment.isInLayout()){
+            //dont do anything
+        }else{
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+            fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit);
+
+            locationFragment = LocationFragment.createFragment(task.getLocation());
+
+            fragmentTransaction.add(R.id.locationFragmentContainer, locationFragment, "HELLO");
+            fragmentTransaction.commit();
+
+        }
+    }
+
     public void addAlarmFragment(){
+        FragmentManager fManager = getSupportFragmentManager();
+        Fragment alarmFragment = fManager.findFragmentById(R.id.fragment_container);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if(alarmFragment != null && alarmFragment.isInLayout()){
+            //dont do anything
+        }else{
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit);
+            fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit);
 
-        AlarmFragment alarmFragment = AlarmFragment.createFragment(task.getAlarm());
+            alarmFragment = AlarmFragment.createFragment(task.getAlarm());
 
-        fragmentTransaction.add(R.id.fragment_container, alarmFragment, "HELLO");
-        fragmentTransaction.commit();
+            fragmentTransaction.add(R.id.fragment_container, alarmFragment, "HELLO");
+            fragmentTransaction.commit();
+
+        }
     }
 
     @Override
@@ -311,12 +217,10 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     }
 
     @Override
-    public void onFragmentInteraction(NotificationReminder alarm) {
-        task.addAction(alarm);
-    }
-
-    @Override
     public void updateSuccessful(boolean success) {
+        if(task.getLocation().isPending()){
+            startService(new Intent(this, TaskActivator.class));
+        }
         if(success){
             showSuccessMessage();
             onBackPressed();
@@ -350,6 +254,16 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     public void deliverTask(Task task) {
         showUi();
         useExistingReminder(task);
+    }
+
+    @Override
+    public void onFragmentInteraction(NotificationReminder alarm) {
+        task.addAction(alarm);
+    }
+
+    @Override
+    public void onFragmentInteraction(TriggerLocation location) {
+        task.setLocation(location);
     }
 }
 

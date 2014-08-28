@@ -44,13 +44,11 @@ public class AlarmFragment extends Fragment {
         if (getArguments() != null) {
             alarm = (NotificationReminder) getArguments().getSerializable("alarm");
         }
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-      //  alarm = (ActionReminder) getArguments().getSerializable("alarm");
 
         // Inflate the layout for this fragment
         LinearLayout ll =  (LinearLayout) inflater.inflate(R.layout.fragment_alarm, container, false);
@@ -74,7 +72,6 @@ public class AlarmFragment extends Fragment {
         });
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void passUpdatedReminderToParentActivity(NotificationReminder reminder) {
         if (mListener != null) {
             mListener.onFragmentInteraction(reminder);

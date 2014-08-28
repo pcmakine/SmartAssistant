@@ -4,6 +4,8 @@ import android.content.ContentValues;
 
 import com.touchdown.app.smartassistant.data.Data;
 
+import java.io.Serializable;
+
 
 /**
  * Created by Pete on 18.8.2014.

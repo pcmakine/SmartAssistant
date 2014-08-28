@@ -92,6 +92,8 @@ public class TaskManager extends Observable{
 
         OnGoingNotification.updateNotification();
 
+        stopTaskActivatorIfNoPendingTasksLeft();
+
         return rowsAffected > 0;
     }
 
@@ -104,7 +106,7 @@ public class TaskManager extends Observable{
     }
 
     private void updateProximityAlarm(Task task){
-        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending()){
+        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending() ){
             ProximityAlarmManager.updateAlert(task);
         }else{
             ProximityAlarmManager.removeAlert(task.getId());
@@ -136,6 +138,8 @@ public class TaskManager extends Observable{
         ProximityAlarmManager.removeAlert(id);
 
         OnGoingNotification.updateNotification();
+
+        stopTaskActivatorIfNoPendingTasksLeft();
         return rowsAffected;
     }
 
@@ -147,6 +151,11 @@ public class TaskManager extends Observable{
         setChanged();
         notifyObservers();
         clearChanged();
+    }
+
+    private void stopTaskActivatorIfNoPendingTasksLeft() {
+        ApplicationContextProvider.getAppContext().startService(
+                new Intent(ApplicationContextProvider.getAppContext(), TaskActivatorKiller.class));
     }
 
 }

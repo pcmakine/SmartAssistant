@@ -1,0 +1,60 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id = "@+id/triggerContainer"
+    android:background="@drawable/layout_bg"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation = "vertical"
+    tools:context=".views.LocationFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "@string/location_trigger_title"
+        android:textSize="@dimen/text_medium"
+        />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray">
+
+    </View>
+
+    <SeekBar
+        android:layout_marginTop="@dimen/margin_between_items"
+        android:id = "@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="500"
+        />
+
+    <TextView
+        android:id = "@+id/radius"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <CheckBox
+            android:id = "@+id/leavingCheckBox"
+            style = "@style/checkBox"
+            android:text = "@string/exiting"
+            android:layout_alignParentRight="true">
+        </CheckBox>
+
+        <CheckBox
+            android:id = "@+id/enteringCheckBox"
+            style = "@style/checkBox"
+            android:text = "@string/entering"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@id/leavingCheckBox"
+            >
+
+        </CheckBox>
+
+    </RelativeLayout>
+</LinearLayout>
