@@ -102,7 +102,7 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
     }
 
     public void viewMap(){
-        Intent intent = new Intent(this, MapActivity.class);
+        Intent intent = new Intent(this, Map.class);
         startActivity(intent);
     }
 

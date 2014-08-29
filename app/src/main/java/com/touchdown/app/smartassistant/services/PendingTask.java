@@ -24,7 +24,8 @@ public class PendingTask {
     public static boolean shouldBePending(Task task){
         Context ctx = ApplicationContextProvider.getAppContext();
         MyLocationProvider locationProvider = new MyLocationProvider(ctx);
-        if(task.isActive() && locationProvider.isUserInLocation(task.getLocation().getLatLng(), task.getLocation().getRadius())){
+        if(task.isActive() && task.getLocation().isArrivalTriggerOn() &&
+                locationProvider.isUserInLocation(task.getLocation().getLatLng(), task.getLocation().getRadius())){
             return true;
         }
         return false;

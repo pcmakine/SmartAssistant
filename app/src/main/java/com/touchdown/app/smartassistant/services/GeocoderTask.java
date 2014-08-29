@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.data.asyncTasks;
+package com.touchdown.app.smartassistant.services;
 
 import android.content.Context;
 import android.location.Address;
@@ -28,9 +28,9 @@ public class GeocoderTask extends AsyncTask<String, Void, List<Address>> {
     private Context ctx;
     LatLng latLng;
     MarkerOptions markerOptions;
-    MapActivity activity;
+    GeocoderListener activity;
 
-    public GeocoderTask(GoogleMap map, Context ctx, MapActivity activity){
+    public GeocoderTask(GoogleMap map, Context ctx, GeocoderListener activity){
         this.map = map;
         this.ctx = ctx;
         this.activity = activity;

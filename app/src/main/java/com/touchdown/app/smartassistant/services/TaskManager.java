@@ -107,7 +107,7 @@ public class TaskManager extends Observable{
     }
 
     private void updateProximityAlarm(Task task){
-        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending()){
+        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending() && task.getLocation().isArrivalTriggerOn()){
             ProximityAlarmManager.updateAlert(task);
         }else{
             ProximityAlarmManager.removeAlert(task.getId());

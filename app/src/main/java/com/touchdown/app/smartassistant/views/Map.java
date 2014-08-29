@@ -22,27 +22,27 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.services.GeocoderListener;
-import com.touchdown.app.smartassistant.services.PendingTask;
-import com.touchdown.app.smartassistant.services.TaskManager;
-import com.touchdown.app.smartassistant.models.TriggerLocation;
-import com.touchdown.app.smartassistant.services.MyLocationProvider;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
-import com.touchdown.app.smartassistant.services.markers.MarkerManager;
 import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksTask;
 import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskTask;
+import com.touchdown.app.smartassistant.models.Task;
+import com.touchdown.app.smartassistant.models.TriggerLocation;
+import com.touchdown.app.smartassistant.services.MyLocationProvider;
+import com.touchdown.app.smartassistant.services.PendingTask;
+import com.touchdown.app.smartassistant.services.TaskManager;
+import com.touchdown.app.smartassistant.services.markers.MarkerManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLongClickListener,
+public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickListener,
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMarkerDragListener, Observer, RemoveTasksListener, UpdateTaskListener, GeocoderListener{
+        GoogleMap.OnMarkerDragListener, Observer, RemoveTasksListener, UpdateTaskListener, GeocoderListener {
 
     public static final String LOG_TAG = MapActivity.class.getSimpleName();
 
@@ -71,7 +71,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                 EditText locationInput = (EditText) findViewById(R.id.locationInput);
                 String location = locationInput.getText().toString();
                 if(location!=null && !location.equals("")){
-                    new GeocoderTask(googleMap, getBaseContext(), MapActivity.this).execute(location);
+                    new GeocoderTask(googleMap, getBaseContext(), Map.this).execute(location);
                 }
             }
         });
@@ -125,8 +125,10 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
     }
 
     private void animateToLocation(android.location.Location loc){
-        CameraPosition pos = new CameraPosition.Builder().target(new LatLng(loc.getLatitude(), loc.getLongitude())).zoom(15).build();
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos));
+        if(loc != null){
+            CameraPosition pos = new CameraPosition.Builder().target(new LatLng(loc.getLatitude(), loc.getLongitude())).zoom(15).build();
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(pos));
+        }
     }
 
     public void setMarker(Marker marker){
@@ -200,7 +202,7 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
                         long id = markerManager.getTask(markerManager.getSelectedMarker()).getId();
                         markerManager.removeSelectedMarker();
 
-                       // taskManager.removeTask(id);
+                        // taskManager.removeTask(id);
                         removeTask(id);
                         supportInvalidateOptionsMenu();
                     }
@@ -328,3 +330,5 @@ public class MapActivity extends ActionBarActivity implements GoogleMap.OnMapLon
         return null;
     }
 }
+
+
