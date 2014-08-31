@@ -7,14 +7,15 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.touchdown.app.smartassistant.R;
+import com.touchdown.app.smartassistant.models.Alarm;
 
 /**
  * Created by Pete on 11.8.2014.
  */
 public class AlarmNotification extends AbstractNotif {
 
-    public AlarmNotification(Context context, NotificationReminder reminder){
-        super(context, reminder);
+    public AlarmNotification(Context context, Alarm alarm){
+        super(context, alarm);
     }
 
     @Override
@@ -26,7 +27,7 @@ public class AlarmNotification extends AbstractNotif {
                 .setVibrate(new long[] {0, 1000, 500, 1000, 500, 1000})
                // .setDefaults(Notification.DEFAULT_SOUND)
                 .setSound(alarmSound)
-                .setContentText(mReminder.getContent())
+                .setContentText(mAlarm.getContent())
                 .setSmallIcon(R.drawable.ic_drawer)
                 .setAutoCancel(true)
                 .setContentIntent(getMapActivityIntent())

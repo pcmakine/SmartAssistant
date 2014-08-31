@@ -13,8 +13,10 @@ public class DbContract {
         public static final String TABLE_NAME = "reminder";
         public static final String COLUMN_NAME_CONTENT = "content";
         public static final String COLUMN_NAME_ON = "alarm_on";
-        public static final String COLUMN_NAME_TASK_ID = "reminderTaskId";
         public static final String COLUMN_NAME_TYPE = "actionType";
+        public static final String COLUMN_NAME_NOTIFICATION_ENABLED = "notification";
+        public static final String COLUMN_NAME_FULLSCREEN_ENABLED = "fullscreen";
+        public static final String COLUMN_NAME_TASK_ID = "reminderTaskId";
     }
 
     public static final class TaskEntry implements BaseColumns {

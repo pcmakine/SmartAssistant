@@ -18,9 +18,9 @@ import java.util.List;
  */
 public abstract class LocationListenerService extends Service {
     public static final String LOG_TAG = LocationListenerService.class.getSimpleName();
-    protected static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 10; // in Meters
+    protected static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 30; // in Meters
     protected static final long HOUR_IN_MS = 1000*60*60;
-    protected static final long SECOND = 1000;
+    protected static final long TEN_SECONDS = 1000 * 10;
 
     protected TaskManager taskManager;
     protected List<Task> tasks;
@@ -51,14 +51,14 @@ public abstract class LocationListenerService extends Service {
         if(testingOnEmulator){
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    SECOND,
+                    TEN_SECONDS,
                     MINIMUM_DISTANCE_CHANGE_FOR_UPDATES,
 
                     createListener(),
                     null);
         }else{
             locationManager.requestLocationUpdates(
-                    SECOND,
+                    TEN_SECONDS,
                     MINIMUM_DISTANCE_CHANGE_FOR_UPDATES,
                     criteria,
                     createListener(),

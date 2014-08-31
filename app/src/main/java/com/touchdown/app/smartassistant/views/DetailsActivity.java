@@ -20,6 +20,7 @@ import com.touchdown.app.smartassistant.data.asyncTasks.FetchOneTaskListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.FetchOneTaskTask;
 import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskTask;
+import com.touchdown.app.smartassistant.models.Alarm;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 import com.touchdown.app.smartassistant.services.PendingTask;
@@ -72,7 +73,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         if(location != null){
             this.task = new Task(-1, "",
                     TriggerLocation.createDefaultLocation(location),
-                    new NotificationReminder(-1, 0, "", true, -1));
+                    Alarm.createDefaultAlarm());
         }else{
         }
         editMode = false;
@@ -135,7 +136,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit);
+            fragmentTransaction.setCustomAnimations(R.anim.pop_out, R.anim.exit);
 
             locationFragment = LocationFragment.createFragment(task.getLocation());
 
@@ -155,7 +156,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit);
+            fragmentTransaction.setCustomAnimations(R.anim.pop_out, R.anim.exit);
 
             alarmFragment = AlarmFragment.createFragment(task.getAlarm());
 
@@ -208,15 +209,18 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     @Override
     public void updateSuccessful(boolean success) {
         if(success){
-            showSuccessMessage();
+            Log.d(LOG_TAG, "Update successful");
+         //   showSuccessMessage();
             onBackPressed();
         }else{
-            showErrorMessage();
+            Log.d(LOG_TAG, "Something went wrong, not updated");
+          //  showErrorMessage();
         }
     }
 
     private void showSuccessMessage(){
         if(editMode){
+            Log.d(LOG_TAG, "Update successful");
             Toast.makeText(this, R.string.update_success, Toast.LENGTH_LONG).show();
         }else{
             Toast.makeText(this, R.string.successfully_added, Toast.LENGTH_LONG).show();
@@ -243,7 +247,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     }
 
     @Override
-    public void onFragmentInteraction(NotificationReminder alarm) {
+    public void onFragmentInteraction(Alarm alarm) {
         task.addAction(alarm);
     }
 

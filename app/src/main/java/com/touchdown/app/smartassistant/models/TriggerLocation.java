@@ -15,7 +15,7 @@ public class TriggerLocation extends Trigger implements Serializable {
     private static final String TABLE_NAME = DbContract.LocationEntry.TABLE_NAME;
     private static final String ID_COLUMN = DbContract.LocationEntry._ID;
 
-    public static final int DEFAULT_RADIUS = 100;
+    public static final int DEFAULT_RADIUS = 200;
     public static final int TRIGGER_TYPE = 0;
 
     private LatLng latLng;

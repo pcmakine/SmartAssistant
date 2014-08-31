@@ -4,7 +4,6 @@ import android.content.ContentValues;
 
 import com.touchdown.app.smartassistant.data.Data;
 import com.touchdown.app.smartassistant.data.DbContract;
-import com.touchdown.app.smartassistant.views.NotificationReminder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -97,10 +96,10 @@ public class Task extends Data implements Comparable<Task>{
         }
     }
 
-    public NotificationReminder getAlarm(){
+    public Alarm getAlarm(){
         for(Action action: actions){
             if(action.getType() == 0){
-                return (NotificationReminder) action;
+                return (Alarm) action;
             }
         }
 

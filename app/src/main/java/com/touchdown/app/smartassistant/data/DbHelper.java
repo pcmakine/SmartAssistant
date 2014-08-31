@@ -36,6 +36,8 @@ public class DbHelper extends SQLiteOpenHelper{
                 ReminderEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL UNIQUE, " +
                 ReminderEntry.COLUMN_NAME_ON + " INTEGER NOT NULL, " +
                 ReminderEntry.COLUMN_NAME_TYPE + " INTEGER NOT NULL, " +
+                ReminderEntry.COLUMN_NAME_NOTIFICATION_ENABLED + " INTEGER NOT NULL, " +
+                ReminderEntry.COLUMN_NAME_FULLSCREEN_ENABLED + " INTEGER NOT NULL, " +
                 " FOREIGN KEY (" + ReminderEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
                 TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ")" +
                 " ON DELETE CASCADE)";

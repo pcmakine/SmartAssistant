@@ -6,10 +6,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
 import com.touchdown.app.smartassistant.R;
+import com.touchdown.app.smartassistant.models.Alarm;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,9 +27,11 @@ public class AlarmFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private CompoundButton onSwitch;
-    private NotificationReminder alarm;
+    private Alarm alarm;
+    private CheckBox fullScreenAlarm;
+    private CheckBox notificationAlarm;
 
-    public static AlarmFragment createFragment(NotificationReminder alarm) {
+    public static AlarmFragment createFragment(Alarm alarm) {
         AlarmFragment fragment = new AlarmFragment();
         Bundle args = new Bundle();
         args.putSerializable("alarm", alarm);
@@ -42,7 +46,7 @@ public class AlarmFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            alarm = (NotificationReminder) getArguments().getSerializable("alarm");
+            alarm = (Alarm) getArguments().getSerializable("alarm");
         }
     }
 
@@ -54,6 +58,11 @@ public class AlarmFragment extends Fragment {
         LinearLayout ll =  (LinearLayout) inflater.inflate(R.layout.fragment_alarm, container, false);
         onSwitch = (CompoundButton) ll.findViewById(R.id.myswitch);
         setUpCompoundButton();
+
+        notificationAlarm = (CheckBox) ll.findViewById(R.id.notificationAlarm);
+        fullScreenAlarm = (CheckBox) ll.findViewById(R.id.fullscreenAlarm);
+        setUpCheckBoxes();
+
         return ll;
     }
 
@@ -72,9 +81,41 @@ public class AlarmFragment extends Fragment {
         });
     }
 
-    public void passUpdatedReminderToParentActivity(NotificationReminder reminder) {
+    private void setUpCheckBoxes(){
+        notificationAlarm.setChecked(alarm.isNotificationEnabled());
+        fullScreenAlarm.setChecked(alarm.isFullScreenEnabled());
+
+        notificationAlarm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!neitherOptionChosen(buttonView)){
+                    alarm.enableNotification(isChecked);
+                }
+            }
+        });
+
+        fullScreenAlarm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!neitherOptionChosen(buttonView)){
+                    alarm.enableFullScreen(isChecked);
+                }
+            }
+        });
+    }
+
+    private boolean neitherOptionChosen(CompoundButton toggled){
+        if(!notificationAlarm.isChecked() && !fullScreenAlarm.isChecked()){
+            toggled.setChecked(true);
+            return true;
+        }
+        return false;
+    }
+
+
+    public void passUpdatedReminderToParentActivity(Alarm alarm) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(reminder);
+            mListener.onFragmentInteraction(alarm);
         }
     }
 
@@ -106,7 +147,7 @@ public class AlarmFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(NotificationReminder reminder);
+        public void onFragmentInteraction(Alarm alarm);
     }
 
 }

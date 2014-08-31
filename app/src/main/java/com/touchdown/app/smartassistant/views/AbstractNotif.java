@@ -7,16 +7,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.TaskStackBuilder;
 
+import com.touchdown.app.smartassistant.models.Alarm;
+
 /**
  * Created by Pete on 16.8.2014.
  */
 public abstract class AbstractNotif {
     private static final long NOTIFICATION_ID = 100;
-    protected NotificationReminder mReminder;
+    protected Alarm mAlarm;
     protected Context mContext;
 
-    public AbstractNotif(Context context, NotificationReminder reminder){
-        this.mReminder = reminder;
+    public AbstractNotif(Context context, Alarm alarm){
+        this.mAlarm = alarm;
         this.mContext = context.getApplicationContext();
     }
 
@@ -26,7 +28,7 @@ public abstract class AbstractNotif {
         NotificationManager notificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = createNotification();
-        long notificationId = mReminder == null ? NOTIFICATION_ID: mReminder.getId();
+        long notificationId = mAlarm == null ? NOTIFICATION_ID: mAlarm.getId();
         notificationManager.notify((int) notificationId, notification);
     }
 
@@ -51,7 +53,7 @@ public abstract class AbstractNotif {
     public void cancelNotification(){
         if (Context.NOTIFICATION_SERVICE!=null) {
             NotificationManager nMgr = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            long notificationId = mReminder == null ? NOTIFICATION_ID: mReminder.getId();
+            long notificationId = mAlarm == null ? NOTIFICATION_ID: mAlarm.getId();
             nMgr.cancel((int) notificationId);
         }
     }

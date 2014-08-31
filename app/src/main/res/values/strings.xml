@@ -48,20 +48,20 @@
     <string name="wifi">Wifi</string>
     <string name="ringtone_volume">Ringtone volume</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string name="notification_reminder_action_title">Notification</string>
-
     <string name="location_trigger_title">Location trigger</string>
     <string name="entering">Entering</string>
     <string name="exiting">Leaving</string>
     <string name="alarm_action_title">Action: alarm</string>
     <string name="fullscreen_alarm_title">Fullscreen alarm</string>
 
-  <!--  PROGRESS INDICATOR-->
+    <!-- PROGRESS INDICATOR -->
     <string name="fetching_data">Fetching data...</string>
     <string name="update_success">Update successful</string>
     <string name="update_error">An error occured, task not updated</string>
     <string name="remove_success">Deleted successfully</string>
     <string name="remove_error">An error occured, task not deleted</string>
+    <string name="title_activity_fullscreen_alarm">FullscreenAlarmActivity</string>
+    <string name="stop_alarm">Stop alarm</string>
 
 </resources>

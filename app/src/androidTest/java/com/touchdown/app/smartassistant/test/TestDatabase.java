@@ -7,13 +7,14 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.touchdown.app.smartassistant.data.DatabaseManager;
+import com.touchdown.app.smartassistant.models.Alarm;
 import com.touchdown.app.smartassistant.services.Util;
 import com.touchdown.app.smartassistant.data.DbContract.LocationEntry;
 import com.touchdown.app.smartassistant.data.DbContract.TaskEntry;
 import com.touchdown.app.smartassistant.data.DbContract.ReminderEntry;
 
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.views.NotificationReminder;
 import com.touchdown.app.smartassistant.data.ActionReminderDao;
 import com.touchdown.app.smartassistant.data.LocDao;
 import com.touchdown.app.smartassistant.models.Task;
@@ -40,11 +41,11 @@ public class TestDatabase extends AndroidTestCase {
     private ActionReminderDao reminderDao;
     private LocDao locationDao;
 
-    private TaskManager taskManager;
+    private DatabaseManager dbManager;
 
     @Override
     public void setUp(){
-        taskManager = TaskManager.getInstance(mContext);
+        dbManager = new DatabaseManager(mContext);
         this.dbHelper = DbHelper.getInstance(mContext);
         Util.clearDb(mContext, dbHelper);
 
@@ -56,16 +57,15 @@ public class TestDatabase extends AndroidTestCase {
     }
 
     public void testInsertActionDirectlyInTheDatabase(){
-        NotificationReminder reminder = getDefaultTestReminder();
+        Alarm alarm = getDefaultTestReminder();
         TriggerLocation testLocation = getDefaultTestLocation();
 
-        Task task = new Task(-1, "testTask", testLocation, reminder);
+        Task task = new Task(-1, "testTask", testLocation, alarm);
 
         long taskId = wDao.insert(task);
-        reminder.setTaskId(taskId);
-        long reminderId = wDao.insert(reminder);
+        task.setIdForThisAndChildObjects(taskId);
 
-        testLocation.setActionId(taskId);
+        long reminderId = wDao.insert(alarm);
         long locId = wDao.insert(testLocation);
 
         assertTrue(taskId != -1);
@@ -73,20 +73,18 @@ public class TestDatabase extends AndroidTestCase {
         assertTrue(locId != -1);
     }
 
-    public void testInsertLocation(){
-
-        long id = insertDefaultLocation();
-        assertTrue(id != -1);
-    }
-
     private long insertDefaultLocation(){
+        TriggerLocation loc =  TriggerLocation.createDefaultLocation(new LatLng(TEST_LAT, TEST_LONG));
+        Alarm alarm = Alarm.createDefaultAlarm();
+        Task task = new Task(-1, "test",loc, alarm);
 
-        TriggerLocation location = getDefaultTestLocation();
+        long id = wDao.insert(task);
+        task.setIdForThisAndChildObjects(id);
 
-        List<Task> tasks = insertTwoTasks("f", "s");
+        long locId = wDao.insert(loc);
+        wDao.insert(alarm);
 
-        location.setActionId(tasks.get(0).getId());
-        return wDao.insert(location);
+       return locId;
     }
 
     public void testGetLocation(){
@@ -131,7 +129,7 @@ public class TestDatabase extends AndroidTestCase {
 
     public void testGetAllTasks(){
         insertTwoTasks("first test task", "second test task");
-        List<Task> tasks = taskManager.getAllTasks();
+        List<Task> tasks = dbManager.getAllTasks();
 
         assertTrue(tasks.size() == 2);
 
@@ -146,7 +144,7 @@ public class TestDatabase extends AndroidTestCase {
     private List<Task> insertTwoTasks(String firstName, String secondName){
         List<Task> list = new ArrayList<Task>();
         Task task = new Task(-1, firstName, getDefaultTestLocation(), getDefaultTestReminder());
-        long id = taskManager.insert(task);
+        long id = dbManager.insertTask(task);
 
         task.setIdForThisAndChildObjects(id);
 
@@ -154,7 +152,7 @@ public class TestDatabase extends AndroidTestCase {
         assertTrue(id != -1);
 
         Task secondTask = new Task(-1, secondName, getDefaultTestLocation(), getDefaultTestReminder());
-        id = taskManager.insert(secondTask);
+        id = dbManager.insertTask(secondTask);
 
         secondTask.setIdForThisAndChildObjects(id);
         list.add(secondTask);
@@ -167,42 +165,42 @@ public class TestDatabase extends AndroidTestCase {
     public void testUpdateWorks(){
         Task task = new Task(-1, "original name", getDefaultTestLocation(), getDefaultTestReminder());
 
-        long id = taskManager.insert(task);
+        long id = dbManager.insertTask(task);
 
         assertTrue(id != -1);
 
-        task = taskManager.findTaskById(id);
+        task = dbManager.findTaskById(id);
 
         task.setName("modified name");
 
         TriggerLocation location = (TriggerLocation) task.getLocation();
         LatLng testLoc = new LatLng(90, 90);
 
-        NotificationReminder reminder = (NotificationReminder) task.getActions().get(0);
-        reminder.setContent("modified content");
+        Alarm alarm = (Alarm) task.getActions().get(0);
+        alarm.setContent("modified content");
 
         location.setLatLng(testLoc);
 
-        taskManager.update(task);
+        dbManager.updateTask(task);
 
-        task = taskManager.findTaskById(id);
+        task = dbManager.findTaskById(id);
 
         assertEquals("modified name", task.getName());
 
         LatLng taskLoc = ((TriggerLocation) task.getTrigger()).getLatLng();
         assertEquals(taskLoc, testLoc);
 
-        NotificationReminder modReminder = (NotificationReminder) task.getActions().get(0);
+        Alarm modAlarm = (Alarm) task.getActions().get(0);
 
-        assertEquals("modified content", modReminder.getContent());
+        assertEquals("modified content", modAlarm.getContent());
     }
 
     public void testRemoveWorks(){
         List<Task> tasks = insertTwoTasks("first", "second");
 
-        int rowsAffected = taskManager.removeTask(tasks.get(0).getId());
+        int rowsAffected = dbManager.removeTask(tasks.get(0).getId());
 
-        Cursor cursor = taskManager.getAllTaskData();
+        Cursor cursor = dbManager.getAllTaskData();
 
         int numberOfRemindersInDb = reminderDao.getAll(ReminderEntry.TABLE_NAME,
                 ReminderEntry._ID).getCount();
@@ -214,10 +212,10 @@ public class TestDatabase extends AndroidTestCase {
 
         assertTrue(numberOfRemindersInDb == 1);
 
-        rowsAffected = taskManager.removeTask(tasks.get(1).getId());
+        rowsAffected = dbManager.removeTask(tasks.get(1).getId());
 
         assertTrue(rowsAffected == 1);
-        assertTrue(taskManager.getAllTaskData().getCount() == 0);
+        assertTrue(dbManager.getAllTaskData().getCount() == 0);
 
         numberOfRemindersInDb = reminderDao.getAll(ReminderEntry.TABLE_NAME,
                 ReminderEntry._ID).getCount();
@@ -225,7 +223,7 @@ public class TestDatabase extends AndroidTestCase {
         numberOfLocationsInDb = locationDao.getAll(LocationEntry.TABLE_NAME,
                 LocationEntry._ID).getCount();
 
-        DbHelper.getInstance(mContext).close();
+   //     DbHelper.getInstance(mContext).close();
 
         assertTrue(numberOfRemindersInDb == 0);
         assertTrue(numberOfLocationsInDb == 0);
@@ -234,7 +232,7 @@ public class TestDatabase extends AndroidTestCase {
     public void testGetActiveTaskCount(){
         insertTwoTasks("first", "second");
 
-        assertEquals(2, taskManager.getActiveTaskCount());
+        assertEquals(2, dbManager.getActiveTaskCount());
     }
 
     public void testGetAllDataDirectlyFromDb(){
@@ -243,7 +241,7 @@ public class TestDatabase extends AndroidTestCase {
         Cursor cursor = taskDao.getAll(TaskEntry.TABLE_NAME, TaskEntry._ID);
         int count = cursor.getCount();
 
-        DbHelper.getInstance(mContext).close();
+       // DbHelper.getInstance(mContext).close();
         assertTrue(count == 2);
     }
 
@@ -251,7 +249,7 @@ public class TestDatabase extends AndroidTestCase {
 
         insertTwoTasks("3rd task", "4th task");
 
-        Cursor cursor = taskManager.getAllTaskData();
+        Cursor cursor = dbManager.getAllTaskData();
         int count = cursor.getCount();
         cursor.moveToFirst();
         while(!cursor.isAfterLast()){
@@ -261,12 +259,12 @@ public class TestDatabase extends AndroidTestCase {
             cursor.moveToNext();
         }
 
-        DbHelper.getInstance(mContext).close();
+//        DbHelper.getInstance(mContext).close();
 
         assertTrue(count == 2);
     }
 
-    public void testGetAllTasksWithLocationTrigger(){
+   /* public void testGetAllTasksWithLocationTrigger(){
         Util.insertTestData(mContext, 2);
         String locationIdAlias = "location";
         String reminderIdAlias = "reminder";
@@ -308,16 +306,16 @@ public class TestDatabase extends AndroidTestCase {
 
         assertTrue(resultSetColumnCount == trueColumnCount);
 
-    }
+    }*/
 
     public void testGetAllTasksWithLocationTriggerWithTaskManager(){
         Util.insertTestData(mContext, 3);
-        List<Task> tasks = taskManager.getAllTasksWithLocationTrigger();
+        List<Task> tasks = dbManager.getAllTasksWithLocationTrigger();
 
         assertEquals(3, tasks.size());
     }
 
-    private int getTableColumnCount(String tableName){
+/*    private int getTableColumnCount(String tableName){
         SQLiteDatabase database = DbHelper.getInstance(mContext).getReadableDatabase();
         Cursor cursor = database.query(
                 tableName,
@@ -330,10 +328,10 @@ public class TestDatabase extends AndroidTestCase {
                 null);
         cursor.moveToFirst();
         return cursor.getColumnCount();
-    }
+    }*/
 
-    private NotificationReminder getDefaultTestReminder(){
-        return new NotificationReminder(-1, 0, "test reminder content", true, -1);
+    private Alarm getDefaultTestReminder(){
+        return new Alarm(-1, 0, "test reminder content", true, -1);
     }
 
     private TriggerLocation getDefaultTestLocation(){

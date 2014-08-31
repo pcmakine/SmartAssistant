@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
-
     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
 
     <uses-feature
@@ -63,7 +62,6 @@
             android:name=".services.HandleAlarmService"
             android:exported="false" >
         </service>
-
         <service
             android:name=".services.TaskActivator"
             android:enabled="true"
@@ -82,6 +80,10 @@
         <activity
             android:name=".views.Map"
             android:label="@string/title_activity_map" >
+        </activity>
+        <activity
+            android:name=".views.FullscreenAlarmActivity"
+            android:label="@string/title_activity_fullscreen_alarm" >
         </activity>
     </application>
 

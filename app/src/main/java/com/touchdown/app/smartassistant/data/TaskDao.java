@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.touchdown.app.smartassistant.data.DbContract.TaskEntry;
 import com.touchdown.app.smartassistant.models.Action;
-import com.touchdown.app.smartassistant.views.NotificationReminder;
+import com.touchdown.app.smartassistant.models.Alarm;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 
@@ -72,9 +72,9 @@ public class TaskDao extends Dao<Task> {
         String name = cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_TASK_NAME));
 
         TriggerLocation location = new LocDao(dbHelper).buildObject(cursor, locationId);
-        NotificationReminder reminder = new ActionReminderDao(dbHelper).buildObject(cursor, reminderId);
+        Alarm alarm = new ActionReminderDao(dbHelper).buildObject(cursor, reminderId);
 
-        Task task = new Task(taskId, name, location, reminder);
+        Task task = new Task(taskId, name, location, alarm);
 
         return task;
 

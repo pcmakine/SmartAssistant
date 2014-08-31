@@ -25,7 +25,7 @@
         android:layout_marginTop="@dimen/margin_between_items">
 
         <CheckBox
-            android:id = "@+id/notification"
+            android:id = "@+id/notificationAlarm"
             style = "@style/checkBox"
             android:text = "@string/notification_reminder_action_title"
             android:layout_alignParentLeft="true"

@@ -6,9 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.views.NotificationReminder;
+import com.touchdown.app.smartassistant.models.Alarm;
 import com.touchdown.app.smartassistant.models.Task;
-import com.touchdown.app.smartassistant.services.TaskManager;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 
 /**
@@ -51,8 +50,8 @@ public class Util {
     }
 
 
-    public static NotificationReminder getDefaultTestReminder(){
-        return new NotificationReminder(-1, 0, "test reminder content", true, -1);
+    public static Alarm getDefaultTestReminder(){
+        return new Alarm(-1, 0, "test reminder content", true, -1);
     }
 
     public static TriggerLocation getDefaultTestLocation(){
@@ -65,5 +64,14 @@ public class Util {
 
     public static boolean intAsBoolean(int value){
         return value == 1;
+    }
+
+
+    public static int msToSec(long ms){
+        return (int) (ms/1000);
+    }
+
+    public static long secondsToMs(int secs){
+        return secs*1000;
     }
 }

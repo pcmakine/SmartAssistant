@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 
+import com.touchdown.app.smartassistant.models.Alarm;
 import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.services.TaskManager;
@@ -15,12 +16,12 @@ public class OnGoingNotification extends AbstractNotif {
 
     private int reminderCount;
 
-    public OnGoingNotification(Context context, NotificationReminder reminder) {
-        super(context, reminder);
+    public OnGoingNotification(Context context, Alarm alarm) {
+        super(context, alarm);
     }
 
-    public OnGoingNotification(Context context, NotificationReminder reminder, int reminderCount){
-        super(context, reminder);
+    public OnGoingNotification(Context context, Alarm alarm, int reminderCount){
+        super(context, alarm);
         this.reminderCount = reminderCount;
     }
 

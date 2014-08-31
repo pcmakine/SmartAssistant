@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.touchdown.app.smartassistant.models.Task;
 
@@ -46,6 +47,7 @@ public class HandleAlarmService extends IntentService {
             task.executeActions();
             task.turnAllActionsOff();
             TaskManager.getInstance(this).update(task);
+            Log.d(LOG_TAG, "End of handle alarm service");
         }else if(entering && taskHasLocationWithDepartureTrigger(task)){            //user is entering an area that has an active task with a departure trigger
             removeProximityAlarmAndStartTrackingWhenUserExits(task);
         }

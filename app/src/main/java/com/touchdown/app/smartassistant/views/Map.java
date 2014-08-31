@@ -93,9 +93,6 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
             }
         });
 
-/*        this.locSpoofer = new LocationSpoofer();
-        locSpoofer.disable("Test");
-        locSpoofer.enable();*/
     }
 
     /**
@@ -336,15 +333,24 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
 
     public void moveLeft(View view) {
         locSpoofer.moveLeft();
+        Toast.makeText(this, "spoofer move left", Toast.LENGTH_SHORT).show();
     }
 
     public void moveRight(View view) {
         locSpoofer.moveRight();
+        Toast.makeText(this, "spoofer move right", Toast.LENGTH_SHORT).show();
     }
 
 
     public void disableSpoofing(View view) {
         locSpoofer.disable();
+        Toast.makeText(this, "spoofer disabled", Toast.LENGTH_SHORT).show();
+    }
+
+    public void enableSpoofer(View view) {
+        this.locSpoofer = new LocationSpoofer();
+        locSpoofer.enable();
+        Toast.makeText(this, "spoofer enabled", Toast.LENGTH_SHORT).show();
     }
 }
 
