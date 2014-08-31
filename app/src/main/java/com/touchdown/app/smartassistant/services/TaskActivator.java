@@ -16,29 +16,25 @@ import com.touchdown.app.smartassistant.services.TaskManager;
  */
 public class TaskActivator extends LocationListenerService {
 
-    protected LocationManager locationManager;
     private MyLocationListener locationListener;
 
     public TaskActivator() {
     }
 
     @Override
-    protected void registerListener(Criteria criteria) {
-        locationListener = new MyLocationListener();
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(
-                TEN_SECONDS,
-                MINIMUM_DISTANCE_CHANGE_FOR_UPDATES,
-                criteria,
-                locationListener,
-                null);
+    protected LocationListener createListener() {
+        this.locationListener = new MyLocationListener();
+        return locationListener;
     }
+
 
     @Override
     public void onDestroy(){
         locationManager.removeUpdates(locationListener);
         super.onDestroy();
     }
+
+
 
     private class MyLocationListener implements LocationListener{
         public void onLocationChanged(Location location) {
@@ -48,19 +44,19 @@ public class TaskActivator extends LocationListenerService {
             Toast.makeText(TaskActivator.this, message, Toast.LENGTH_LONG)
                     .show();
 
-            if(setAlarmsForPendingTasks()){ //if no pending tasks left
+            if(setAlarmsForPendingTasks(location)){ //if no pending tasks left
                 stopSelf();
             }
         }
 
-        private boolean setAlarmsForPendingTasks(){
+        private boolean setAlarmsForPendingTasks(Location location){
             boolean noPendingTasks = true;
             for (Task task: tasks){
                 if(task.getLocation().isPending()){
                     MyLocationProvider locationProvider = new MyLocationProvider(TaskActivator.this);
 
                     boolean userStillInLocation = locationProvider.
-                            isUserInLocation(task.getLocation().getLatLng(), task.getLocation().getRadius());   //todo use the location provided by the onlocationchanged
+                            isLocationInArea(location, task.getLocation().getLatLng(), task.getLocation().getRadius());
                     if(!userStillInLocation){
                         task.getLocation().setPending(false);
                         TaskManager.getInstance(TaskActivator.this).update(task);                   //the updatefunction

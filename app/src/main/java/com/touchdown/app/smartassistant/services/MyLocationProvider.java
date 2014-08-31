@@ -23,38 +23,40 @@ public class MyLocationProvider {
 
     public Location getLocation(){
         int minTime = 0;
+        float bestAccuracy = Float.MAX_VALUE;
+        Location bestResult = null;
+        long bestTime = Long.MAX_VALUE;
+
         List<String> matchingProviders = locManager.getAllProviders();
-        if(matchingProviders == null){
-            Log.d(LOG_TAG, "No location providers found!!");
-        }else{
-            String prov = matchingProviders.get(0);
-            Location loc = locManager.getLastKnownLocation(prov);
-            float bestAccuracy = loc.getAccuracy();
-            Location bestResult = loc;
-            long bestTime = loc.getTime();
+        String prov = matchingProviders.get(0);
+        Location loc = locManager.getLastKnownLocation(prov);
 
-            for (String provider: matchingProviders) {
-                Location location = locManager.getLastKnownLocation(provider);
+        if(loc != null){
+            bestAccuracy = loc.getAccuracy();
+            bestResult = loc;
+            bestTime = loc.getTime();
+        }
 
-                if (location != null) {
-                    float accuracy = location.getAccuracy();
-                    long time = location.getTime();
+        for (String provider: matchingProviders) {
+            Location location = locManager.getLastKnownLocation(provider);
 
-                    if ((time > minTime && accuracy < bestAccuracy)) {
-                        bestResult = location;
-                        bestAccuracy = accuracy;
-                        bestTime = time;
-                    }
-                    else if (time < minTime &&
-                            bestAccuracy == Float.MAX_VALUE && time > bestTime){
-                        bestResult = location;
-                        bestTime = time;
-                    }
+            if (location != null) {
+                float accuracy = location.getAccuracy();
+                long time = location.getTime();
+
+                if ((time > minTime && accuracy < bestAccuracy)) {
+                    bestResult = location;
+                    bestAccuracy = accuracy;
+                    bestTime = time;
+                }
+                else if (time < minTime &&
+                        bestAccuracy == Float.MAX_VALUE && time > bestTime){
+                    bestResult = location;
+                    bestTime = time;
                 }
             }
-            return bestResult;
         }
-        return null;
+        return bestResult;
     }
 
     public boolean isUserInLocation(LatLng latLng, int radiusInMeters){

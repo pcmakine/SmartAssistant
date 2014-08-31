@@ -43,7 +43,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
         Intent intent = getIntent();
         if(noReminderIdInExtras(intent)){
-            makeNewReminder();
+            createNewTask();
         }else{
             long id = intent.getLongExtra("reminderID", -1);
             new FetchOneTaskTask(this).execute(id);
@@ -66,17 +66,16 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         return intent.getLongExtra("reminderID", -1) == -1;
     }
 
-    private void makeNewReminder(){
+    private void createNewTask(){
         showUi();
         this.location = getIntent().getParcelableExtra("location");
         if(location != null){
             this.task = new Task(-1, "",
-                    new TriggerLocation(-1, location, TriggerLocation.DEFAULT_RADIUS, -1),
+                    TriggerLocation.createDefaultLocation(location),
                     new NotificationReminder(-1, 0, "", true, -1));
         }else{
         }
         editMode = false;
-
         prepareTaskRelatedUiElements();
     }
 

@@ -3,6 +3,7 @@ package com.touchdown.app.smartassistant.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.location.LocationManager;
+import android.util.Log;
 
 import com.touchdown.app.smartassistant.models.Task;
 
@@ -12,6 +13,7 @@ import com.touchdown.app.smartassistant.models.Task;
  * <p>
  */
 public class HandleAlarmService extends IntentService {
+    public static final String LOG_TAG = HandleAlarmService.class.getSimpleName();
 
     public HandleAlarmService() {
         super("HandleAlarmService");
@@ -27,8 +29,12 @@ public class HandleAlarmService extends IntentService {
             if(id != -1){
                 TaskManager taskManager = TaskManager.getInstance(this);
                 Task task = taskManager.findTaskById(id);
-
-                executeActions(entering, task);
+                if(task == null){
+                    Log.d(LOG_TAG, "task was null :(");
+                    ProximityAlarmManager.removeAlert(id);
+                }else{
+                    executeActions(entering, task);
+                }
             }
             ProximityIntentReceiver.completeWakefulIntent(intent);
         }

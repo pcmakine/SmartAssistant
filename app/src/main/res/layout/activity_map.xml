@@ -27,6 +27,33 @@
             android:hint="@string/find_location_hint"
             android:imeOptions="actionSearch"
             android:layout_toLeftOf="@id/findLocationBtn" />
+  <!--      <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/locationInput"
+            android:orientation="horizontal">
+            <Button
+                android:id = "@+id/leftBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text = "L"
+                android:onClick="moveLeft"/>
+
+            <Button
+                android:id = "@+id/rightBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text = "R"
+                android:onClick="moveRight"/>
+
+            <Button
+                android:id = "@+id/disableBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text = "remove"
+                android:onClick = "disableSpoofing"/>
+        </LinearLayout>-->
 
     </RelativeLayout>
 

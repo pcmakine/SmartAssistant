@@ -3,17 +3,9 @@ package com.touchdown.app.smartassistant.services;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteOpenHelper;
 
-import com.touchdown.app.smartassistant.data.ActionReminderDao;
-import com.touchdown.app.smartassistant.data.DbContract;
-import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.data.LocDao;
-import com.touchdown.app.smartassistant.data.TaskDao;
-import com.touchdown.app.smartassistant.data.WriterDao;
-import com.touchdown.app.smartassistant.models.Action;
+import com.touchdown.app.smartassistant.data.DatabaseManager;
 import com.touchdown.app.smartassistant.models.Task;
-import com.touchdown.app.smartassistant.services.LocationListenerManager;
 import com.touchdown.app.smartassistant.views.OnGoingNotification;
 
 import java.util.List;
@@ -24,18 +16,10 @@ import java.util.Observable;
  */
 public class TaskManager extends Observable{
     private static TaskManager sInstance;
-    private TaskDao taskDao;
-    private ActionReminderDao reminderDao;
-    private LocDao locationDao;
-    private WriterDao wDao;
-    private SQLiteOpenHelper dbHelper;
+    private DatabaseManager dbManager;
 
     private TaskManager(Context context){
-        this.dbHelper = DbHelper.getInstance(context);
-        this.taskDao = new TaskDao(dbHelper);
-        this.reminderDao = new ActionReminderDao(dbHelper);
-        this.locationDao = new LocDao(dbHelper);
-        this.wDao = new WriterDao(dbHelper);
+        this.dbManager = new DatabaseManager(context);
     }
 
     public synchronized static TaskManager getInstance(Context context){
@@ -46,9 +30,7 @@ public class TaskManager extends Observable{
     }
 
     public long insert(Task task){
-        long id = wDao.insert(task);
-
-        insertActionsAndTriggers(task, id);
+        long id = dbManager.insertTask(task);
 
         saveProximityAlert(task);
 
@@ -56,22 +38,8 @@ public class TaskManager extends Observable{
 
         notifyDataObservers();
 
+        updateLocationListeners();
         return id;
-    }
-
-    private void insertActionsAndTriggers(Task task, long id){
-        task.setIdForThisAndChildObjects(id);
-
-        wDao.insert(task.getTrigger()); //todo only supports one trigger for now
-
-        insertActions(task);
-    }
-
-    private void insertActions(Task task){
-        List<Action> actions = task.getActions();
-        for(Action action: actions){
-            wDao.insert(action);
-        }
     }
 
     private void saveProximityAlert(Task task){
@@ -81,11 +49,7 @@ public class TaskManager extends Observable{
     }
 
     public boolean update(Task task){
-        int rowsAffected = wDao.update(task);
-
-        wDao.update(task.getTrigger());
-
-        updateActions(task);
+        boolean success = dbManager.updateTask(task);
 
         notifyDataObservers();
 
@@ -95,19 +59,11 @@ public class TaskManager extends Observable{
 
         updateLocationListeners();
 
-        return rowsAffected > 0;
-    }
-
-    public void updateActions(Task task){
-        List<Action> actions = task.getActions();
-
-        for(Action action: actions){
-            wDao.update(action);
-        }
+        return success;
     }
 
     private void updateProximityAlarm(Task task){
-        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending() && task.getLocation().isArrivalTriggerOn()){
+        if(task.isActive() && task.getLocation() != null && !task.getLocation().isPending()){
             ProximityAlarmManager.updateAlert(task);
         }else{
             ProximityAlarmManager.removeAlert(task.getId());
@@ -115,24 +71,23 @@ public class TaskManager extends Observable{
     }
 
     public Task findTaskById(long id){
-        Task task = taskDao.getOne(id, DbContract.TaskEntry.TABLE_NAME, DbContract.TaskEntry._ID);
-        return task;
+        return dbManager.findTaskById(id);
     }
 
     public Cursor getAllTaskData(){
-        return taskDao.getAll(DbContract.TaskEntry.TABLE_NAME, DbContract.TaskEntry._ID);
+        return dbManager.getAllTaskData();
     }
 
     public List<Task> getAllTasks(){
-        return taskDao.getAllAsList(DbContract.TaskEntry.TABLE_NAME, DbContract.TaskEntry._ID);
+        return dbManager.getAllTasks();
     }
 
     public List<Task> getAllTasksWithLocationTrigger(){
-        return taskDao.getAllTasksWithLocation();
+        return dbManager.getAllTasksWithLocationTrigger();
     }
 
     public int removeTask(long id){
-        int rowsAffected = wDao.remove(id, DbContract.TaskEntry.TABLE_NAME, DbContract.TaskEntry._ID);
+        int rowsAffected = dbManager.removeTask(id);
 
         notifyDataObservers();
 
@@ -145,7 +100,7 @@ public class TaskManager extends Observable{
     }
 
     public int getActiveTaskCount(){
-        return reminderDao.getActiveRemindersCount(DbContract.ReminderEntry.TABLE_NAME, DbContract.ReminderEntry.COLUMN_NAME_ON, 1);
+        return dbManager.getActiveTaskCount();
     }
 
     private void notifyDataObservers(){

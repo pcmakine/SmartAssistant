@@ -3,13 +3,11 @@ package com.touchdown.app.smartassistant.views;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -28,8 +26,8 @@ public class LocationFragment extends Fragment {
 
     private TriggerLocation location;
 
-    private CheckBox entering;
-    private CheckBox leaving;
+    private RadioButton entering;
+    private RadioButton exiting;
     private SeekBar radiusBar;
     private int radius;
     private TextView radiusTW;
@@ -62,53 +60,57 @@ public class LocationFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         LinearLayout ll =  (LinearLayout) inflater.inflate(R.layout.fragment_location, container, false);
-        entering = (CheckBox) ll.findViewById(R.id.enteringCheckBox);
-        leaving = (CheckBox) ll.findViewById(R.id.leavingCheckBox);
+        entering = (RadioButton) ll.findViewById(R.id.enteringRadio);
+        exiting = (RadioButton) ll.findViewById(R.id.exitingRadio);
         radiusBar = (SeekBar) ll.findViewById(R.id.seekBar);
         radiusTW = (TextView) ll.findViewById(R.id.radius);
 
-        setUpCheckBoxes();
+        setUpRadios();
         setUpSeekBar();
 
         return ll;
     }
 
-    private void setUpCheckBoxes(){
-        entering.setChecked(location.isArrivalTriggerOn());
-        setListenerForEnteringCheckBox();
+        private void setUpRadios(){
+            entering.setChecked(location.isArrivalTriggerOn());
+            setListenerForRadios(entering);
 
-        leaving.setChecked(location.isDepartureTriggerOn());
-        setListenerForLeavingCheckBox();
-    }
+            exiting.setChecked(location.isDepartureTriggerOn());
+            setListenerForRadios(exiting);
+        }
 
+        private void setListenerForRadios(RadioButton btn){
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onRadioButtonClicked(v);
+                }
+            });
+        }
 
-    private void setListenerForEnteringCheckBox(){
-        entering.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(LOG_TAG, "entering checkbox checked value: " + isChecked);
-                if(isChecked){
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.enteringRadio:
+                if (checked){
                     location.turnOnArrivalTrigger();
-                }else{
-                    location.turnOffArrivalTrigger();
+                    location.turnOffDepartureTrigger();
+                    exiting.setChecked(false);
                 }
-            }
-        });
+                break;
+            case R.id.exitingRadio:
+                if (checked){
+                    location.turnOffArrivalTrigger();
+                    entering.setChecked(false);
+                    location.turnOnDepartureTrigger();
+                }
+                break;
+        }
     }
 
-    private void setListenerForLeavingCheckBox(){
-        leaving.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(LOG_TAG, "leaving checkbox checked value: " + isChecked);
-                if(isChecked){
-                    location.turnOnDepartureTrigger();
-                }else{
-                    location.turnOffDepartureTrigger();
-                }
-            }
-        });
-    }
 
     private void setUpSeekBar(){
         if(location != null){

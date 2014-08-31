@@ -38,6 +38,12 @@ public class TriggerLocation extends Trigger implements Serializable {
         this.triggerWhenEntering = true;
     }
 
+    public static TriggerLocation createDefaultLocation(LatLng latLng){
+        TriggerLocation loc = new TriggerLocation(-1, latLng, TriggerLocation.DEFAULT_RADIUS, -1);
+        loc.setArrivalTrigger(true);
+        return loc;
+    }
+
     public int getRadius() {
         return radius;
     }

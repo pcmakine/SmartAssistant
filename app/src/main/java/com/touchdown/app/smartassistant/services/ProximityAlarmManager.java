@@ -11,7 +11,7 @@ import com.touchdown.app.smartassistant.models.Task;
  * Created by Pete on 11.8.2014.
  */
 public class ProximityAlarmManager {
-    private static final long PROX_ALERT_EXPIRATION = 1000*60*60*24*2; //in milliseconds two days todo change to -1 when ready to ship
+    private static final long PROX_ALERT_EXPIRATION = 1000*60*60*5; //in milliseconds 5 hours todo change to -1 when ready to ship
     private static final String PROX_ALERT_INTENT = "com.touchdown.app.smartassistant.services.ProximityIntentReceiver";
 
 

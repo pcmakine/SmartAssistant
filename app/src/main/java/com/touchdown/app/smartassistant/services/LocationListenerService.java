@@ -3,12 +3,12 @@ package com.touchdown.app.smartassistant.services;
 import android.app.Service;
 import android.content.Intent;
 import android.location.Criteria;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.IBinder;
 import android.widget.Toast;
 
 import com.touchdown.app.smartassistant.models.Task;
-import com.touchdown.app.smartassistant.services.TaskManager;
 
 import java.util.List;
 
@@ -18,14 +18,14 @@ import java.util.List;
  */
 public abstract class LocationListenerService extends Service {
     public static final String LOG_TAG = LocationListenerService.class.getSimpleName();
-    protected static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 50; // in
-    // Meters
+    protected static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 10; // in Meters
     protected static final long HOUR_IN_MS = 1000*60*60;
-    protected static final long TEN_SECONDS  = 1000 * 10;
+    protected static final long SECOND = 1000;
 
     protected TaskManager taskManager;
     protected List<Task> tasks;
     protected LocationManager locationManager;
+    private boolean testingOnEmulator;      //todo remove this when ready to ship!
 
 
     @Override
@@ -44,6 +44,26 @@ public abstract class LocationListenerService extends Service {
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
 
         registerListener(criteria);
+    }
+
+    protected final void registerListener(Criteria criteria) {
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if(testingOnEmulator){
+            locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    SECOND,
+                    MINIMUM_DISTANCE_CHANGE_FOR_UPDATES,
+
+                    createListener(),
+                    null);
+        }else{
+            locationManager.requestLocationUpdates(
+                    SECOND,
+                    MINIMUM_DISTANCE_CHANGE_FOR_UPDATES,
+                    criteria,
+                    createListener(),
+                    null);
+        }
     }
 
     @Override
@@ -67,8 +87,7 @@ public abstract class LocationListenerService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-
-    protected abstract void registerListener(Criteria criteria);
+    protected abstract LocationListener createListener();
 }
 
 

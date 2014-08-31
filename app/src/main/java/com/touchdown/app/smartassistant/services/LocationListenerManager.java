@@ -15,7 +15,7 @@ public class LocationListenerManager extends IntentService {
     public static final String LOG_TAG = LocationListenerManager.class.getSimpleName();
 
     public LocationListenerManager() {
-        super("TaskActivatorKiller");
+        super("LocationListenerManager");
     }
 
     @Override
@@ -39,16 +39,6 @@ public class LocationListenerManager extends IntentService {
         }else{
             startService(new Intent(this, TaskActivator.class));
         }
-    }
-
-
-    private boolean checkIfTaskActivatorShouldBeKilled(List<Task> tasks){
-        for(Task task: tasks){
-            if(task.isActive() && task.getLocation().isPending()){
-                return false;
-            }
-        }
-        return true;
     }
 
     private void handleDepartureBroadcastAlarm(List<Task> tasks){

@@ -30,6 +30,7 @@ import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskTask;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
+import com.touchdown.app.smartassistant.services.LocationSpoofer;
 import com.touchdown.app.smartassistant.services.MyLocationProvider;
 import com.touchdown.app.smartassistant.services.PendingTask;
 import com.touchdown.app.smartassistant.services.TaskManager;
@@ -44,14 +45,14 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMarkerDragListener, Observer, RemoveTasksListener, UpdateTaskListener, GeocoderListener {
 
-    public static final String LOG_TAG = MapActivity.class.getSimpleName();
+    public static final String LOG_TAG = Map.class.getSimpleName();
 
     private MarkerManager markerManager;
     private TaskManager taskManager;
     private boolean onCreateRan;
     private MyLocationProvider locProvider;
     private EditText addressField;
-    private Task taskBeingUpdated;
+    private LocationSpoofer locSpoofer;
 
     // Google Map
     private GoogleMap googleMap;
@@ -91,6 +92,10 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
                 return false;
             }
         });
+
+/*        this.locSpoofer = new LocationSpoofer();
+        locSpoofer.disable("Test");
+        locSpoofer.enable();*/
     }
 
     /**
@@ -288,7 +293,6 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
             //markerManager.showRadius(marker);
 
             PendingTask.updatePendingStatus(task);
-            taskBeingUpdated = task;
             new UpdateTaskTask(this, false, false).execute(task);   //todo how to save the selected marker... the update will overwrite it
         }
     }
@@ -328,6 +332,19 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
     @Override
     public LinearLayout getOnProgressIndicator() {
         return null;
+    }
+
+    public void moveLeft(View view) {
+        locSpoofer.moveLeft();
+    }
+
+    public void moveRight(View view) {
+        locSpoofer.moveRight();
+    }
+
+
+    public void disableSpoofing(View view) {
+        locSpoofer.disable();
     }
 }
 

@@ -17,7 +17,6 @@ import java.util.List;
 
 public class DepartureTaskBroadcastAlarm extends LocationListenerService {
 
-    protected LocationManager locationManager;
     private MyLocationListener locationListener;
 
     public DepartureTaskBroadcastAlarm() {
@@ -30,15 +29,9 @@ public class DepartureTaskBroadcastAlarm extends LocationListenerService {
     }
 
     @Override
-    protected void registerListener(Criteria criteria) {
-        locationListener = new MyLocationListener();
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(
-                TEN_SECONDS,
-                MINIMUM_DISTANCE_CHANGE_FOR_UPDATES,
-                criteria,
-                locationListener,
-                null);
+    protected LocationListener createListener() {
+        this.locationListener = new MyLocationListener();
+        return locationListener;
     }
 
     private List<Task> checkForTriggeredDepartureTasks(Location location){

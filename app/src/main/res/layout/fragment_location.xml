@@ -35,26 +35,49 @@
         android:layout_height="wrap_content"
         />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <!--    <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">-->
 
-        <CheckBox
-            android:id = "@+id/leavingCheckBox"
-            style = "@style/checkBox"
-            android:text = "@string/exiting"
-            android:layout_alignParentRight="true">
-        </CheckBox>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-        <CheckBox
-            android:id = "@+id/enteringCheckBox"
-            style = "@style/checkBox"
-            android:text = "@string/entering"
-            android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@id/leavingCheckBox"
-            >
+            <RadioButton
+                android:id = "@+id/exitingRadio"
+                style = "@style/checkBox"
+                android:layout_alignParentRight="true"
+                android:text = "@string/exiting"
+                android:checked="false"
+                />
 
-        </CheckBox>
+            <RadioButton
+                android:id = "@+id/enteringRadio"
+                style = "@style/checkBox"
+                android:text = "@string/entering"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/exitingRadio"
+                android:checked = "true"
+                />
 
-    </RelativeLayout>
+        </RelativeLayout>
+
+    <!--        <CheckBox
+                android:id = "@+id/leavingCheckBox"
+                style = "@style/checkBox"
+                android:text = "@string/exiting"
+                android:layout_alignParentRight="true">
+            </CheckBox>
+
+            <CheckBox
+                android:id = "@+id/enteringCheckBox"
+                style = "@style/checkBox"
+                android:text = "@string/entering"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/leavingCheckBox"
+                >
+
+            </CheckBox>
+
+        </RelativeLayout>-->
 </LinearLayout>

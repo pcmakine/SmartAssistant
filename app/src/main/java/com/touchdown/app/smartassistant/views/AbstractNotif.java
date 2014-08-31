@@ -31,10 +31,10 @@ public abstract class AbstractNotif {
     }
 
     protected PendingIntent getMapActivityIntent(){
-        Intent resultIntent = new Intent(mContext, MapActivity.class);
+        Intent resultIntent = new Intent(mContext, Map.class);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-        stackBuilder.addParentStack(MapActivity.class);
+        stackBuilder.addParentStack(Map.class);
 
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
