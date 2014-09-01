@@ -6,7 +6,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.data.DbHelper;
+import com.touchdown.app.smartassistant.models.ActionType;
 import com.touchdown.app.smartassistant.models.Alarm;
+import com.touchdown.app.smartassistant.models.RingerVolume;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 
@@ -39,7 +41,9 @@ public class Util {
         for (int i = 0; i < numberOfRecords; i++){
             double lat = 60 + i*0.1;
             TriggerLocation location = new TriggerLocation(-1, new LatLng(lat, TEST_LONG), TriggerLocation.DEFAULT_RADIUS, -1);
-            Task task = new Task(-1, i + ". task", location, getDefaultTestReminder());
+            Task task = new Task(-1, i + ". task", location);
+            task.addAction(Alarm.createDefault());
+            task.addAction(RingerVolume.createDefault());
 
             taskManager.insert(task);
 
@@ -51,7 +55,7 @@ public class Util {
 
 
     public static Alarm getDefaultTestReminder(){
-        return new Alarm(-1, 0, "test reminder content", true, -1);
+        return new Alarm(-1, ActionType.ALARM, "test reminder content", true, -1);
     }
 
     public static TriggerLocation getDefaultTestLocation(){

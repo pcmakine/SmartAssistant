@@ -21,18 +21,17 @@ public class Task extends Data implements Comparable<Task>{
     private Trigger trigger;
     private Set<Action> actions;
 
-    public Task(long id, String name, Trigger trigger, Action action) {
+    public Task(long id, String name, Trigger trigger) {
         super(id);
         this.trigger = trigger;
         this.actions = new HashSet<Action>();
-        actions.add(action);
         this.name = name;
-        setTableName(TABLE_NAME);
-        setIdColumn(ID_COLUMN);
     }
 
     public void addAction(Action action){
-        actions.add(action);
+        if(action != null){
+            actions.add(action);
+        }
     }
 
     public void removeAction(Action action){
@@ -98,11 +97,19 @@ public class Task extends Data implements Comparable<Task>{
 
     public Alarm getAlarm(){
         for(Action action: actions){
-            if(action.getType() == 0){
+            if(action.getType() == ActionType.ALARM){
                 return (Alarm) action;
             }
         }
+        return null;
+    }
 
+    public RingerVolume getRingerVolume(){
+        for(Action action: actions){
+            if(action.getType() == ActionType.RINGERVOLUME){
+                return (RingerVolume) action;
+            }
+        }
         return null;
     }
 
@@ -140,6 +147,16 @@ public class Task extends Data implements Comparable<Task>{
             return 1;
         }
         return 0;
+    }
+
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    public String getIdColumn() {
+        return ID_COLUMN;
     }
 
     @Override

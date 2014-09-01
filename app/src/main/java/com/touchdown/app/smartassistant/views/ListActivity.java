@@ -18,11 +18,13 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import com.touchdown.app.smartassistant.R;
+import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksTask;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.data.asyncTasks.FetchAllDataListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.FetchAllDataTask;
+import com.touchdown.app.smartassistant.services.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,7 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
         setContentView(R.layout.activity_list);
         listView = (ListView) findViewById(R.id.list);
 
+        Util.clearDb(this, DbHelper.getInstance(this));
   //      Util.clearAndInsertTestData(this, new DbHelper(this));
 
         // ListView Item Click Listener

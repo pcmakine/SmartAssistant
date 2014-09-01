@@ -1,29 +1,23 @@
 package com.touchdown.app.smartassistant.test;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.touchdown.app.smartassistant.data.AlarmDao;
 import com.touchdown.app.smartassistant.data.DatabaseManager;
 import com.touchdown.app.smartassistant.models.Alarm;
+import com.touchdown.app.smartassistant.models.RingerVolume;
 import com.touchdown.app.smartassistant.services.Util;
-import com.touchdown.app.smartassistant.data.DbContract.LocationEntry;
-import com.touchdown.app.smartassistant.data.DbContract.TaskEntry;
-import com.touchdown.app.smartassistant.data.DbContract.ReminderEntry;
 
 import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.data.ActionReminderDao;
 import com.touchdown.app.smartassistant.data.LocDao;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.data.TaskDao;
-import com.touchdown.app.smartassistant.services.TaskManager;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 import com.touchdown.app.smartassistant.data.WriterDao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,54 +32,113 @@ public class TestDatabase extends AndroidTestCase {
     private SQLiteOpenHelper dbHelper;
     private TaskDao taskDao;
     private WriterDao wDao;
-    private ActionReminderDao reminderDao;
+    private AlarmDao reminderDao;
     private LocDao locationDao;
 
     private DatabaseManager dbManager;
 
     @Override
     public void setUp(){
-        dbManager = new DatabaseManager(mContext);
+        dbManager = DatabaseManager.getInstance(mContext);
         this.dbHelper = DbHelper.getInstance(mContext);
         Util.clearDb(mContext, dbHelper);
 
-        reminderDao = new ActionReminderDao(dbHelper);
+        reminderDao = new AlarmDao(dbHelper);
         locationDao = new LocDao(dbHelper);
         taskDao = new TaskDao(dbHelper);
         wDao = new WriterDao(dbHelper);
 
     }
 
-    public void testInsertActionDirectlyInTheDatabase(){
-        Alarm alarm = getDefaultTestReminder();
-        TriggerLocation testLocation = getDefaultTestLocation();
-
-        Task task = new Task(-1, "testTask", testLocation, alarm);
-
-        long taskId = wDao.insert(task);
-        task.setIdForThisAndChildObjects(taskId);
-
-        long reminderId = wDao.insert(alarm);
-        long locId = wDao.insert(testLocation);
-
-        assertTrue(taskId != -1);
-        assertTrue(reminderId != -1);
-        assertTrue(locId != -1);
+    public void testCreateDb() throws Throwable {
+        mContext.deleteDatabase(DbHelper.DATABASE_NAME);
+        SQLiteDatabase db = new DbHelper(this.mContext).getWritableDatabase();
+        assertEquals(true, db.isOpen());
+        db.close();
     }
 
-    private long insertDefaultLocation(){
-        TriggerLocation loc =  TriggerLocation.createDefaultLocation(new LatLng(TEST_LAT, TEST_LONG));
-        Alarm alarm = Alarm.createDefaultAlarm();
-        Task task = new Task(-1, "test",loc, alarm);
-
-        long id = wDao.insert(task);
-        task.setIdForThisAndChildObjects(id);
-
-        long locId = wDao.insert(loc);
-        wDao.insert(alarm);
-
-       return locId;
+    public void testInsertTask(){
+        assertTrue(insertDefaultTask("default task") != -1);
     }
+
+    private long insertDefaultTask(String name){
+        Task task = new Task(-1, name, TriggerLocation.createDefault(new LatLng(TEST_LAT, TEST_LONG)));
+        task.addAction(Alarm.createDefault());
+        task.addAction(RingerVolume.createDefault());
+
+        long id = dbManager.insertTask(task);
+        return id;
+    }
+
+    public void testGetTask(){
+        long id = insertDefaultTask("another test task");
+
+        Task task = dbManager.findTaskById(id);
+
+        assertTrue(task != null);
+        assertTrue(task.getId() == id);
+        assertEquals(new LatLng(TEST_LAT, TEST_LONG), task.getLocation().getLatLng());
+    }
+
+    public void testUpdate(){
+        long id = insertDefaultTask("test name");
+
+        Task task = dbManager.findTaskById(id);
+        TriggerLocation loc = task.getLocation();
+        double updatedLong = 100;
+        loc.setLatLng(new LatLng(TEST_LAT, updatedLong));
+
+        Alarm alarm = task.getAlarm();
+        alarm.turnOff();
+
+        boolean success = dbManager.updateTask(task);
+
+        assertTrue(success == true);
+
+        Task updated = dbManager.findTaskById(id);
+
+        assertEquals(new LatLng(TEST_LAT, updatedLong), updated.getLocation().getLatLng());
+        assertTrue(updated.getAlarm().isOn() == false);
+    }
+
+    public void testRingerVolumesInsertedAndFetchedCorrectlyByFindTaskById(){
+        Task task = new Task(-1, "test task",
+                TriggerLocation.createDefault(new LatLng(TEST_LAT, TEST_LONG)));
+        task.addAction(Alarm.createDefault());
+        task.addAction(RingerVolume.createDefault());
+
+        long firstId = dbManager.insertTask(task);
+
+        assertTrue(firstId != -1);
+
+        task = dbManager.findTaskById(firstId);
+
+        assertTrue(task != null);
+        assertTrue(task.getRingerVolume() != null);
+    }
+
+    public void testRingerVolumesInsertedAndFetchedCorrectlyByGetAllTasks(){
+        Task task = new Task(-1, "test task",
+                TriggerLocation.createDefault(new LatLng(TEST_LAT, TEST_LONG)));
+        task.addAction(Alarm.createDefault());
+
+        Task secondTask = new Task(-1, "second test task",
+                TriggerLocation.createDefault(new LatLng(TEST_LAT, TEST_LONG)));
+        secondTask.addAction(Alarm.createDefault());
+
+        task.addAction(RingerVolume.createDefault());
+        secondTask.addAction(RingerVolume.createDefault());
+
+        long firstId = dbManager.insertTask(task);
+        long secondId = dbManager.insertTask(secondTask);
+
+        assertTrue(firstId != -1);
+        assertTrue(secondId != -1);
+
+        //List<Task>
+    }
+
+   /*
 
     public void testGetLocation(){
         long id = insertDefaultLocation();
@@ -262,7 +315,7 @@ public class TestDatabase extends AndroidTestCase {
 //        DbHelper.getInstance(mContext).close();
 
         assertTrue(count == 2);
-    }
+    }*/
 
    /* public void testGetAllTasksWithLocationTrigger(){
         Util.insertTestData(mContext, 2);
@@ -308,12 +361,14 @@ public class TestDatabase extends AndroidTestCase {
 
     }*/
 
+/*
     public void testGetAllTasksWithLocationTriggerWithTaskManager(){
         Util.insertTestData(mContext, 3);
         List<Task> tasks = dbManager.getAllTasksWithLocationTrigger();
 
         assertEquals(3, tasks.size());
     }
+*/
 
 /*    private int getTableColumnCount(String tableName){
         SQLiteDatabase database = DbHelper.getInstance(mContext).getReadableDatabase();
@@ -330,11 +385,11 @@ public class TestDatabase extends AndroidTestCase {
         return cursor.getColumnCount();
     }*/
 
-    private Alarm getDefaultTestReminder(){
+/*    private Alarm getDefaultTestReminder(){
         return new Alarm(-1, 0, "test reminder content", true, -1);
     }
 
     private TriggerLocation getDefaultTestLocation(){
         return new TriggerLocation(-1, new LatLng(TEST_LAT, TEST_LONG), TriggerLocation.DEFAULT_RADIUS, -1);
-    }
+    }*/
 }

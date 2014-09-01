@@ -7,28 +7,15 @@ import android.content.ContentValues;
  */
 public abstract class Data {
     private long id;
-    private String tableName;
-    private String idColumn;
 
     public Data(long id){
         this.id = id;
     }
 
-    public String getTableName(){
-        return tableName;
-    }
 
-    public void setTableName(String tableName){
-        this.tableName = tableName;
-    }
+    public abstract String getTableName();
 
-    public String getIdColumn(){
-        return this.idColumn;
-    }
-
-    public void setIdColumn(String idColumn){
-        this.idColumn = idColumn;
-    }
+    public abstract String getIdColumn();
 
     public abstract ContentValues getContentValues();
 

@@ -33,12 +33,10 @@ public class TriggerLocation extends Trigger implements Serializable {
         }else{
             this.radius = radius;
         }
-        setTableName(TABLE_NAME);
-        setIdColumn(ID_COLUMN);
         this.triggerWhenEntering = true;
     }
 
-    public static TriggerLocation createDefaultLocation(LatLng latLng){
+    public static TriggerLocation createDefault(LatLng latLng){
         TriggerLocation loc = new TriggerLocation(-1, latLng, TriggerLocation.DEFAULT_RADIUS, -1);
         loc.setArrivalTrigger(true);
         return loc;
@@ -98,6 +96,16 @@ public class TriggerLocation extends Trigger implements Serializable {
 
     public boolean isPending(){
         return pending;
+    }
+
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    public String getIdColumn() {
+        return ID_COLUMN;
     }
 
     @Override

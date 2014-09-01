@@ -19,7 +19,7 @@ public class TaskManager extends Observable{
     private DatabaseManager dbManager;
 
     private TaskManager(Context context){
-        this.dbManager = new DatabaseManager(context);
+        this.dbManager = DatabaseManager.getInstance(context);
     }
 
     public synchronized static TaskManager getInstance(Context context){

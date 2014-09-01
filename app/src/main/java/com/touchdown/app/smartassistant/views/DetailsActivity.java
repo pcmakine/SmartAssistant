@@ -72,8 +72,8 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         this.location = getIntent().getParcelableExtra("location");
         if(location != null){
             this.task = new Task(-1, "",
-                    TriggerLocation.createDefaultLocation(location),
-                    Alarm.createDefaultAlarm());
+                    TriggerLocation.createDefault(location));
+            task.addAction(Alarm.createDefault());
         }else{
         }
         editMode = false;

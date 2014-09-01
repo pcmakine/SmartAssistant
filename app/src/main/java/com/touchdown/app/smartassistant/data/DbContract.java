@@ -9,7 +9,12 @@ import android.provider.BaseColumns;
  */
 public class DbContract {
 
-    public static final class ReminderEntry implements BaseColumns {
+    public static final class TaskEntry implements BaseColumns {
+        public static final String TABLE_NAME = "task";
+        public static final String COLUMN_NAME_TASK_NAME = "taskName";
+    }
+
+    public static final class AlarmEntry implements BaseColumns {
         public static final String TABLE_NAME = "reminder";
         public static final String COLUMN_NAME_CONTENT = "content";
         public static final String COLUMN_NAME_ON = "alarm_on";
@@ -19,9 +24,13 @@ public class DbContract {
         public static final String COLUMN_NAME_TASK_ID = "reminderTaskId";
     }
 
-    public static final class TaskEntry implements BaseColumns {
-        public static final String TABLE_NAME = "task";
-        public static final String COLUMN_NAME_TASK_NAME = "taskName";
+
+    public static final class RingerVolumeEntry implements BaseColumns {
+        public static final String TABLE_NAME = "ringerVolume";
+        public static final String COLUMN_NAME_VOLUME = "volume";
+        public static final String COLUMN_NAME_TASK_ID = "ringerVolumeTaskId";
+        public static final String COLUMN_NAME_ON = "alarm_on";
+        public static final String COLUMN_NAME_TYPE = "actionType";
     }
 
     public static final class LocationEntry implements BaseColumns {

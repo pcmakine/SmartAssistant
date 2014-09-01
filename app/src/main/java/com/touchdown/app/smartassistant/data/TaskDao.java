@@ -6,8 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.touchdown.app.smartassistant.data.DbContract.TaskEntry;
-import com.touchdown.app.smartassistant.models.Action;
 import com.touchdown.app.smartassistant.models.Alarm;
+import com.touchdown.app.smartassistant.models.RingerVolume;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 
@@ -28,26 +28,66 @@ public class TaskDao extends Dao<Task> {
         long id = cursor.getLong(cursor.getColumnIndex(TaskEntry._ID));
         String name = cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_TASK_NAME));
 
-        //todo could the object creation take place somewhere else so that these objects wouldn't have to be created every time we get task objects?
-        ActionReminderDao reminderDao = new ActionReminderDao(dbHelper);
-        Action action = reminderDao.findReminderByTaskId(id);
-
         LocDao locDao = new LocDao(dbHelper);
         TriggerLocation location = locDao.findByTaskId(id);
 
-        return new Task(id, name, location, action);
+        Task task = new Task(id, name, location);
+        addActions(task);
+
+        return task;
     }
 
-    public List<Task> getAllTasksWithLocation(){
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+    private void addActions(Task task){
+        addAlarm(task);
+        addRingerVolume(task);
+    }
 
+    private void addRingerVolume(Task task){
+        RingerVolumeDao ringerDao = new RingerVolumeDao(dbHelper);
+        List<RingerVolume> ringerVolumes = ringerDao.findByFieldLong(DbContract.RingerVolumeEntry.TABLE_NAME,
+                DbContract.RingerVolumeEntry.COLUMN_NAME_TASK_ID, task.getId());
+
+        if(!ringerVolumes.isEmpty()){
+            RingerVolume rVolume = ringerVolumes.get(0);            //should never have more than one entry
+            task.addAction(rVolume);
+        }
+    }
+
+    private void addAlarm(Task task){
+        //todo could the object creation take place somewhere else so that these objects wouldn't have to be created every time we get task objects?
+        AlarmDao reminderDao = new AlarmDao(dbHelper);
+        Alarm alarm = reminderDao.findReminderByTaskId(task.getId());
+        task.addAction(alarm);
+    }
+
+    public List<Task> getAllTasksWithLocation() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
         String query = "SELECT * FROM " + TaskEntry.TABLE_NAME + " JOIN " +
                 DbContract.LocationEntry.TABLE_NAME + " ON " +
                 TaskEntry.TABLE_NAME + "." + TaskEntry._ID + " = " +
+                DbContract.LocationEntry.TABLE_NAME + "." + DbContract.LocationEntry._ID;
+
+        Cursor cursor = db.rawQuery(query, null);
+        List<Task> list = new ArrayList<Task>();
+
+        while (cursor.moveToNext()) {
+            list.add(buildLocationTask(cursor));
+        }
+            return list;
+    }
+
+ /*       String query = "SELECT * FROM " + TaskEntry.TABLE_NAME + " JOIN " +
+                DbContract.LocationEntry.TABLE_NAME + " ON " +
+                TaskEntry.TABLE_NAME + "." + TaskEntry._ID + " = " +
                 DbContract.LocationEntry.TABLE_NAME + "." + DbContract.LocationEntry._ID +
-                " JOIN " + DbContract.ReminderEntry.TABLE_NAME + " ON " +
+
+                " JOIN " + DbContract.AlarmEntry.TABLE_NAME + " ON " +
                 DbContract.LocationEntry.TABLE_NAME + "." + DbContract.LocationEntry.COLUMN_NAME_TASK_ID + " = " +
-                DbContract.ReminderEntry.TABLE_NAME + "." + DbContract.ReminderEntry.COLUMN_NAME_TASK_ID;
+                DbContract.AlarmEntry.TABLE_NAME + "." + DbContract.AlarmEntry.COLUMN_NAME_TASK_ID +
+
+                " JOIN " + DbContract.RingerVolumeEntry.TABLE_NAME + " ON " +
+                DbContract.LocationEntry.TABLE_NAME + "." + DbContract.LocationEntry.COLUMN_NAME_TASK_ID + " = " +
+                DbContract.RingerVolumeEntry.TABLE_NAME + "." + DbContract.RingerVolumeEntry.COLUMN_NAME_TASK_ID;
 
         Cursor cursor = db.rawQuery(query, null);
 
@@ -55,29 +95,25 @@ public class TaskDao extends Dao<Task> {
 
         while(cursor.moveToNext()){
             list.add(buildLocationTask(cursor));
-        }
+        }*/
 
-        return list;
-    }
+
 
     private Task buildLocationTask(Cursor cursor){
+
         long taskId = cursor.getLong(cursor.getColumnIndex(TaskEntry._ID));
         int locationIdIndex = cursor.getColumnIndex(TaskEntry.COLUMN_NAME_TASK_NAME) + 1;
 
         long locationId = cursor.getLong(locationIdIndex);
-
-        int reminderIndex = cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TASK_ID) + 1;
-        long reminderId = cursor.getLong(reminderIndex);
-
         String name = cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_TASK_NAME));
 
         TriggerLocation location = new LocDao(dbHelper).buildObject(cursor, locationId);
-        Alarm alarm = new ActionReminderDao(dbHelper).buildObject(cursor, reminderId);
 
-        Task task = new Task(taskId, name, location, alarm);
+        Task task = new Task(taskId, name, location);
+
+        addActions(task);
 
         return task;
-
     }
 }
 

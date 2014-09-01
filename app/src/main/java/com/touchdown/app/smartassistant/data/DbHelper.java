@@ -29,18 +29,10 @@ public class DbHelper extends SQLiteOpenHelper{
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        final String SQL_CREATE_REMINDER_TABLE = "CREATE TABLE " + ReminderEntry.TABLE_NAME
-                + " (" + ReminderEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 
-                ReminderEntry.COLUMN_NAME_CONTENT + " TEXT NOT NULL, " +
-                ReminderEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL UNIQUE, " +
-                ReminderEntry.COLUMN_NAME_ON + " INTEGER NOT NULL, " +
-                ReminderEntry.COLUMN_NAME_TYPE + " INTEGER NOT NULL, " +
-                ReminderEntry.COLUMN_NAME_NOTIFICATION_ENABLED + " INTEGER NOT NULL, " +
-                ReminderEntry.COLUMN_NAME_FULLSCREEN_ENABLED + " INTEGER NOT NULL, " +
-                " FOREIGN KEY (" + ReminderEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
-                TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ")" +
-                " ON DELETE CASCADE)";
+        final String SQL_CREATE_TASK_TABLE = "CREATE TABLE " + TaskEntry.TABLE_NAME +
+                " (" + TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                TaskEntry.COLUMN_NAME_TASK_NAME + " TEXT NOT NULL)";
 
         final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + LocationEntry.TABLE_NAME +
                 " (" + LocationEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -56,6 +48,41 @@ public class DbHelper extends SQLiteOpenHelper{
                 " FOREIGN KEY (" + LocationEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
                 TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ") " +
                 " ON DELETE CASCADE)";
+
+
+        final String SQL_CREATE_REMINDER_TABLE = "CREATE TABLE " + AlarmEntry.TABLE_NAME
+                + " (" + AlarmEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+
+                AlarmEntry.COLUMN_NAME_CONTENT + " TEXT NOT NULL, " +
+                AlarmEntry.COLUMN_NAME_ON + " INTEGER NOT NULL, " +
+                AlarmEntry.COLUMN_NAME_TYPE + " INTEGER NOT NULL, " +
+                AlarmEntry.COLUMN_NAME_NOTIFICATION_ENABLED + " INTEGER NOT NULL, " +
+                AlarmEntry.COLUMN_NAME_FULLSCREEN_ENABLED + " INTEGER NOT NULL, " +
+                AlarmEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL UNIQUE, " +
+                " FOREIGN KEY (" + AlarmEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
+                TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ")" +
+                " ON DELETE CASCADE)";
+
+        final String SQL_CREATE_RINGER_VOLUME_TABLE = "CREATE TABLE " + RingerVolumeEntry.TABLE_NAME
+                + " (" + RingerVolumeEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+
+                RingerVolumeEntry.COLUMN_NAME_VOLUME + " INTEGER NOT NULL, " +
+                RingerVolumeEntry.COLUMN_NAME_ON + " INTEGER NOT NULL, " +
+                RingerVolumeEntry.COLUMN_NAME_TYPE + " INTEGER NOT NULL, " +
+                RingerVolumeEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL UNIQUE, " +
+                " FOREIGN KEY (" + RingerVolumeEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
+                TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + ")" +
+                " ON DELETE CASCADE)";
+
+        db.execSQL(SQL_CREATE_TASK_TABLE);
+        db.execSQL(SQL_CREATE_LOCATION_TABLE);
+        db.execSQL(SQL_CREATE_REMINDER_TABLE);
+        db.execSQL(SQL_CREATE_RINGER_VOLUME_TABLE);
+
+        Log.d(LOG_TAG, SQL_CREATE_TASK_TABLE);
+        Log.d(LOG_TAG, SQL_CREATE_LOCATION_TABLE);
+        Log.d(LOG_TAG, SQL_CREATE_REMINDER_TABLE);
+        Log.d(LOG_TAG, SQL_CREATE_RINGER_VOLUME_TABLE);
 
 /*        final String SQL_CREATE_ACTION_TRIGGER_TABLE = "CREATE TABLE " + ActionTriggerEntry.TABLE_NAME +
                 " (" + ActionTriggerEntry.COLUMN_NAME_TASK_ID + " INTEGER NOT NULL, " +
@@ -76,9 +103,6 @@ public class DbHelper extends SQLiteOpenHelper{
                 "FOREIGN KEY (" + TriggerEntry.COLUMN_NAME_TASK_ID + ") REFERENCES " +
                 TaskEntry.TABLE_NAME + "(" + TaskEntry._ID + "))";*/
 
-        final String SQL_CREATE_TASK_TABLE = "CREATE TABLE " + TaskEntry.TABLE_NAME +
-                " (" + TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TaskEntry.COLUMN_NAME_TASK_NAME + " TEXT NOT NULL)";
 
 /*        final String SQL_CREATE_TIME_TABLE = "CREATE TABLE " + DbContract.TimeEntry.TABLE_NAME +
                 " (" + DbContract.TimeEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -92,12 +116,6 @@ public class DbHelper extends SQLiteOpenHelper{
         // db.execSQL(SQL_CREATE_REMINDER_TABLE);
         // db.execSQL(SQL_CREATE_LOCATION_TABLE);
 
-        db.execSQL(SQL_CREATE_TASK_TABLE);
-        db.execSQL(SQL_CREATE_LOCATION_TABLE);
-        db.execSQL(SQL_CREATE_REMINDER_TABLE);
-
-        Log.d(LOG_TAG, SQL_CREATE_LOCATION_TABLE);
-        Log.d(LOG_TAG, SQL_CREATE_REMINDER_TABLE);
     }
 
     @Override
@@ -111,7 +129,7 @@ public class DbHelper extends SQLiteOpenHelper{
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + DbContract.ReminderEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + AlarmEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + DbContract.LocationEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + TaskEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS  " + DbContract.TimeEntry.TABLE_NAME);

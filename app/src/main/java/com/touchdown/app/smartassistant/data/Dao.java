@@ -44,18 +44,17 @@ public abstract class Dao<T> {
                 null,
                 null,
                 sortOrder);
-        //todo can the db be closed at this point?
         return c;
     }
 
 
-    public List<T> findByFieldInt(String tableName, String columnName, int value){
-        Cursor cursor = getDataByFieldInt(tableName, columnName, value);
+    public List<T> findByFieldLong(String tableName, String columnName, long value){
+        Cursor cursor = getDataByFieldLong(tableName, columnName, value);
         List<T> list = getListFromCursor(cursor);
         return list;
     }
 
-    public Cursor getDataByFieldInt(String tableName, String columnName, int value){
+    public Cursor getDataByFieldLong(String tableName, String columnName, long value){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(tableName, null,
                 columnName + " = ?",

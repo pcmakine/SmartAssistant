@@ -4,11 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.touchdown.app.smartassistant.data.ActionReminderDao;
-import com.touchdown.app.smartassistant.data.DbContract;
-import com.touchdown.app.smartassistant.data.DbHelper;
-import com.touchdown.app.smartassistant.data.TaskDao;
-import com.touchdown.app.smartassistant.data.WriterDao;
 import com.touchdown.app.smartassistant.models.Action;
 import com.touchdown.app.smartassistant.models.Task;
 
@@ -20,14 +15,22 @@ import java.util.List;
 public class DatabaseManager {
     private SQLiteOpenHelper dbHelper;
     private TaskDao taskDao;
-    private ActionReminderDao reminderDao;
+    private AlarmDao reminderDao;
     private WriterDao wDao;
+    private static DatabaseManager sInstance;
 
-    public DatabaseManager(Context context){
+    private DatabaseManager(Context context){
         this.dbHelper = DbHelper.getInstance(context);
         this.taskDao = new TaskDao(dbHelper);
-        this.reminderDao = new ActionReminderDao(dbHelper);
+        this.reminderDao = new AlarmDao(dbHelper);
         this.wDao = new WriterDao(dbHelper);
+    }
+
+    public synchronized static DatabaseManager getInstance(Context context){
+        if(sInstance == null){
+            sInstance = new DatabaseManager(context);
+        }
+        return sInstance;
     }
 
     public long insertTask(Task task){
@@ -93,7 +96,7 @@ public class DatabaseManager {
     }
 
     public int getActiveTaskCount(){
-        return reminderDao.getActiveRemindersCount(DbContract.ReminderEntry.TABLE_NAME, DbContract.ReminderEntry.COLUMN_NAME_ON, 1);
+        return reminderDao.getActiveRemindersCount(DbContract.AlarmEntry.TABLE_NAME, DbContract.AlarmEntry.COLUMN_NAME_ON, 1);
     }
 
 

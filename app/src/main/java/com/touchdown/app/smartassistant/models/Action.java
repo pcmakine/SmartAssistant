@@ -6,22 +6,22 @@ import com.touchdown.app.smartassistant.data.Data;
  * Created by Pete on 19.8.2014.
  */
 public abstract class Action extends Data {
-    private int type;
+    private ActionType type;
     private boolean isOn;   //property of the subtables
     private long actionCollectionId;
 
-    public Action(long id, int type, boolean isOn, long actionCollectionId){
+    public Action(long id, ActionType type, boolean isOn, long actionCollectionId){
         super(id);
         this.type = type;
         this.isOn = isOn;
         this.actionCollectionId = actionCollectionId;
     }
 
-    public int getType(){
+    public ActionType getType(){
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(ActionType type) {
         this.type = type;
     }
 
@@ -55,7 +55,7 @@ public abstract class Action extends Data {
         }
         Action action = (Action) obj;
 
-        return getId() == action.getId();
+        return getId() == action.getId() && type == action.getType();
     }
 
     @Override
