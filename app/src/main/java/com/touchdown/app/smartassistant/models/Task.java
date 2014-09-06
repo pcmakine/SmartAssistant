@@ -2,7 +2,6 @@ package com.touchdown.app.smartassistant.models;
 
 import android.content.ContentValues;
 
-import com.touchdown.app.smartassistant.data.Data;
 import com.touchdown.app.smartassistant.data.DbContract;
 
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public class Task extends Data implements Comparable<Task>{
     public void setIdForThisAndChildObjects(long id){
         setId(id);
         if(trigger != null){
-           trigger.setActionId(id);
+           trigger.setTaskId(id);
         }
         if(actions != null){
             for(Action action: actions){

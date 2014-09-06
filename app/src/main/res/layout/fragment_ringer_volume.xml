@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/layout_bg"
+    android:orientation="vertical"
+    tools:context=".views.RingerVolumeFragment">
+
+    <FrameLayout
+        android:id = "@+id/titleFrame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+        <include layout="@layout/fragments_title"
+            />
+    </FrameLayout>
+
+    <SeekBar
+        android:id = "@+id/seekBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:max = "100"
+        />
+
+    <TextView
+        android:id = "@+id/ringerVolumeTw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

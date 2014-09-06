@@ -1,6 +1,6 @@
 package com.touchdown.app.smartassistant.models;
 
-import com.touchdown.app.smartassistant.data.Data;
+import android.os.Parcel;
 
 /**
  * Created by Pete on 19.8.2014.
@@ -8,17 +8,21 @@ import com.touchdown.app.smartassistant.data.Data;
 public abstract class Action extends Data {
     private ActionType type;
     private boolean isOn;   //property of the subtables
-    private long actionCollectionId;
+    private long taskId;
 
-    public Action(long id, ActionType type, boolean isOn, long actionCollectionId){
+    public Action(long id, ActionType type, boolean isOn, long taskId){
         super(id);
         this.type = type;
         this.isOn = isOn;
-        this.actionCollectionId = actionCollectionId;
+        this.taskId = taskId;
     }
 
     public ActionType getType(){
         return type;
+    }
+
+    protected Action(){
+
     }
 
     public void setType(ActionType type) {
@@ -37,15 +41,25 @@ public abstract class Action extends Data {
         isOn = false;
     }
 
-    public long getActionCollectionId(){
-        return actionCollectionId;
+    public void setOn(boolean on){
+        isOn = on;
     }
 
+    public long getTaskId(){
+        return taskId;
+    }
     public void setTaskId(long actionCollectionId){
-        this.actionCollectionId = actionCollectionId;
+        this.taskId = actionCollectionId;
     }
 
     public abstract void execute();
+
+    public void writeToParcel(Parcel dest, int flags){
+        dest.writeLong(getId());
+        dest.writeLong(taskId);
+        dest.writeInt(type.value);
+        dest.writeBooleanArray(new boolean[]{isOn});
+    }
 
     //todo check somewhere that this is a good way to implement equals
     @Override

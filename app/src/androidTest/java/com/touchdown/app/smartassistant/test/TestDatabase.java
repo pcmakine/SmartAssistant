@@ -26,8 +26,8 @@ import java.util.List;
 public class TestDatabase extends AndroidTestCase {
 
     public static final String LOG_TAG = TestDatabase.class.getSimpleName();
-    private static final double TEST_LAT = 60;
-    private static final double TEST_LONG = 20;
+    public static final double TEST_LAT = 60;
+    public static final double TEST_LONG = 20;
 
     private SQLiteOpenHelper dbHelper;
     private TaskDao taskDao;

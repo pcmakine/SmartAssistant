@@ -38,7 +38,7 @@ public class LocationFragment extends Fragment {
         LocationFragment fragment = new LocationFragment();
 
         Bundle args  = new Bundle();
-        args.putSerializable(ARGS_LOCATION, location);
+        args.putParcelable(ARGS_LOCATION, location);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,7 +51,7 @@ public class LocationFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            location = (TriggerLocation) getArguments().getSerializable("location");
+            location = getArguments().getParcelable("location");
         }
     }
 
@@ -132,6 +132,7 @@ public class LocationFragment extends Fragment {
                 if(location != null){
                     location.setRadius(radius);
                 }
+                mListener.onFragmentInteraction(location);
             }
 
             private String getRadiusText(){
@@ -164,7 +165,6 @@ public class LocationFragment extends Fragment {
         }
         return metersToProgress(SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD) +
                 (meters - SEEKBAR_MULTIPLIER_CHANGE_TRESHOLD) / SEEKBAR_MULTIPLIER_OVER_KILOMETER;
-
     }
 
     @Override

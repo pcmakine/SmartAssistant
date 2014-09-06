@@ -22,8 +22,8 @@
     </View>
 
     <SeekBar
-        android:layout_marginTop="@dimen/margin_between_items"
         android:id = "@+id/seekBar"
+        android:layout_marginTop="@dimen/margin_between_items"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="500"

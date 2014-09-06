@@ -20,14 +20,16 @@ import com.touchdown.app.smartassistant.data.asyncTasks.FetchOneTaskListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.FetchOneTaskTask;
 import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskTask;
+import com.touchdown.app.smartassistant.models.Action;
 import com.touchdown.app.smartassistant.models.Alarm;
+import com.touchdown.app.smartassistant.models.RingerVolume;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 import com.touchdown.app.smartassistant.services.PendingTask;
 
 
 public class DetailsActivity extends ActionBarActivity implements AlarmFragment.OnFragmentInteractionListener,
-        UpdateTaskListener, FetchOneTaskListener, LocationFragment.onFragmentInteractionListener {
+        UpdateTaskListener, FetchOneTaskListener, LocationFragment.onFragmentInteractionListener, OnActionFragmentInteractionListener {
     public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
 
     private LatLng location;
@@ -42,13 +44,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         super.onCreate(savedInstanceState);
         Log.e(LOG_TAG, "oncreate called");
 
-        Intent intent = getIntent();
-        if(noReminderIdInExtras(intent)){
-            createNewTask();
-        }else{
-            long id = intent.getLongExtra("reminderID", -1);
-            new FetchOneTaskTask(this).execute(id);
-        }
     }
 
     private void showUi(){
@@ -59,8 +54,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     private void prepareTaskRelatedUiElements(){
         addLocationFragment();
         addAlarmFragment();
-     //   setUpSeekBar();
-      //  setUpCheckBoxes();
+        addRingerVolumeFragment();
     }
 
     private boolean noReminderIdInExtras(Intent intent){
@@ -74,6 +68,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
             this.task = new Task(-1, "",
                     TriggerLocation.createDefault(location));
             task.addAction(Alarm.createDefault());
+            task.addAction(RingerVolume.createDefault());
         }else{
         }
         editMode = false;
@@ -148,7 +143,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
     public void addAlarmFragment(){
         FragmentManager fManager = getSupportFragmentManager();
-        Fragment alarmFragment = fManager.findFragmentById(R.id.fragment_container);
+        Fragment alarmFragment = fManager.findFragmentById(R.id.alarm_fragment_container);
 
         if(alarmFragment != null && alarmFragment.isInLayout()){
             //dont do anything
@@ -160,7 +155,27 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
             alarmFragment = AlarmFragment.createFragment(task.getAlarm());
 
-            fragmentTransaction.add(R.id.fragment_container, alarmFragment, "HELLO");
+            fragmentTransaction.add(R.id.alarm_fragment_container, alarmFragment, "HELLO");
+            fragmentTransaction.commit();
+
+        }
+    }
+
+    public void addRingerVolumeFragment(){
+        FragmentManager fManager = getSupportFragmentManager();
+        Fragment rVolumeFragment = fManager.findFragmentById(R.id.ringerVolume_fragment_container);
+
+        if(rVolumeFragment != null && rVolumeFragment.isInLayout()){
+            //dont do anything
+        }else{
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+            fragmentTransaction.setCustomAnimations(R.anim.pop_out, R.anim.exit);
+
+            rVolumeFragment = RingerVolumeFragment.createFragment(task.getRingerVolume());
+
+            fragmentTransaction.add(R.id.ringerVolume_fragment_container, rVolumeFragment, "HELLO");
             fragmentTransaction.commit();
 
         }
@@ -178,6 +193,13 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
     @Override
     public void onResume(){
+        Intent intent = getIntent();
+        if(noReminderIdInExtras(intent)){
+            createNewTask();
+        }else{
+            long id = intent.getLongExtra("reminderID", -1);
+            new FetchOneTaskTask(this).execute(id);
+        }
         super.onResume();
     }
 
@@ -254,6 +276,11 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     @Override
     public void onFragmentInteraction(TriggerLocation location) {
         task.setLocation(location);
+    }
+
+    @Override
+    public void onFragmentInteraction(Action action) {
+        task.addAction(action);
     }
 }
 

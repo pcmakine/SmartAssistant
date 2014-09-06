@@ -42,7 +42,7 @@ public class ListActivity extends ActionBarActivity implements FetchAllDataListe
         setContentView(R.layout.activity_list);
         listView = (ListView) findViewById(R.id.list);
 
-        Util.clearDb(this, DbHelper.getInstance(this));
+        //Util.clearDb(this, DbHelper.getInstance(this));
   //      Util.clearAndInsertTestData(this, new DbHelper(this));
 
         // ListView Item Click Listener

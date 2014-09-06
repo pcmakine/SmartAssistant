@@ -23,7 +23,8 @@ import com.touchdown.app.smartassistant.models.Alarm;
  *
  */
 public class AlarmFragment extends Fragment {
-    public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
+    public static final String LOG_TAG = AlarmFragment.class.getSimpleName();
+    private static final String ALARM_BUNDLE_KEY = "alarm";
 
     private OnFragmentInteractionListener mListener;
     private CompoundButton onSwitch;
@@ -34,7 +35,7 @@ public class AlarmFragment extends Fragment {
     public static AlarmFragment createFragment(Alarm alarm) {
         AlarmFragment fragment = new AlarmFragment();
         Bundle args = new Bundle();
-        args.putSerializable("alarm", alarm);
+        args.putParcelable(ALARM_BUNDLE_KEY, alarm);
         fragment.setArguments(args);
         return fragment;
     }
@@ -46,7 +47,7 @@ public class AlarmFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            alarm = (Alarm) getArguments().getSerializable("alarm");
+            alarm = (Alarm) getArguments().getParcelable(ALARM_BUNDLE_KEY);
         }
     }
 

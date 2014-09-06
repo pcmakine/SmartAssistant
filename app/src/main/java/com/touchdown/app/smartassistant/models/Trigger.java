@@ -1,35 +1,39 @@
 package com.touchdown.app.smartassistant.models;
 
-import android.content.ContentValues;
-
-import com.touchdown.app.smartassistant.data.Data;
-
-import java.io.Serializable;
+import android.os.Parcelable;
 
 
 /**
  * Created by Pete on 18.8.2014.
  */
-public abstract class Trigger extends Data {
+public abstract class Trigger extends Data implements Parcelable {
     private int type;
-    private long actionId;
+    private long taskId;
 
-    public Trigger(long id, int type, long actionId) {
+    public Trigger(long id, int type, long taskId) {
         super(id);
         this.type = type;
-        this.actionId = actionId;
+        this.taskId = taskId;
+    }
+
+    protected Trigger(){
+
     }
 
     public int getType(){
         return type;
     }
 
-    public long getActionId() {
-        return actionId;
+    public void setType(int type){
+        this.type = type;
     }
 
-    public void setActionId(long actionId){
-        this.actionId = actionId;
+    public long getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(long taskId){
+        this.taskId = taskId;
     }
 
 

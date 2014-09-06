@@ -3,6 +3,8 @@ package com.touchdown.app.smartassistant.models;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
 import com.touchdown.app.smartassistant.services.Util;
@@ -15,9 +17,10 @@ import java.io.Serializable;
 /**
  * Created by Pete on 19.8.2014.
  */
-public class Alarm extends Action implements Serializable {
+public class Alarm extends Action implements Parcelable {
     private static final String TABLE_NAME = DbContract.AlarmEntry.TABLE_NAME;
     private static final String ID_COLUMN = DbContract.AlarmEntry._ID;
+    private static final int NUMBER_OF_BOOLEANS = 3;
 
     private String content;
     private boolean notification;
@@ -87,7 +90,7 @@ public class Alarm extends Action implements Serializable {
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_CONTENT, content);
         int onInteger = Util.booleanAsInt(isOn());
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_ON, onInteger);
-        vals.put(DbContract.AlarmEntry.COLUMN_NAME_TASK_ID, this.getActionCollectionId());
+        vals.put(DbContract.AlarmEntry.COLUMN_NAME_TASK_ID, this.getTaskId());
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_TYPE, this.getType().value);
 
         int fullScreenInt = Util.booleanAsInt(fullScreen);
@@ -97,5 +100,54 @@ public class Alarm extends Action implements Serializable {
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_FULLSCREEN_ENABLED, fullScreenInt);
 
         return vals;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+
+        //this class
+        dest.writeString(content);
+        dest.writeBooleanArray(new boolean[]
+                {isOn(),
+                notification,
+                fullScreen});
+        int five = 5;
+    }
+
+    public static final Parcelable.Creator<Alarm> CREATOR
+            = new Parcelable.Creator<Alarm>() {
+        public Alarm createFromParcel(Parcel in) {
+            return new Alarm(in);
+        }
+
+        public Alarm[] newArray(int size) {
+            return new Alarm[size];
+        }
+    };
+
+    private Alarm(Parcel in) {
+        //superclass
+        setId(in.readLong());
+        setTaskId(in.readLong());
+        setType(ActionType.getEnum(in.readInt()));
+
+        content = in.readString();
+
+        boolean[] booleans = new boolean[NUMBER_OF_BOOLEANS];
+        in.readBooleanArray(booleans);
+
+        setOn(booleans[0]);
+
+        //this class
+
+        notification = booleans[1];
+        fullScreen = booleans[2];
+
     }
 }

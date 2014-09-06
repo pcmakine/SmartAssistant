@@ -63,5 +63,8 @@
     <string name="remove_error">An error occured, task not deleted</string>
     <string name="title_activity_fullscreen_alarm">FullscreenAlarmActivity</string>
     <string name="stop_alarm">Stop alarm</string>
+    <string name="ringer_volume_title">Change ringer volume</string>
+    <string name="volume">Volume:</string>
+    <string name="silent">Silent</string>
 
 </resources>

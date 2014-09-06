@@ -34,13 +34,22 @@
                 android:layout_height="wrap_content">
 
             </FrameLayout>
-            <LinearLayout
-                android:id="@+id/fragment_container"
+            <FrameLayout
+                android:id="@+id/alarm_fragment_container"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_between_items"
                 android:orientation="vertical"
                 >
-            </LinearLayout>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/ringerVolume_fragment_container"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_between_items"
+                android:orientation="vertical"
+                >
+            </FrameLayout>
         </LinearLayout>
     </ScrollView>
 

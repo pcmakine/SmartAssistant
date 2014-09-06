@@ -3,7 +3,7 @@ package com.touchdown.app.smartassistant.data;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.touchdown.app.smartassistant.data.Data;
+import com.touchdown.app.smartassistant.models.Data;
 
 /**
  * Created by Pete on 21.8.2014.

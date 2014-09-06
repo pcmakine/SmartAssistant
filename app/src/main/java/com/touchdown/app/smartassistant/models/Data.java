@@ -1,4 +1,4 @@
-package com.touchdown.app.smartassistant.data;
+package com.touchdown.app.smartassistant.models;
 
 import android.content.ContentValues;
 
@@ -10,6 +10,10 @@ public abstract class Data {
 
     public Data(long id){
         this.id = id;
+    }
+
+    protected Data(){
+
     }
 
 

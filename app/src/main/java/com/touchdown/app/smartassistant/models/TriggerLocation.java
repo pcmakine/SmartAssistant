@@ -1,19 +1,20 @@
 package com.touchdown.app.smartassistant.models;
 
 import android.content.ContentValues;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.services.Util;
 import com.touchdown.app.smartassistant.data.DbContract;
 
-import java.io.Serializable;
-
 /**
  * Created by Pete on 18.8.2014.
  */
-public class TriggerLocation extends Trigger implements Serializable {
+public class TriggerLocation extends Trigger implements Parcelable {
     private static final String TABLE_NAME = DbContract.LocationEntry.TABLE_NAME;
     private static final String ID_COLUMN = DbContract.LocationEntry._ID;
+    private static final int NUMBER_OF_BOOLEANS = 3;    //number of boolean fields. Used to create the parcel
 
     public static final int DEFAULT_RADIUS = 200;
     public static final int TRIGGER_TYPE = 0;
@@ -22,7 +23,7 @@ public class TriggerLocation extends Trigger implements Serializable {
     private int radius;     //meters
     private boolean triggerWhenEntering;
     private boolean triggerWhenLeaving;
-    private boolean pending;        //wether the task was started inside the location and is waiting to be activated once the user is outside
+    private boolean pending;        //whether the task was started inside the location and is waiting to be activated once the user is outside
 
     public TriggerLocation(long id, LatLng loc, int radius, long actionId) {
         super(id, 0, actionId);
@@ -35,6 +36,7 @@ public class TriggerLocation extends Trigger implements Serializable {
         }
         this.triggerWhenEntering = true;
     }
+
 
     public static TriggerLocation createDefault(LatLng latLng){
         TriggerLocation loc = new TriggerLocation(-1, latLng, TriggerLocation.DEFAULT_RADIUS, -1);
@@ -115,7 +117,7 @@ public class TriggerLocation extends Trigger implements Serializable {
         vals.put(DbContract.LocationEntry.COLUMN_NAME_LONG, latLng.longitude);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_RADIUS, radius);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_TYPE, this.getType());
-        vals.put(DbContract.LocationEntry.COLUMN_NAME_TASK_ID, this.getActionId());
+        vals.put(DbContract.LocationEntry.COLUMN_NAME_TASK_ID, this.getTaskId());
 
         int arrivalTriggerInt = Util.booleanAsInt(triggerWhenEntering);
         int departureTriggerInt = Util.booleanAsInt(triggerWhenLeaving);
@@ -126,5 +128,55 @@ public class TriggerLocation extends Trigger implements Serializable {
         vals.put(DbContract.LocationEntry.COLUMN_NAME_PENDING, pendingInt);
 
         return vals;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        //values from the superclass
+        dest.writeLong(getId());
+        dest.writeLong(getTaskId());
+        dest.writeInt(getType());
+
+        //this class' values
+        dest.writeParcelable(latLng, 0);
+        dest.writeInt(radius);
+        dest.writeBooleanArray(
+                new boolean[]{
+                triggerWhenEntering,
+                triggerWhenLeaving,
+                pending});
+    }
+
+    public static final Parcelable.Creator<TriggerLocation> CREATOR
+            = new Parcelable.Creator<TriggerLocation>() {
+        public TriggerLocation createFromParcel(Parcel in) {
+            return new TriggerLocation(in);
+        }
+
+        public TriggerLocation[] newArray(int size) {
+            return new TriggerLocation[size];
+        }
+    };
+
+    private TriggerLocation(Parcel in) {
+        //superclass
+        setId(in.readLong());
+        setTaskId(in.readLong());
+        setType(in.readInt());
+
+        //this class
+        latLng = in.readParcelable(null);   //null to use the default class loader
+        radius = in.readInt();
+
+        boolean[] booleans = new boolean[NUMBER_OF_BOOLEANS];
+        in.readBooleanArray(booleans);
+        triggerWhenEntering = booleans[0];
+        triggerWhenLeaving = booleans[1];
+        pending = booleans[2];
     }
 }
