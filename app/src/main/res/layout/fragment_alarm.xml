@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".views.NotificationReminderFragment"
 
+    android:id = "@+id/alarmContainer"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/layout_bg"

@@ -7,7 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
-import com.touchdown.app.smartassistant.services.Util;
+import com.touchdown.app.smartassistant.services.Common;
 import com.touchdown.app.smartassistant.data.DbContract.RingerVolumeEntry;
 
 /**
@@ -68,7 +68,7 @@ public class RingerVolume extends Action implements Parcelable {
     public ContentValues getContentValues() {
         ContentValues vals = new ContentValues();
         vals.put(RingerVolumeEntry.COLUMN_NAME_TASK_ID, this.getTaskId());
-        int onInteger = Util.booleanAsInt(isOn());
+        int onInteger = Common.booleanAsInt(isOn());
         vals.put(RingerVolumeEntry.COLUMN_NAME_ON, onInteger);
         vals.put(RingerVolumeEntry.COLUMN_NAME_TYPE, this.getType().value);
         vals.put(RingerVolumeEntry.COLUMN_NAME_VOLUME, volume);
@@ -84,6 +84,9 @@ public class RingerVolume extends Action implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
+
+        dest.writeBooleanArray(new boolean[]
+                {isOn()});
 
         //this class
         dest.writeInt(volume);

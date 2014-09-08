@@ -1,11 +1,12 @@
 package com.touchdown.app.smartassistant.models;
 
 import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by Pete on 19.8.2014.
  */
-public abstract class Action extends Data {
+public abstract class Action extends Data implements Parcelable {
     private ActionType type;
     private boolean isOn;   //property of the subtables
     private long taskId;
@@ -22,7 +23,6 @@ public abstract class Action extends Data {
     }
 
     protected Action(){
-
     }
 
     public void setType(ActionType type) {
@@ -58,7 +58,7 @@ public abstract class Action extends Data {
         dest.writeLong(getId());
         dest.writeLong(taskId);
         dest.writeInt(type.value);
-        dest.writeBooleanArray(new boolean[]{isOn});
+  //      dest.writeBooleanArray(new boolean[]{isOn});      doing this here makes the app crash when unmarshalling
     }
 
     //todo check somewhere that this is a good way to implement equals

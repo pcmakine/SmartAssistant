@@ -1,6 +1,11 @@
 package com.touchdown.app.smartassistant.views;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,21 +17,12 @@ import android.widget.LinearLayout;
 
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.models.Alarm;
+import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link AlarmFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link AlarmFragment#createFragment} factory method to
- * create an instance of this fragment.
- *
- */
-public class AlarmFragment extends Fragment {
+public class AlarmFragment extends ActionFragment {
     public static final String LOG_TAG = AlarmFragment.class.getSimpleName();
     private static final String ALARM_BUNDLE_KEY = "alarm";
 
-    private OnFragmentInteractionListener mListener;
     private CompoundButton onSwitch;
     private Alarm alarm;
     private CheckBox fullScreenAlarm;
@@ -67,19 +63,32 @@ public class AlarmFragment extends Fragment {
         return ll;
     }
 
-    private void setUpCompoundButton(){
+    @Override
+    protected void setUpCompoundButton(){
         onSwitch.setChecked(alarm.isOn());
         onSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     alarm.turnOn();
+                    changeFrameColor(getResources().getColor(R.color.orange), R.id.alarmContainer);
                 }else{
                     alarm.turnOff();
+                    changeFrameColor(getResources().getColor(R.color.blue), R.id.alarmContainer);
                 }
-                passUpdatedReminderToParentActivity(alarm);
+                mListener.onFragmentInteraction(alarm);
             }
         });
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if(alarm.isOn()){
+            changeFrameColor(getResources().getColor(R.color.orange), R.id.alarmContainer);
+        }else{
+            changeFrameColor(getResources().getColor(R.color.blue), R.id.alarmContainer);
+        }
     }
 
     private void setUpCheckBoxes(){
@@ -111,44 +120,6 @@ public class AlarmFragment extends Fragment {
             return true;
         }
         return false;
-    }
-
-
-    public void passUpdatedReminderToParentActivity(Alarm alarm) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(alarm);
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Alarm alarm);
     }
 
 }

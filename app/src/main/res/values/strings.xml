@@ -52,7 +52,7 @@
     <string name="location_trigger_title">Location trigger</string>
     <string name="entering">Entering</string>
     <string name="exiting">Leaving</string>
-    <string name="alarm_action_title">Action: alarm</string>
+    <string name="alarm_action_title">Alarm</string>
     <string name="fullscreen_alarm_title">Fullscreen alarm</string>
 
     <!-- PROGRESS INDICATOR -->

@@ -5,7 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.touchdown.app.smartassistant.services.Util;
+import com.touchdown.app.smartassistant.services.Common;
 import com.touchdown.app.smartassistant.data.DbContract;
 
 /**
@@ -119,9 +119,9 @@ public class TriggerLocation extends Trigger implements Parcelable {
         vals.put(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_TYPE, this.getType());
         vals.put(DbContract.LocationEntry.COLUMN_NAME_TASK_ID, this.getTaskId());
 
-        int arrivalTriggerInt = Util.booleanAsInt(triggerWhenEntering);
-        int departureTriggerInt = Util.booleanAsInt(triggerWhenLeaving);
-        int pendingInt = Util.booleanAsInt(pending);
+        int arrivalTriggerInt = Common.booleanAsInt(triggerWhenEntering);
+        int departureTriggerInt = Common.booleanAsInt(triggerWhenLeaving);
+        int pendingInt = Common.booleanAsInt(pending);
 
         vals.put(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL, arrivalTriggerInt);
         vals.put(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE, departureTriggerInt);
@@ -170,7 +170,7 @@ public class TriggerLocation extends Trigger implements Parcelable {
         setType(in.readInt());
 
         //this class
-        latLng = in.readParcelable(null);   //null to use the default class loader
+        latLng = in.readParcelable(LatLng.class.getClassLoader());
         radius = in.readInt();
 
         boolean[] booleans = new boolean[NUMBER_OF_BOOLEANS];

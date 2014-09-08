@@ -5,8 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
-import com.touchdown.app.smartassistant.services.Util;
+import com.touchdown.app.smartassistant.services.Common;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 
 /**
@@ -35,9 +34,9 @@ public class LocDao extends Dao<TriggerLocation> {
 
         TriggerLocation loc = new TriggerLocation(id, new LatLng(lat, longitude), radius, parentId);
 
-        boolean arrivalTriggerOn = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL)));
-        boolean departureTriggerOn = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE)));
-        boolean pending = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_PENDING)));
+        boolean arrivalTriggerOn = Common.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_ARRIVAL)));
+        boolean departureTriggerOn = Common.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_TRIGGER_ON_DEPARTURE)));
+        boolean pending = Common.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.LocationEntry.COLUMN_NAME_PENDING)));
 
         loc.setArrivalTrigger(arrivalTriggerOn);
         loc.setDepartureTrigger(departureTriggerOn);

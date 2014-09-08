@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.touchdown.app.smartassistant.R;
+import com.touchdown.app.smartassistant.services.Common;
 import com.touchdown.app.smartassistant.services.GeocoderListener;
 import com.touchdown.app.smartassistant.services.GeocoderTask;
 import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksListener;
@@ -154,9 +155,9 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
         }
     }
 
-    public void startEdit(Task r){
+    public void startEdit(Task task){
         Intent intent = new Intent(this, DetailsActivity.class);
-        intent.putExtra("reminderID", r.getId());
+        intent.putExtra(Common.TASK_TAG, task);
         startActivity(intent);
     }
 

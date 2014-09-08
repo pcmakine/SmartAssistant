@@ -7,12 +7,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
-import com.touchdown.app.smartassistant.services.Util;
+import com.touchdown.app.smartassistant.services.Common;
 import com.touchdown.app.smartassistant.data.DbContract;
 import com.touchdown.app.smartassistant.views.AlarmNotification;
 import com.touchdown.app.smartassistant.views.FullscreenAlarmActivity;
-
-import java.io.Serializable;
 
 /**
  * Created by Pete on 19.8.2014.
@@ -88,13 +86,13 @@ public class Alarm extends Action implements Parcelable {
     public ContentValues getContentValues() {
         ContentValues vals = new ContentValues();
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_CONTENT, content);
-        int onInteger = Util.booleanAsInt(isOn());
+        int onInteger = Common.booleanAsInt(isOn());
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_ON, onInteger);
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_TASK_ID, this.getTaskId());
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_TYPE, this.getType().value);
 
-        int fullScreenInt = Util.booleanAsInt(fullScreen);
-        int notificationInt = Util.booleanAsInt(notification);
+        int fullScreenInt = Common.booleanAsInt(fullScreen);
+        int notificationInt = Common.booleanAsInt(notification);
 
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_NOTIFICATION_ENABLED, notificationInt);
         vals.put(DbContract.AlarmEntry.COLUMN_NAME_FULLSCREEN_ENABLED, fullScreenInt);
@@ -117,7 +115,6 @@ public class Alarm extends Action implements Parcelable {
                 {isOn(),
                 notification,
                 fullScreen});
-        int five = 5;
     }
 
     public static final Parcelable.Creator<Alarm> CREATOR

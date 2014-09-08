@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.touchdown.app.smartassistant.models.ActionType;
 import com.touchdown.app.smartassistant.models.Alarm;
 import com.touchdown.app.smartassistant.models.RingerVolume;
+import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 
 import java.lang.reflect.Field;
@@ -89,6 +90,32 @@ public class TestParcelable extends AndroidTestCase {
         assertEquals(alarm.isNotificationEnabled(), readAlarm.isNotificationEnabled());
 
         assertEquals(fieldsWrittenToParcel, countObjectAndItsSuperclassNonStaticFields(alarm));
+    }
+
+    public void testReadWriteTask(){
+
+        int fieldsWrittenToParcel = 4;
+
+        TriggerLocation location = TriggerLocation.createDefault(new LatLng(TestDatabase.TEST_LAT, TestDatabase.TEST_LONG));
+        Alarm alarm = Alarm.createDefault();
+
+        Task task = new Task(5, "testTask", location);
+        task.addAction(alarm);
+
+        task.setIdForThisAndChildObjects(5);
+
+        Bundle bundle = new Bundle();
+
+        bundle.putParcelable("task", task);
+
+        Task readTask = bundle.getParcelable("task");
+
+        assertEquals(task.getId(), readTask.getId());
+        assertEquals(task.getId(), readTask.getAlarm().getTaskId());
+        assertEquals(task.getLocation().getLatLng(), readTask.getLocation().getLatLng());
+
+        assertEquals(fieldsWrittenToParcel, countObjectAndItsSuperclassNonStaticFields(task));
+
     }
 
     private int countObjectAndItsSuperclassNonStaticFields(Object object){

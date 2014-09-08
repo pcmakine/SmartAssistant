@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.touchdown.app.smartassistant.models.ActionType;
 import com.touchdown.app.smartassistant.models.Alarm;
-import com.touchdown.app.smartassistant.services.Util;
+import com.touchdown.app.smartassistant.services.Common;
 
 /**
  * Created by Pete on 19.8.2014.
@@ -27,10 +27,10 @@ public class AlarmDao extends Dao<Alarm> {
         long actionCollectionId = cursor.getLong(cursor.getColumnIndex(DbContract.AlarmEntry.COLUMN_NAME_TASK_ID));
         String content = cursor.getString(cursor.getColumnIndex(DbContract.AlarmEntry.COLUMN_NAME_CONTENT));
         int type = cursor.getInt(cursor.getColumnIndex(DbContract.AlarmEntry.COLUMN_NAME_TYPE));
-        boolean isOn = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.AlarmEntry.COLUMN_NAME_ON)));
+        boolean isOn = Common.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.AlarmEntry.COLUMN_NAME_ON)));
 
-        boolean notificationEnabled = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.AlarmEntry.COLUMN_NAME_NOTIFICATION_ENABLED)));
-        boolean fullscreenEnabled = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.AlarmEntry.COLUMN_NAME_FULLSCREEN_ENABLED)));
+        boolean notificationEnabled = Common.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.AlarmEntry.COLUMN_NAME_NOTIFICATION_ENABLED)));
+        boolean fullscreenEnabled = Common.intAsBoolean(cursor.getInt(cursor.getColumnIndex(DbContract.AlarmEntry.COLUMN_NAME_FULLSCREEN_ENABLED)));
 
         Alarm alarm = new Alarm(id, ActionType.ALARM, content, isOn, actionCollectionId);
 

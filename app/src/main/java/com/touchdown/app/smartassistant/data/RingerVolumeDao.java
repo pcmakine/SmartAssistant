@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.touchdown.app.smartassistant.models.ActionType;
 import com.touchdown.app.smartassistant.models.RingerVolume;
-import com.touchdown.app.smartassistant.services.Util;
+import com.touchdown.app.smartassistant.services.Common;
 import com.touchdown.app.smartassistant.data.DbContract.RingerVolumeEntry;
 
 /**
@@ -27,7 +27,7 @@ public class RingerVolumeDao extends Dao<RingerVolume> {
         long actionCollectionId = cursor.getLong(cursor.getColumnIndex(RingerVolumeEntry.COLUMN_NAME_TASK_ID));
 
         int type = cursor.getInt(cursor.getColumnIndex(RingerVolumeEntry.COLUMN_NAME_TYPE));
-        boolean isOn = Util.intAsBoolean(cursor.getInt(cursor.getColumnIndex(RingerVolumeEntry.COLUMN_NAME_ON)));
+        boolean isOn = Common.intAsBoolean(cursor.getInt(cursor.getColumnIndex(RingerVolumeEntry.COLUMN_NAME_ON)));
 
         RingerVolume rVolume = new RingerVolume(id, ActionType.RINGERVOLUME, isOn, actionCollectionId);
 

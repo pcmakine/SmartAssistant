@@ -7,7 +7,6 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.CountDownTimer;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -17,7 +16,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import com.touchdown.app.smartassistant.R;
-import com.touchdown.app.smartassistant.services.Util;
+import com.touchdown.app.smartassistant.services.Common;
 
 import java.io.IOException;
 
@@ -57,7 +56,7 @@ public class FullscreenAlarmActivity extends Activity {
     }
 
     private void setAlarmExpiration(){
-        timer = new CountDownTimer(Util.secondsToMs(ALARMEXPIRATION), Util.secondsToMs(ALARMEXPIRATION)) {
+        timer = new CountDownTimer(Common.secondsToMs(ALARMEXPIRATION), Common.secondsToMs(ALARMEXPIRATION)) {
             @Override
             public void onTick(long millisUntilFinished) {
             }

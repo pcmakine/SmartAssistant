@@ -1,8 +1,6 @@
 package com.touchdown.app.smartassistant.views;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +11,10 @@ import android.widget.TextView;
 
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.models.RingerVolume;
-import com.touchdown.app.smartassistant.services.ApplicationContextProvider;
 
-public class RingerVolumeFragment extends Fragment {
+public class RingerVolumeFragment extends ActionFragment {
     public static final String LOG_TAG = RingerVolumeFragment.class.getSimpleName();
     private static final String RINGERVOLUME_BUNDLE_KEY = "ringerVolume";
-
-    private OnActionFragmentInteractionListener mListener;
 
     private RingerVolume ringerVolume;
     private SeekBar seekBar;
@@ -102,38 +97,32 @@ public class RingerVolumeFragment extends Fragment {
         });
     }
 
-    private void setUpCompoundButton(){
+    @Override
+    protected void setUpCompoundButton(){
         onSwitch.setChecked(ringerVolume.isOn());
+
         onSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     ringerVolume.turnOn();
+                    changeFrameColor(getResources().getColor(R.color.orange), R.id.ringerVolumeContainer);
                 }else{
                     ringerVolume.turnOff();
+                    changeFrameColor(getResources().getColor(R.color.blue), R.id.ringerVolumeContainer);
                 }
                 mListener.onFragmentInteraction(ringerVolume);
             }
         });
     }
 
-
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnActionFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+    public void onResume(){
+        super.onResume();
+        if(ringerVolume.isOn()){
+            changeFrameColor(getResources().getColor(R.color.orange), R.id.ringerVolumeContainer);
+        }else{
+            changeFrameColor(getResources().getColor(R.color.blue), R.id.ringerVolumeContainer);
         }
     }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-
 }

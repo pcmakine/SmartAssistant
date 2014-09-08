@@ -25,11 +25,12 @@ import com.touchdown.app.smartassistant.models.Alarm;
 import com.touchdown.app.smartassistant.models.RingerVolume;
 import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
+import com.touchdown.app.smartassistant.services.Common;
 import com.touchdown.app.smartassistant.services.PendingTask;
 
 
-public class DetailsActivity extends ActionBarActivity implements AlarmFragment.OnFragmentInteractionListener,
-        UpdateTaskListener, FetchOneTaskListener, LocationFragment.onFragmentInteractionListener, OnActionFragmentInteractionListener {
+public class DetailsActivity extends ActionBarActivity implements UpdateTaskListener,
+        FetchOneTaskListener, LocationFragment.onFragmentInteractionListener, OnActionFragmentInteractionListener {
     public static final String LOG_TAG = DetailsActivity.class.getSimpleName();
 
     private LatLng location;
@@ -42,6 +43,15 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        showUi();
+
+        Intent intent = getIntent();
+        task = intent.getParcelableExtra(Common.TASK_TAG);
+        if(task == null){
+            createNewTask();
+        }else{
+            useExistingReminder(task);
+        }
         Log.e(LOG_TAG, "oncreate called");
 
     }
@@ -55,10 +65,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
         addLocationFragment();
         addAlarmFragment();
         addRingerVolumeFragment();
-    }
-
-    private boolean noReminderIdInExtras(Intent intent){
-        return intent.getLongExtra("reminderID", -1) == -1;
     }
 
     private void createNewTask(){
@@ -193,13 +199,7 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
 
     @Override
     public void onResume(){
-        Intent intent = getIntent();
-        if(noReminderIdInExtras(intent)){
-            createNewTask();
-        }else{
-            long id = intent.getLongExtra("reminderID", -1);
-            new FetchOneTaskTask(this).execute(id);
-        }
+
         super.onResume();
     }
 
@@ -266,11 +266,6 @@ public class DetailsActivity extends ActionBarActivity implements AlarmFragment.
     public void deliverTask(Task task) {
         showUi();
         useExistingReminder(task);
-    }
-
-    @Override
-    public void onFragmentInteraction(Alarm alarm) {
-        task.addAction(alarm);
     }
 
     @Override

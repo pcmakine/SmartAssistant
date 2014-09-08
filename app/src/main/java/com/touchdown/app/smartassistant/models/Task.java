@@ -1,6 +1,8 @@
 package com.touchdown.app.smartassistant.models;
 
 import android.content.ContentValues;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.touchdown.app.smartassistant.data.DbContract;
 
@@ -12,7 +14,7 @@ import java.util.Set;
 /**
  * Created by Pete on 19.8.2014.
  */
-public class Task extends Data implements Comparable<Task>{
+public class Task extends Data implements Comparable<Task>, Parcelable{
     private static final String TABLE_NAME = DbContract.TaskEntry.TABLE_NAME;
     private static final String ID_COLUMN = DbContract.TaskEntry._ID;
 
@@ -163,5 +165,63 @@ public class Task extends Data implements Comparable<Task>{
         ContentValues vals = new ContentValues();
         vals.put(DbContract.TaskEntry.COLUMN_NAME_TASK_NAME, this.name);
         return vals;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        //superclass
+        dest.writeLong(getId());
+
+        //this class
+        dest.writeString(name);
+        dest.writeParcelable(trigger, 0);
+        actionsToParcel(dest, flags);
+    }
+
+    private void actionsToParcel(Parcel dest, int flags){
+        dest.writeInt(actions.size());
+        for (Action action: actions){
+            dest.writeParcelable(action, 0);
+        }
+    }
+
+    public static final Parcelable.Creator<Task> CREATOR
+            = new Parcelable.Creator<Task>() {
+        public Task createFromParcel(Parcel in) {
+            return new Task(in);
+        }
+
+        public Task[] newArray(int size) {
+            return new Task[size];
+        }
+    };
+
+    private Task(Parcel in) {
+        //superclass
+        setId(in.readLong());
+
+        name = in.readString();
+        trigger = in.readParcelable(TriggerLocation.class.getClassLoader());
+
+        int numberOfActions = in.readInt();
+        retrieveActions(in, numberOfActions);
+    }
+
+    private void retrieveActions(Parcel in, int numberOfActions){
+        actions = new HashSet<Action>();
+        for (int i = 0; i < numberOfActions; i++){
+            Action action = (Action) in.readParcelable(Action.class.getClassLoader());
+            actions.add(action);
+        }
+    }
+
+    @Override
+    public String toString(){
+        return name;
     }
 }

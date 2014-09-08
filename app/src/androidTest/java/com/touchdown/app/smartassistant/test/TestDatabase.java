@@ -9,7 +9,7 @@ import com.touchdown.app.smartassistant.data.AlarmDao;
 import com.touchdown.app.smartassistant.data.DatabaseManager;
 import com.touchdown.app.smartassistant.models.Alarm;
 import com.touchdown.app.smartassistant.models.RingerVolume;
-import com.touchdown.app.smartassistant.services.Util;
+import com.touchdown.app.smartassistant.services.Common;
 
 import com.touchdown.app.smartassistant.data.DbHelper;
 import com.touchdown.app.smartassistant.data.LocDao;
@@ -17,8 +17,6 @@ import com.touchdown.app.smartassistant.models.Task;
 import com.touchdown.app.smartassistant.data.TaskDao;
 import com.touchdown.app.smartassistant.models.TriggerLocation;
 import com.touchdown.app.smartassistant.data.WriterDao;
-
-import java.util.List;
 
 /**
  * Created by Pete on 20.8.2014.
@@ -41,7 +39,7 @@ public class TestDatabase extends AndroidTestCase {
     public void setUp(){
         dbManager = DatabaseManager.getInstance(mContext);
         this.dbHelper = DbHelper.getInstance(mContext);
-        Util.clearDb(mContext, dbHelper);
+        Common.clearDb(mContext, dbHelper);
 
         reminderDao = new AlarmDao(dbHelper);
         locationDao = new LocDao(dbHelper);
