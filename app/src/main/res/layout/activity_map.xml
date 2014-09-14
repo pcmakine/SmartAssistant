@@ -19,7 +19,7 @@
             android:text="@string/find_location_btn"
             android:layout_alignParentRight="true" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/locationInput"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

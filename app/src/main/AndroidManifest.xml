@@ -37,20 +37,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".views.MapActivity"
-            android:label="@string/title_activity_map"
-            android:launchMode="singleTop" >
-        </activity>
-        <activity
-            android:name=".views.DetailsActivity"
-            android:label="@string/title_activity_details"
-            android:parentActivityName=".views.MapActivity"
-            android:windowSoftInputMode="stateUnchanged" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.touchdown.app.smartassistant.MapActivity" />
-        </activity>
 
         <receiver android:name=".services.ProximityIntentReceiver" >
             <intent-filter>

@@ -21,7 +21,7 @@ public class MyLocationProvider {
         locManager = (LocationManager) ctx.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
     }
 
-    public Location getLocation(){
+    public Location getCurrentLocation(){
         int minTime = 0;
         float bestAccuracy = Float.MAX_VALUE;
         Location bestResult = null;
@@ -60,7 +60,7 @@ public class MyLocationProvider {
     }
 
     public boolean isUserInLocation(LatLng latLng, int radiusInMeters){
-        return isLocationInArea(getLocation(), latLng, radiusInMeters);
+        return isLocationInArea(getCurrentLocation(), latLng, radiusInMeters);
     }
 
     public boolean isLocationInArea(Location location, LatLng areaCenter, int radiusInMeters){

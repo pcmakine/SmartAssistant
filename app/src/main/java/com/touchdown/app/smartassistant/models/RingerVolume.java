@@ -50,7 +50,7 @@ public class RingerVolume extends Action implements Parcelable {
 
         double volMultiplier = (volume/(MAX_VOLUME * 1.0));
 
-        aManager.setStreamVolume(AudioManager.STREAM_RING, (int) volMultiplier*maxVol, AudioManager.FLAG_VIBRATE);
+        aManager.setStreamVolume(AudioManager.STREAM_RING, (int) volMultiplier*maxVol, 0);
 
     }
 

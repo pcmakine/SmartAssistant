@@ -3,15 +3,20 @@ package com.touchdown.app.smartassistant.views;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -23,8 +28,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.touchdown.app.smartassistant.R;
 import com.touchdown.app.smartassistant.services.Common;
-import com.touchdown.app.smartassistant.services.GeocoderListener;
-import com.touchdown.app.smartassistant.services.GeocoderTask;
+import com.touchdown.app.smartassistant.services.address_suggestions.DEPRECEATEDAddressSuggestionsPlacesApi;
+import com.touchdown.app.smartassistant.services.address_suggestions.ArrayAdapterNoFilter;
+import com.touchdown.app.smartassistant.services.address_suggestions.GeocoderListener;
+import com.touchdown.app.smartassistant.services.address_suggestions.GeocoderTask;
 import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksListener;
 import com.touchdown.app.smartassistant.data.asyncTasks.RemoveTasksTask;
 import com.touchdown.app.smartassistant.data.asyncTasks.UpdateTaskListener;
@@ -42,18 +49,26 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+
+//TODO save user queries in database and make autocomplete using those, no other autocomplete
 public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickListener,
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMarkerDragListener, Observer, RemoveTasksListener, UpdateTaskListener, GeocoderListener {
+        GoogleMap.OnMarkerDragListener, Observer, RemoveTasksListener, UpdateTaskListener, GeocoderListener, TextWatcher {
 
     public static final String LOG_TAG = Map.class.getSimpleName();
+    private static final int AUTOCOMPLETE_DELAY = 500;
+    private static final int AUTOCOMPLETE_THRESHOLD = 2;
 
     private MarkerManager markerManager;
     private TaskManager taskManager;
-    private boolean onCreateRan;
+    private boolean activityCreated;
     private MyLocationProvider locProvider;
-    private EditText addressField;
+    private AutoCompleteTextView addressField;
     private LocationSpoofer locSpoofer;
+
+    private ArrayAdapter<String> autoCompleteAdapter;
+    private Handler delayedSuggestionHandler;
+    private AddressSuggestionTaskRunner addressSuggestionRunner;
 
     // Google Map
     private GoogleMap googleMap;
@@ -66,33 +81,12 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
         taskManager = TaskManager.getInstance(this);
 
         locProvider = new MyLocationProvider(this);
-        final Button findLocationBtn = (Button) findViewById(R.id.findLocationBtn);
-        findLocationBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText locationInput = (EditText) findViewById(R.id.locationInput);
-                String location = locationInput.getText().toString();
-                if(location!=null && !location.equals("")){
-                    new GeocoderTask(googleMap, getBaseContext(), Map.this).execute(location);
-                }
-            }
-        });
+
         initializeMap();
         markerManager = new MarkerManager(googleMap);
-        onCreateRan = true;
+        activityCreated = true;
 
-        addressField = (EditText) findViewById(R.id.locationInput);
-        addressField.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                Log.d(LOG_TAG, "keycode: " + keyCode);
-                if(event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_ENTER){
-                    findLocationBtn.performClick();
-                    return false;
-                }
-                return false;
-            }
-        });
+        setUpAddressFieldAndSearchButton();
 
     }
 
@@ -114,7 +108,7 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
             googleMap.setOnMarkerClickListener(this);
             googleMap.setOnInfoWindowClickListener(this);
             googleMap.setOnMarkerDragListener(this);
-            android.location.Location loc = locProvider.getLocation();
+            android.location.Location loc = locProvider.getCurrentLocation();
             animateToLocation(loc);
 
             // check if map is created successfully or not
@@ -134,11 +128,44 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
         }
     }
 
+    private void setUpAddressFieldAndSearchButton(){
+        final Button findLocationBtn = (Button) findViewById(R.id.findLocationBtn);
+        addressField = (AutoCompleteTextView) findViewById(R.id.locationInput);
+
+        findLocationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String location = addressField.getText().toString();
+                if(location!=null && !location.equals("")){
+                    new GeocoderTask(Map.this, true).execute(location);
+                }
+            }
+        });
+
+        autoCompleteAdapter = new ArrayAdapterNoFilter(this, android.R.layout.simple_dropdown_item_1line);
+        delayedSuggestionHandler = new Handler();
+        addressSuggestionRunner = new AddressSuggestionTaskRunner();
+
+        addressField.addTextChangedListener(this);
+        addressField.setAdapter(autoCompleteAdapter);
+        addressField.setThreshold(AUTOCOMPLETE_THRESHOLD);
+        addressField.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.d(LOG_TAG, "keycode: " + keyCode);
+                if(event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_ENTER){
+                    findLocationBtn.performClick();
+                    return false;
+                }
+                return false;
+            }
+        });
+    }
+
     public void setMarker(Marker marker){
         markerManager.saveMarker(marker, null);
         markerManager.selectMarker(marker);
     }
-
 
     //todo show the search field. If the search button is not pressed do not show it at all
     public void showSearch(){
@@ -232,7 +259,7 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
     @Override
     protected void onResume() {
         taskManager.addObserver(this);
-        if(!onCreateRan){
+        if(!activityCreated){
             markerManager.updateMarkerData();
             markerManager.unSelectMarker();
         }
@@ -241,7 +268,7 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
 
     @Override
     protected void onPause(){
-        onCreateRan = false;
+        activityCreated = false;
         taskManager.deleteObserver(this);
         super.onPause();
     }
@@ -352,6 +379,74 @@ public class Map extends ActionBarActivity implements GoogleMap.OnMapLongClickLi
         this.locSpoofer = new LocationSpoofer();
         locSpoofer.enable();
         Toast.makeText(this, "spoofer enabled", Toast.LENGTH_SHORT).show();
+    }
+/*
+
+    @Override
+    public void updateAddresses(List suggestions) {
+        List<String> list = suggestions;
+        autoCompleteAdapter.clear();
+
+        int index = 0;
+        for(String suggestion: list){
+            autoCompleteAdapter.add(suggestion);
+            Log.d(LOG_TAG, "address " + index + ": " + suggestion);
+            index++;
+        }
+        autoCompleteAdapter.notifyDataSetChanged();
+    }
+*/
+
+
+    @Override
+    public void updateAddresses(List addresses) {
+        List<Address> list = addresses;
+        autoCompleteAdapter.clear();
+
+        int index = 0;
+        for(Address a: list){
+            autoCompleteAdapter.add(getAddressString(a));
+            Log.d(LOG_TAG, "address " + index + ": " + a.toString());
+            index++;
+        }
+        autoCompleteAdapter.notifyDataSetChanged();
+    }
+
+    private String getAddressString(Address address){
+        String streetAdress = address.getMaxAddressLineIndex() > 0 ?
+                address.getAddressLine(0) + ", " : "";
+        String city = address.getLocality() == null ? "": address.getLocality() + ", ";
+        String country = address.getCountryName() == null ? "": address.getCountryName();
+        StringBuilder sb = new StringBuilder();
+        sb.append(streetAdress);
+        sb.append(city);
+        sb.append(country);
+        String addressText = sb.toString();
+        return addressText;
+    }
+
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        delayedSuggestionHandler.removeCallbacks(addressSuggestionRunner);
+        delayedSuggestionHandler.postDelayed(addressSuggestionRunner, AUTOCOMPLETE_DELAY);
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
+    private class AddressSuggestionTaskRunner implements Runnable {
+        @Override
+        public void run() {
+            new GeocoderTask(Map.this, false).execute(addressField.getText().toString());
+        }
     }
 }
 
